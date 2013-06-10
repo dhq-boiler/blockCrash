@@ -13,3 +13,5 @@ Release/
 *.cache
 *.vsp
 *.psess
+
+*.opensdf
