@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugLBC", "DebugLBC\DebugLBC.vcxproj", "{9C3530AF-D686-4D3E-AC62-EA8311F98D5A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{86E944EA-57FC-4C61-9172-4EAA06F58CE5} = {86E944EA-57FC-4C61-9172-4EAA06F58CE5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libBlockCrash", "libBlockCrash\libBlockCrash.vcxproj", "{86E944EA-57FC-4C61-9172-4EAA06F58CE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C3530AF-D686-4D3E-AC62-EA8311F98D5A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9C3530AF-D686-4D3E-AC62-EA8311F98D5A}.Debug|Win32.Build.0 = Debug|Win32
+		{9C3530AF-D686-4D3E-AC62-EA8311F98D5A}.Release|Win32.ActiveCfg = Release|Win32
+		{9C3530AF-D686-4D3E-AC62-EA8311F98D5A}.Release|Win32.Build.0 = Release|Win32
+		{86E944EA-57FC-4C61-9172-4EAA06F58CE5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{86E944EA-57FC-4C61-9172-4EAA06F58CE5}.Debug|Win32.Build.0 = Debug|Win32
+		{86E944EA-57FC-4C61-9172-4EAA06F58CE5}.Release|Win32.ActiveCfg = Release|Win32
+		{86E944EA-57FC-4C61-9172-4EAA06F58CE5}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
