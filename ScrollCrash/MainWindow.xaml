@@ -1,0 +1,35 @@
+﻿<Window x:Class="ScrollCrash.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:my="clr-namespace:libts;assembly=libts"
+        SizeToContent="WidthAndHeight"
+        Title="ScrollCrash">
+    <Grid x:Name="mainGrid"
+          Width="1280"
+          Height="800">
+        <Canvas x:Name="ViewCameraInputGrid"
+                Width="1280"
+                Height="800"
+                Visibility="Visible">
+            <Image x:Name="PreviewImage"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Left"
+                   Width="1280"
+                   Height="800" />
+            <Grid x:Name="InitializeGrid"
+                  Width="640"
+                  Height="480"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Center"
+                  Visibility="Visible">
+                <Button x:Name="StartCalibration"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Width="100"
+                        Height="50"
+                        Visibility="Hidden"
+                        Click="StartCalibration_Click">Calibrate</Button>
+            </Grid>
+        </Canvas>
+    </Grid>
+</Window>
