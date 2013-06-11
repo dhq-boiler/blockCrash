@@ -9,6 +9,7 @@ Release/
 *.v11.suo
 
 *.sdf
+*.opensdf
 
 *.cache
 *.vsp

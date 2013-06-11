@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenCvItmdUtil">
-      <HintPath>..\..\NMBridge\Release_Parallel\OpenCvItmdUtil.dll</HintPath>
+      <HintPath>..\..\nmbridge\Release\OpenCvItmdUtil.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp">
       <HintPath>..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.dll</HintPath>
