@@ -119,7 +119,7 @@ bool MAIN::All(){
 		}
 		if(m_actcount == 1){
 			if(barselect->All()){ // ‘I‘ðI—¹‚Åtrue‚ð•Ô‚·
-				stageselect->SetValue( barselect->mbar, 0, 0, 2);
+				stageselect->SetValue( barselect->mbar, 1, 0, 2);
 				m_actcount = 2;
 			}
 			rB = lB = eB = false;

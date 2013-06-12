@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DxLibDLL;
 
 namespace libBlockCrashBridge
 {
@@ -18,15 +19,47 @@ namespace libBlockCrashBridge
         private bool end;
         private int accel;
         private int mbar;
+        private Input input;
 
         private void Draw()
         {
-            throw new NotImplementedException();
+            DX.DrawExtendGraph(x - width * ex / 4, y - height / 2,
+                x + width * ex / 4, y + height / 2, gh[mbar], 1);
         }
 
-        private void KeyGet()
+        private bool KeyGet()
         {
-            throw new NotImplementedException();
+            bool on = false;
+
+            if (input.barx != 0) //バーの移動
+            {
+                x = input.barx;
+                on = true;
+            }
+
+            if (input.key256[Input.KEY_INPUT_LEFT] == 1)
+            {
+                //左に移動
+                x -= Main.SPEED;
+                accel = -1;
+                on = true;
+            }
+
+            if (input.key256[Input.KEY_INPUT_ESCAPE] == 1)
+            {
+                //エスケープキーが押されていれば終了フラグをtrueにする
+                endflag = true;
+            }
+            
+            //画面のはみ出し処理
+            if (x < width * ex / 4)
+                x = width * ex / 4;
+
+            if (x > Main.WIDTH - width * ex / 4)
+                x = Main.WIDTH - width * ex / 4;
+
+            mx = x;
+            return on;
         }
 
         public void Destroy()
@@ -34,59 +67,93 @@ namespace libBlockCrashBridge
             throw new NotImplementedException();
         }
 
-        public Bar(int barnum)
+        public Bar(Input input, int barnum)
         {
-            throw new NotImplementedException();
+            this.input = input;
+
+            gh = new int[3];
+            gh[0] = DX.LoadGraph("bar.bmp"); //バー１
+            gh[1] = DX.LoadGraph("barsecond.bmp"); //バー２
+            gh[2] = DX.LoadGraph("barthird.bmp"); //バー3
+
+            mbar = barnum - 1;
+
+            DX.GetGraphSize(gh[mbar], out width, out height);
+
+            //y座標は固定なのでここで設定
+            y = 540;
+
+            //最初は真ん中
+            x = Main.WIDTH / 2;
+
+            //拡大率の初期化
+            ex = 2;
+
+            //終了フラグは偽にしとく
+            endflag = false;
+
+            end = false;
         }
 
         public bool All()
         {
-            throw new NotImplementedException();
+            if (!end)
+            {
+                //キー処理
+                if (!KeyGet())
+                    accel = 0;
+            }
+
+            //描画処理
+            Draw();
+
+            //終了フラグを返す
+            return endflag;
         }
 
         public void SetX(int vx)
         {
-            throw new NotImplementedException();
+            x = vx;
         }
 
         public int GetX()
         {
-            throw new NotImplementedException();
+            return x;
         }
 
         public int GetY()
         {
-            throw new NotImplementedException();
+            return y;
         }
 
         public int GetWidth()
         {
-            throw new NotImplementedException();
+            return width;
         }
 
         public int GetHeight()
         {
-            throw new NotImplementedException();
+            return height;
         }
 
         public int GetAcceleration()
         {
-            throw new NotImplementedException();
+            return accel;
         }
 
         public void SetFlag(bool flag)
         {
-            throw new NotImplementedException();
+            end = flag;
         }
 
         public void ExtendWidth()
         {
-            throw new NotImplementedException();
+            ++ex;
         }
 
         public void Reset()
         {
-            throw new NotImplementedException();
+            ex = 2;
         }
 
         public int mx;

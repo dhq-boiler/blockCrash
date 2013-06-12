@@ -16,6 +16,7 @@ namespace libBlockCrashBridge
 
         public Game()
         {
+            input = new Input();
             main = new Main(input);
         }
 

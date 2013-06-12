@@ -46,6 +46,7 @@
     <Compile Include="Bar.cs" />
     <Compile Include="BarSelect.cs" />
     <Compile Include="Block.cs" />
+    <Compile Include="Color.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Input.cs" />
@@ -56,6 +57,9 @@
     <Compile Include="Title.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(ProjectDir)DxLib.dll C:\Git\blockcrash\libblockcrashbridge\$(OutDir)DxLib.dll</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

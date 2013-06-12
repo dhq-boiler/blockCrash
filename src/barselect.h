@@ -36,7 +36,7 @@ public:
 	void SetFlag(bool);
 	bool GetFlag();
 	void Reset();
-	void SetValue(int bar, int stage, int score, int stock);
+	//void SetValue(int bar, int stage, int score, int stock);
 
 	// ‘I‘ğƒo[í—Ş
 	int mbar;

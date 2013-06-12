@@ -11,12 +11,13 @@ int main()
 	while(true){
 		if(actcount == 0){
 			GAME *game = new GAME;
-			boost::thread th(boost::bind(&GAME::GameStart, game));
-			boost::thread th2(boost::bind(&ct, game));
+			/*boost::thread th(boost::bind(&GAME::GameStart, game));
+			boost::thread th2(boost::bind(&ct, game));*/
+			game->GameStart();
 			++actcount;
 		}
 	}
 }
 void ct(GAME *game){ // オートモード　// 解除にはAuto(false)を行う
-	game->Auto( true );
+	game->Auto( false );
 }

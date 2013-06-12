@@ -21,17 +21,18 @@ namespace libBlockCrashBridge
         private bool automode;
         private Input input;
 
-        const int WIDTH = 800;
-        const int HEIGHT = 600;
-        const int REFRESHRATE = 16;
+        public const int WIDTH = 800;
+        public const int HEIGHT = 600;
+        public const int REFRESHRATE = 16;
+        public const int SPEED = 8;
         
         private void ReStart()
         {
             input.Clear();
 
-            title = new Title();
-            barselect = new BarSelect();
-            stageselect = new StageSelect();
+            title = new Title(input);
+            barselect = new BarSelect(input);
+            stageselect = new StageSelect(input);
             act = 0;
             stock = 0;
             keycheck = true;
@@ -127,7 +128,7 @@ namespace libBlockCrashBridge
                 {
                     if (barselect.All()) //barselect.All() は選択終了でtrueを返す
                     {
-                        stageselect.SetValue(barselect.mbar, 0, 0, 2);
+                        stageselect.SetValue(barselect.mbar, 1, 0, 2);
                         m_actcount = 2;
                     }
                     input.rB = input.lB = input.eB = false;
@@ -139,7 +140,7 @@ namespace libBlockCrashBridge
                     {
                         m_actcount = 3;
                         stock = stageselect.mstock;
-                        control = new Control(stageselect.mbar, stageselect.mstage, stageselect.mscore, stock);
+                        control = new Control(input, stageselect.mbar, stageselect.mstage, stageselect.mscore, stock);
                     }
                     input.rB = input.lB = input.eB = false;
                 }
@@ -154,7 +155,7 @@ namespace libBlockCrashBridge
                         {
                             if (act == 0)
                             {
-                                message = new Message(1, 50);
+                                message = new Message(input, 1, 50);
                                 ++act;
                             }
 
@@ -170,7 +171,7 @@ namespace libBlockCrashBridge
                         {
                             if (act == 0)
                             {
-                                message = new Message(3, 200);
+                                message = new Message(input, 3, 200);
                                 ++act;
                             }
 
@@ -189,7 +190,7 @@ namespace libBlockCrashBridge
                     {
                         if (act == 0)
                         {
-                            message = new Message(2, 200);
+                            message = new Message(input, 2, 200);
                             ++act;
                         }
 
@@ -244,9 +245,9 @@ namespace libBlockCrashBridge
             DX.SetDrawScreen(DX.DX_SCREEN_BACK);
 
             //キーボードの状態を取得
-            title = new Title();
-            barselect = new BarSelect();
-            stageselect = new StageSelect();
+            title = new Title(input);
+            barselect = new BarSelect(input);
+            stageselect = new StageSelect(input);
             m_actcount = 0;
             act = 0;
             stock = 0;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DxLibDLL;
 
 namespace libBlockCrashBridge
 {
@@ -14,35 +15,53 @@ namespace libBlockCrashBridge
         private bool decisionflag;
         private int sh;
         private int dh;
+        private Input input;
 
         private void Draw()
         {
-            throw new NotImplementedException();
+            DX.DrawGraph(0, 0, titlegh, 1); //タイトル表示
         }
 
         private void KeyGet()
         {
-            throw new NotImplementedException();
+            if (input.rB || input.lB || input.eB) //ボタンon
+                endflag = true;
         }
 
         public bool All()
         {
-            throw new NotImplementedException();
+            //キー処理
+            KeyGet();
+
+            //描画処理
+            Draw();
+
+            return endflag;
         }
 
-        public Title()
+        public Title(Input input)
         {
-            throw new NotImplementedException();
+            this.input = input;
+            titlegh = DX.LoadGraph("title.png"); // タイトル
+
+            selectflag = false;
+            decisionflag = false;
+
+            endflag = false;
+
+            //音声ファイル読み込み。
+            sh = DX.LoadSoundMem("bound.wav");
+            dh = DX.LoadSoundMem("demolish.wav");
         }
 
         public void SetFlag(bool flag)
         {
-            throw new NotImplementedException();
+            endflag = flag;
         }
 
         public bool GetFlag()
         {
-            throw new NotImplementedException();
+            return endflag;
         }
     }
 }
