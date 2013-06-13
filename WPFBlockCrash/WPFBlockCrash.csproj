@@ -47,6 +47,14 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ball.cs" />
+    <Compile Include="Bar.cs" />
+    <Compile Include="BarSelect.cs" />
+    <Compile Include="Block.cs" />
+    <Compile Include="Control.cs" />
+    <Compile Include="Message.cs" />
+    <Compile Include="StageSelect.cs" />
+    <Compile Include="Title.cs" />
     <Page Include="BlockCrashView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -57,6 +65,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Input.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -73,6 +83,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

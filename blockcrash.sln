@@ -10,10 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollCrash", "ScrollCrash\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libBlockCrash", "libBlockCrash\libBlockCrash.vcxproj", "{86E944EA-57FC-4C61-9172-4EAA06F58CE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libBlockCrashBridge", "libBlockCrashBridge\libBlockCrashBridge.csproj", "{AA5FA04A-2A59-4078-866A-24BCB60085E3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libBlockCrashBridgeTest", "libBlockCrashBridgeTest\libBlockCrashBridgeTest.csproj", "{A3AA4797-6C47-4023-982F-82C79CB751C4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFBlockCrash", "WPFBlockCrash\WPFBlockCrash.csproj", "{1AD63B96-723B-436E-95DE-064F055C3EE2}"
 EndProject
 Global
@@ -60,28 +56,6 @@ Global
 		{86E944EA-57FC-4C61-9172-4EAA06F58CE5}.Release|Mixed Platforms.Deploy.0 = Release|Win32
 		{86E944EA-57FC-4C61-9172-4EAA06F58CE5}.Release|Win32.ActiveCfg = Release|Win32
 		{86E944EA-57FC-4C61-9172-4EAA06F58CE5}.Release|Win32.Build.0 = Release|Win32
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Debug|Win32.Build.0 = Debug|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Release|Win32.ActiveCfg = Release|Any CPU
-		{AA5FA04A-2A59-4078-866A-24BCB60085E3}.Release|Win32.Build.0 = Release|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{A3AA4797-6C47-4023-982F-82C79CB751C4}.Release|Win32.ActiveCfg = Release|Any CPU
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
