@@ -3,44 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace WPFBlockCrash
 {
-    enum ItemType
+    enum EItemType
     {
         ITEMTYPE_LONG,
         ITEMTYPE_POWERUP,
         ITEMTYPE_INCRESE,
         ITEMTYPE_1UP,
-        ITEMTYPE_SCOREUP
+        ITEMTYPE_SCOREUP,
+        ITEMTYPE_NO
     }
 
     class Block
     {
-        //private int x, y;
-        private int width, height, itemwidth, itemheight;
-        //private bool endflag;
-
-        //private static int[] gh;
-        //private static int[] itemgh;
-
-        private static bool IsFirstInstance = false;
-        private static Image[] gh = new Image[8];
-        private static Image[] itemgh = new Image[5];
+        private static bool IsFirstInstance = true;
+        private static ImageSource[] gh = new ImageSource[8];
+        private static ImageSource[] itemgh = new ImageSource[5];
 
         private bool half;
         private int count;
 
-        //public bool itemflag { get; set; }
-        public ItemType it { get; private set; }
+        public EItemType ItemType { get; private set; }
 
         public int X { get; private set; }
         public int Y { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public bool EndFlag { get; set; }
-        public bool ItemFlag { get; set; }
+        public int ItemWidth { get; private set; }
+        public int ItemHeight { get; private set; }
+        public bool IsDead { get; set; }
+
+        private bool itemflag;
+        public bool ItemFlag
+        {
+            get { return itemflag; }
+            set
+            {
+                if (itemflag && !value)
+                    WasItem = true;
+                itemflag = value;
+            }
+        }
+
+        private bool WasItem;
         public bool HalfFlag
         {
             get { return half; }
@@ -58,42 +67,48 @@ namespace WPFBlockCrash
         {
             if (IsFirstInstance)
             {
-                gh[0] = new Image() { Source = new BitmapImage(new Uri("block1.bmp")) };
-                gh[1] = new Image() { Source = new BitmapImage(new Uri("block2.bmp")) };
-                gh[2] = new Image() { Source = new BitmapImage(new Uri("block3.bmp")) };
-                gh[3] = new Image() { Source = new BitmapImage(new Uri("block4.bmp")) };
-                gh[4] = new Image() { Source = new BitmapImage(new Uri("block1in.bmp")) };
-                gh[5] = new Image() { Source = new BitmapImage(new Uri("block2in.bmp")) };
-                gh[6] = new Image() { Source = new BitmapImage(new Uri("block3in.bmp")) };
-                gh[7] = new Image() { Source = new BitmapImage(new Uri("block4in.bmp")) };
+                gh = new ImageSource[8];
+                itemgh = new ImageSource[5];
 
-                itemgh[0] = new Image() { Source = new BitmapImage(new Uri("item_long.bmp")) };
-                itemgh[1] = new Image() { Source = new BitmapImage(new Uri("item_powerup.bmp")) };
-                itemgh[2] = new Image() { Source = new BitmapImage(new Uri("item_increse.bmp")) };
-                itemgh[3] = new Image() { Source = new BitmapImage(new Uri("item_1up.bmp")) };
-                itemgh[4] = new Image() { Source = new BitmapImage(new Uri("item_scoreup.bmp")) };
+                gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "block1.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "block2.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "block3.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "block4.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "block1in.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "block2in.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[6] = new BitmapImage(new Uri(Main.ResourceDirectory, "block3in.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[7] = new BitmapImage(new Uri(Main.ResourceDirectory, "block4in.bmp")) { CreateOptions = BitmapCreateOptions.None };
+
+                itemgh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_long.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                itemgh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_powerup.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                itemgh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_increse.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                itemgh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_1up.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                itemgh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_scoreup.bmp")) { CreateOptions = BitmapCreateOptions.None };
 
                 IsFirstInstance = false;
             }
 
-            width = (int)gh[0].ActualWidth;
-            height = (int)gh[0].ActualHeight;
-            itemwidth = (int)itemgh[0].ActualWidth;
-            itemheight = (int)itemgh[0].ActualHeight;
+            BitmapImage bs = gh[0] as BitmapImage;
+            BitmapImage bsitem = itemgh[0] as BitmapImage;
+                        
+            Width = (int)bs.PixelWidth;
+            Height = (int)bs.PixelHeight;
+            ItemWidth = (int)bsitem.PixelWidth;
+            ItemHeight = (int)bsitem.PixelHeight;
 
-            EndFlag = false;
+            IsDead = false;
 
-            Random rand = new Random(Environment.TickCount);
-            int r = rand.Next() % 5;
+            //Random rand = new Random(Environment.TickCount);
+            int r = Main.rand.Next() % 5;
             if (r == 1)
             {
                 ItemFlag = true;
-                it = (ItemType)(rand.Next() % 5);
+                ItemType = (EItemType)(Main.rand.Next() % 5);
             }
             else
             {
                 ItemFlag = false;
-                it = (ItemType)0;
+                ItemType = EItemType.ITEMTYPE_NO;
             }
 
             this.X = x;
@@ -103,9 +118,47 @@ namespace WPFBlockCrash
             half = false;
         }
 
-        internal void All(int p)
+        internal void Process(DrawingContext dc, int blockhandle)
         {
-            throw new NotImplementedException();
+            Draw(dc, blockhandle);
+        }
+
+        private void Draw(DrawingContext dc, int blockhandle)
+        {
+            if (half)
+            {
+                if (!IsDead)
+                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
+                else if (ItemFlag)
+                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                else
+                {
+                    if (count < 20)
+                    {
+                        dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
+                        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
+                        dc.Pop();
+                        ++count;
+                    }
+                }
+            }
+            else
+            {
+                if (!IsDead)
+                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
+                else if (ItemFlag)
+                    DrawUtil.DrawExtendGraph(dc, X - ItemWidth / 2, Y - ItemHeight / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                else
+                {
+                    if (count < 20)
+                    {
+                        dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
+                        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
+                        dc.Pop();
+                        ++count;
+                    }
+                }
+            }
         }
     }
 }

@@ -11,6 +11,13 @@ del .\DebugLBC\*.wav /Q
 del .\DebugLBC\*.png /Q
 del .\DebugLBC\*.bmp /Q
 
+
+del .\ScrollCrash\*.wav /Q
+del .\ScrollCrash\*.png /Q
+del .\ScrollCrash\*.bmp /Q
+
+
+
 rmdir .\libBlockCrash\Debug /S /Q
 rmdir .\libBlockCrash\Release /S /Q
 

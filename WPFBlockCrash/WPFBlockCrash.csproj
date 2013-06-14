@@ -52,6 +52,8 @@
     <Compile Include="BarSelect.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="Control.cs" />
+    <Compile Include="DisplayInfo.cs" />
+    <Compile Include="DrawUtil.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="StageSelect.cs" />
     <Compile Include="Title.cs" />

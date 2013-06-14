@@ -117,7 +117,19 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WPFBlockCrash\WPFBlockCrash.csproj">
+      <Project>{1ad63b96-723b-436e-95de-064f055c3ee2}</Project>
+      <Name>WPFBlockCrash</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>mkdir $(ProjectDir)$(OutDir)res\
+copy "$(SolutionDir)res\*.wav" "$(ProjectDir)$(OutDir)res\*.wav"
+copy "$(SolutionDir)res\*.png" "$(ProjectDir)$(OutDir)res\*.png"
+copy "$(SolutionDir)res\*.bmp" "$(ProjectDir)$(OutDir)res\*.bmp"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

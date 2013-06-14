@@ -8,6 +8,12 @@ namespace WPFBlockCrash
 {
     class Input
     {
+        public const int KEY_INPUT_A = 0x1E;
+
+        public const int KEY_INPUT_LEFT = 0xCB;
+        public const int KEY_INPUT_RIGHT = 0xCD;
+        public const int KEY_INPUT_ESCAPE = 0x01;
+
         public Input()
         {
             key256 = new char[256];
@@ -55,5 +61,7 @@ namespace WPFBlockCrash
         public bool IsFinished { get; set; }
         public int barx { get; set; }
         public char[] key256 { get; set; }
+
+        public bool IsFinishing { get; set; }
     }
 }

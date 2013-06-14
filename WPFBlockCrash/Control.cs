@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Media;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -12,7 +14,9 @@ namespace WPFBlockCrash
 {
 	class Control
 	{
-		private Input input;
+		private const int MAX_SBALLCOUNT = 20;
+		private const int MAX_BLOCKCOUNT = 100;
+
 		private Bar bar;
 		private Ball ball;
 		private Ball[] sBall;
@@ -23,9 +27,10 @@ namespace WPFBlockCrash
 		private int bdwidth, bdheight, blwidth, blheight, bkwidth, bkheight;
 
 		private int exwidth;
-		private bool boundFlag, demolishFlag;
+		private bool boundFlag;
+		private bool demolishFlag;
 
-		private int bh, dh;
+		//private int bh, dh;
 		private SoundPlayer playerBH;
 		private SoundPlayer playerDH;
 		
@@ -33,7 +38,7 @@ namespace WPFBlockCrash
 		private int mLevel, mScore, mStock;
 
 		//private int gh;
-		private Image gh;
+		private ImageSource gh;
 
 		private int act;
 		private int sumblock;
@@ -42,20 +47,24 @@ namespace WPFBlockCrash
 		private int barnum;
 		private int ballspup;
 		private int vspeed;
+		private DisplayInfo dInfo;
+
 		public bool clear;
 
 		public int Stock { get; set; }
 
-		public Control(Input input, int mbar, int stage, int score, int stock)
+		public Control(int mbar, int stage, int score, int stock, DisplayInfo dInfo)
 		{
-			this.input = input;
-
+			this.dInfo = dInfo;
 			barnum = mbar;
 	
 			//バーとボールのインスタンスを生成
-			bar = new Bar(input, barnum);
-			ball = new Ball(input);
+			bar = new Bar(barnum, dInfo);
+			ball = new Ball(dInfo);
 			ballspup = 0;
+
+			block = new Block[MAX_BLOCKCOUNT];
+			sBall = new Ball[MAX_SBALLCOUNT];
 
 			boundFlag=false;
 			demolishFlag=false;
@@ -67,26 +76,25 @@ namespace WPFBlockCrash
 			mStage = stage;
 			vspeed = 0;
 
-			Random rand = new Random(Environment.TickCount);
+			//Random rand = new Random(Environment.TickCount);
 	
 			//バーの幅と高さ
-			bdwidth = bar.GetWidth();
-			bdheight = bar.GetHeight();
+			bdwidth = bar.Width;
+			bdheight = bar.Height;
 
 			// バーが拡大する長さ
 			exwidth = (int)bdwidth/2;
 
 			//ボールの幅と高さ
-			blwidth = ball.GetWidth();
-			blheight = ball.GetHeight();
+			blwidth = ball.Width;
+			blheight = ball.Height;
 
 			//音声ファイル読み込み。
-			playerBH = new SoundPlayer("bound.wav");
-			playerDH = new SoundPlayer("demolish.wav");
+			playerBH = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
+			playerDH = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
 
 			// 残機表示の読み込み
-			//gh = LoadGraph(TEXT("ball_b.png")); // 通常弾
-			gh = new Image() { Source = new BitmapImage(new Uri("ball_b.png")) };
+			gh = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_b.png"));
 
 	
 			switch( mStage ){
@@ -268,7 +276,7 @@ namespace WPFBlockCrash
 			bkheight = block[0].Height;
 		}
 
-		internal bool All()
+		internal bool Process(Input input, DrawingContext dc)
 		{
 			bool back, sballdrop;
 			int itemhandle;
@@ -276,31 +284,32 @@ namespace WPFBlockCrash
 
 			for (int i = 0; i < sumblock; ++i)
 			{
-				if (block[i].EndFlag)
+				if (block[i].IsDead)
 					++count;
 				if (block[i].ItemFlag)
 					itemhandle = 4;
 				else
 					itemhandle = 0;
+
 				switch (mStage)
 				{
 					case 1: if (i < 7)
-							block[i].All(0 + itemhandle);
+							block[i].Process(dc, 0 + itemhandle);
 						else if (i > 6 && i < 14)
-							block[i].All(1 + itemhandle);
+							block[i].Process(dc, 1 + itemhandle);
 						else if (i > 13 && i < 21)
-							block[i].All(2 + itemhandle);
+							block[i].Process(dc, 2 + itemhandle);
 						else
-							block[i].All(3 + itemhandle);
+							block[i].Process(dc, 3 + itemhandle);
 						break;
 					default: if (i % 4 == 0)
-							block[i].All(0 + itemhandle);
+							block[i].Process(dc, 0 + itemhandle);
 						else if (i % 4 == 1)
-							block[i].All(1 + itemhandle);
+							block[i].Process(dc, 1 + itemhandle);
 						else if (i % 4 == 2)
-							block[i].All(2 + itemhandle);
+							block[i].Process(dc, 2 + itemhandle);
 						else
-							block[i].All(3 + itemhandle);
+							block[i].Process(dc, 3 + itemhandle);
 						break;
 
 				}
@@ -315,15 +324,16 @@ namespace WPFBlockCrash
 				bar.X = ball.X;
 			}
 			//バーの処理
-			bar.All();
+			bar.Process(input, dc);
 
-			if (ball.m_actcount == 0)
+			if (ball.ActCount == 0)
 			{
 				ball.X = bar.MX;
 			}
 
 			// ボールの動き
 			++ballspup; // 速度上昇カウント
+
 			switch (barnum)
 			{ // バーによりの速度上昇の早さが違う
 				case 1: if (ballspup % 1500 == 0)
@@ -342,14 +352,16 @@ namespace WPFBlockCrash
 					}
 					break;
 			}
+
 			++vspeed; // 進まなくなったとき用カウントの増加
+
 			if (vspeed == 1000)
 			{
 				vspeed = 0;
 				ball.spchange();
 			}
 
-			back = ball.All();
+			back = ball.Process(input, dc);
 
 			//ボールとバーの当たり判定
 			HitCheckBallAndBar(ball);
@@ -357,52 +369,61 @@ namespace WPFBlockCrash
 			//ボールとブロックの当たり判定
 			HitCheckBallAndBlock(ball);
 
-
 			// 小玉があれば表示　// 謎の挙動
 			for (int i = 0; i < sballcount; ++i)
 			{
-				if (sball[i] == null)
+				if (sBall[i] == null)
 					continue;
-				sballdrop = sball[i].All();
+
+				sballdrop = sBall[i].Process(input, dc);
+
 				//ボールとバーの当たり判定
-				HitCheckBallAndBar(sball[i]);
+				HitCheckBallAndBar(sBall[i]);
 				//ボールとブロックの当たり判定
-				HitCheckBallAndBlock(sball[i]);
+
+				HitCheckBallAndBlock(sBall[i]);
 				if (sballdrop)
-					sball[i] = null;
+				{
+					sBall[i] = null;
+					--sballcount;
+				}
 			}
 
-			accel = bar.GetAcceleration(); // デバック用
+			accel = bar.Accel; // デバック用
+			
 			// 得点、レベル、残機枠の表示
-			DrawBox(0, 0, 800, 30, RGB(230, 230, 230), true);
-			DrawFormatString(20, 10, RGB(255, 120, 0), TEXT("SCORE: %d"), mscore);
-			DrawFormatString(220, 10, RGB(10, 120, 120), TEXT("LEVEL: %d"), ball.level);
-			for (int i = 0; i < mstock; ++i)
-				DrawGraph(540 + 18 * i, 7, gh, TRUE);
+			DrawUtil.DrawBox(dc, 0, 0, 800, 30, Color.FromRgb(230, 230, 230), 3, null);
+			DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", mScore), Color.FromRgb(255, 120, 0));
+			DrawUtil.DrawString(dc, 220, 10, string.Format("LEVEL: {0}", ball.Level), Color.FromRgb(255, 120, 0));
+
+			for (int i = 0; i < mStock; ++i)
+			{
+				dc.DrawImage(gh, new Rect(540 + 18 * i, 7, gh.Width, gh.Height));
+			}
 
 			///音再生
 			SoundPlay();
 
 			if (back)
 			{
-				//bar.SetFlag(true);
-				bar.Flag = true;
+				bar.IsDead = true;
 				ball.DX = 0;
 			}
 			if (clear)
 			{
 				ball.DX = 0;
 				ball.DY = 0;
+
 				// 小玉があれば表示
 				for (int i = 0; i < sballcount; ++i)
 				{
-					if (sball[i] == null)
+					if (sBall[i] == null)
 						continue;
-					sball[i].DX = 0;
-					sball[i].DY = 0;
+					sBall[i].DX = 0;
+					sBall[i].DY = 0;
 				}
 				vspeed = 0;
-				bar.Flag = true;
+				bar.IsDead = true;
 			}
 
 			return back;
@@ -410,22 +431,256 @@ namespace WPFBlockCrash
 
 		private void SoundPlay()
 		{
-			throw new NotImplementedException();
+			if (boundFlag)
+				playerBH.Play(); //非同期
+
+			if (demolishFlag)
+				playerDH.Play(); //非同期
 		}
 
 		private void HitCheckBallAndBlock(Ball ball)
 		{
-			throw new NotImplementedException();
+			demolishFlag = false;
+
+			blx = ball.X;
+			bly = ball.Y;
+
+			for (int i = 0; i < sumblock; ++i)
+			{
+				if (!block[i].IsDead)
+				{
+					bkx = block[i].X;
+					bky = block[i].Y;
+
+					if (blx < bkx + bkwidth / 2
+						&& blx > bkx - bkwidth / 2
+						&& bly + blheight / 2 > bky - bkheight / 2
+						&& bly + blheight / 2 < bky + bkheight / 2)
+					{
+						vspeed = 0;
+
+						block[i].IsDead = true;
+						demolishFlag = true;
+
+						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+							ball.DY = -ball.DY;
+					}
+					else if (blx < bkx + bkwidth / 2
+						&& blx > bkx - bkwidth / 2
+						&& bly - blheight / 2 > bky - bkheight / 2
+						&& bly - blheight / 2 < bky + bkheight / 2)
+					{
+						vspeed = 0;
+
+						block[i].IsDead = true;
+						demolishFlag = true;
+						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+							ball.DY = -ball.DY;
+					}
+					else if (blx + blwidth / 2 < bkx - bkwidth / 2 + blwidth
+						&& blx + blwidth / 2 > bkx - bkwidth / 2
+						&& bly > bky - bkheight / 2
+						&& bly < bky + bkheight / 2)
+					{
+						vspeed = 0;
+
+						block[i].IsDead = true;
+						demolishFlag = true;
+						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+							ball.DX = -ball.DX;
+					}
+					else if (blx - blwidth / 2 < bkx + bkwidth / 2
+						&& blx - blwidth / 2 > bkx + bkwidth / 2 - blwidth
+						&& bly > bky - bkheight / 2
+						&& bly < bky + bkheight / 2)
+					{
+						vspeed = 0;
+
+						block[i].IsDead = true;
+						demolishFlag = true;
+						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+							ball.DX = -ball.DX;
+					}
+
+					if (block[i].IsDead)
+					{
+						mScore += 100 + 50 * ball.Level;
+						ball.Radius = 0;
+					}
+				}
+				else if (block[i].ItemFlag)
+				{
+					bkx = block[i].X;
+					bky = block[i].Y;
+
+					if (blx < bkx + bkwidth / 2
+						&& blx > bkx - bkwidth / 2
+						&& bly + blheight / 2 > bky - bkheight / 2
+						&& bly + blheight / 2 < bky + bkheight / 2)
+					{
+						vspeed = 0;
+
+						block[i].ItemFlag = false;
+
+						ItemEffect(block[i].ItemType, blx, bly);
+
+						demolishFlag = true;
+					}
+					else if (blx < bkx + bkwidth / 2
+						&& blx > bkx - bkwidth / 2
+						&& bly - blheight / 2 > bky - bkheight / 2
+						&& bly - blheight / 2 < bky + bkheight / 2)
+					{
+						vspeed = 0;
+
+						block[i].ItemFlag = false;
+
+						ItemEffect(block[i].ItemType, blx, bly);
+
+						demolishFlag = true;
+					}
+					else if (blx + blwidth / 2 < bkx - bkwidth / 2 + blwidth
+						&& blx + blwidth / 2 > bkx - bkwidth / 2
+						&& bly > bky - bkheight / 2
+						&& bly < bky + bkheight / 2)
+					{
+						vspeed = 0;
+
+						block[i].ItemFlag = false;
+
+						ItemEffect(block[i].ItemType, blx, bly);
+
+						demolishFlag = true;
+					}
+					else if (blx - blwidth / 2 < bkx + bkwidth / 2
+						&& blx - blwidth / 2 > bkx + bkwidth / 2 - blwidth
+						&& bly > bky - bkheight / 2
+						&& bly < bky + bkheight / 2)
+					{
+						vspeed = 0;
+
+						block[i].ItemFlag = false;
+
+						ItemEffect(block[i].ItemType, blx, bly);
+
+						demolishFlag = true;
+					}
+
+					if (!block[i].ItemFlag)
+						mScore += 300;
+				}
+			}
+		}
+
+		private void ItemEffect(EItemType eItemType, int blx, int bly)
+		{
+			int ct = 0;
+			int index = 0;
+			switch (eItemType)
+			{
+				case EItemType.ITEMTYPE_LONG:
+					if (barnum != 3)
+					{
+						bar.ExtendWidth();
+						bdwidth += exwidth;
+					}
+					break;
+				case EItemType.ITEMTYPE_POWERUP:
+					ball.PowerUp();
+					break;
+				case EItemType.ITEMTYPE_INCRESE:
+					while (true)
+					{
+						if (sBall[sballcount + index] != null)
+						{
+							++index;
+							continue;
+						}
+						if (sballcount + index >= MAX_SBALLCOUNT)
+						{
+							break;
+						}
+						sBall[sballcount + index] = new Ball(dInfo);
+						sBall[sballcount + index].Increse(blx, bly);
+						++sballcount;
+						++ct;
+						if (ct == 3) break;
+					}
+					break;
+				case EItemType.ITEMTYPE_1UP:
+					++mStock;
+					break;
+				case EItemType.ITEMTYPE_SCOREUP:
+					mScore += 2000;
+					break;
+			}
 		}
 
 		private void HitCheckBallAndBar(Ball ball)
 		{
-			throw new NotImplementedException();
+			boundFlag = false;
+
+			boundFlag = ball.PlaySound;
+
+			bdx = bar.X;
+			bdy = bar.Y;
+
+			blx = ball.X;
+			bly = ball.Y;
+
+			if (Math.Abs(bdy - bly) < blheight / 2 + bdheight / 2)
+			{
+				if (bdx + bdwidth / 2 > blx
+					&& bdx - bdwidth / 2 < blx)
+				{
+					ball.Radius = 20;
+
+					if (blx < bdx - bdwidth / 2 * 2 / 3)
+					{
+						if (barnum == 3)
+							ball.LvUp(1);
+
+						ball.DX = -ball.DX;
+						ball.DY = -ball.DY;
+						ball.Y = ball.Y - 5;
+
+						boundFlag = true;
+					}
+					else if (blx > bdx + bdwidth / 2 * 2 / 3)
+					{
+						if (barnum == 3)
+							ball.LvUp(1);
+
+						ball.DX = -ball.DX;
+						ball.DY = -ball.DY;
+						ball.Y = ball.Y - 5;
+
+						boundFlag = true;
+					}
+					else
+					{
+						if (barnum == 3)
+							ball.LvUp(1);
+
+						ball.DY = -ball.DY;
+						ball.Y = ball.Y - 5;
+						boundFlag = true;
+					}
+				}
+			}
 		}
 
 		internal void Reset()
 		{
-			throw new NotImplementedException();
+			for (int i = 0; i < sballcount; ++i)
+				sBall[i] = null;
+
+			sballcount = 0;
+			--mStock;
+			bdwidth = bar.Width;
+			bar.Reset();
+			ball.Reset();
+			bar.IsDead = false;
 		}
 
 		public int Bar { get; set; }

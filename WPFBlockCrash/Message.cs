@@ -3,30 +3,75 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace WPFBlockCrash
 {
     class Message
     {
-        private Input input;
-        private int p1;
-        private int p2;
+        private int pattern;
+        private int count;
+        private string message;
+        private DisplayInfo dInfo;
 
-        public Message(Input input)
+        public bool IsDead { get; set; }
+
+        public Message(int pattern, int count, DisplayInfo dInfo)
         {
-            this.input = input;
+            this.dInfo = dInfo;
+            this.pattern = pattern;
+            this.count = count;
+
+            IsDead = false;
+
+            switch (pattern)
+            {
+                case 1:
+                    message = "BALL FAILED!!";
+                    break;
+                case 2:
+                    message = "CLEAR!!";
+                    break;
+                case 3:
+                    message = "GAME OVER!!";
+                    break;
+            }
         }
 
-        public Message(int p1, int p2)
+        internal bool Process(Input input, DrawingContext dc)
         {
-            // TODO: Complete member initialization
-            this.p1 = p1;
-            this.p2 = p2;
+            //キー処理
+            KeyGet(input);
+
+            //描画処理
+            Draw(dc);
+
+            return IsDead;
         }
 
-        internal bool All()
+        private void Draw(DrawingContext dc)
         {
-            throw new NotImplementedException();
+            if (count > 0)
+            {
+                dc.PushOpacity(128d / byte.MaxValue);
+                DrawUtil.DrawBox(dc, 0, 0, dInfo.Width, dInfo.Height, RGB(30, 30, 30));
+                dc.Pop();
+                DrawUtil.DrawString(dc, 250, 300, message, RGB(255, 255, 255), 32);
+                --count;
+            }
+            else
+                IsDead = true;
+        }
+
+        private Color RGB(byte r, byte g, byte b)
+        {
+            return Color.FromRgb(r, g, b);
+        }
+
+        private void KeyGet(Input input)
+        {
+            if (input.key256[Input.KEY_INPUT_A] == 1)
+                IsDead = true;
         }
     }
 }

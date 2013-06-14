@@ -143,14 +143,17 @@ namespace ScrollCrash
                     timerToCalibrate.Stop();
 
                     ////コントロールの切り替え
-                    //ViewCameraInputGrid.Visibility = System.Windows.Visibility.Hidden;
+                    ViewCameraInputGrid.Visibility = System.Windows.Visibility.Hidden;
                     //ProcessTouchButtonGrid.Visibility = System.Windows.Visibility.Visible;
+                    ProcessGrid.Visibility = Visibility.Visible;
 
                     ////タッチボタンの初期化
                     //PrepareButton();
 
                     ////ShadowPixelIndicator.FontSize = 30;
                     //infoIndicator.Content = "TouchButton's Background has been obtained.";
+
+                    blockCrashView.RunGame();
 
                     //timerToRetrieveBackground = new DispatcherTimer();
                     //timerToRetrieveBackground.Tick += (ss, e) => RetrieveButtonBackground(ss, e);
