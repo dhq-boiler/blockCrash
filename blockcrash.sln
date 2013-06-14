@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libBlockCrash", "libBlockCr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFBlockCrash", "WPFBlockCrash\WPFBlockCrash.csproj", "{1AD63B96-723B-436E-95DE-064F055C3EE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockCrashGUI", "BlockCrashGUI\BlockCrashGUI.csproj", "{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,17 @@ Global
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Release|Win32.ActiveCfg = Release|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Win32.Build.0 = Debug|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

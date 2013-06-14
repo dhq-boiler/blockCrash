@@ -26,10 +26,10 @@ namespace WPFBlockCrash
         private int enterCount;
         private int autocount;
 
-        public int mScore { get; set; }
-        public int mStock { get; set; }
-        public int mStage { get; set; }
-        public int mBar { get; set; }
+        public int Score { get; set; }
+        public int Stock { get; set; }
+        public int Stage { get; set; }
+        public int Bar { get; set; }
 
         public bool IsDead { get; set; }
 
@@ -40,7 +40,7 @@ namespace WPFBlockCrash
             sdetailgh = new ImageSource[6];
             clear = new bool[6];
 
-            mStage = 1;
+            Stage = 1;
 
             bargh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "bar.bmp"));
             bargh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "barsecond.bmp"));
@@ -78,9 +78,9 @@ namespace WPFBlockCrash
                 clear[i] = false;
             }
 
-            mScore = 0;
-            mStock = 2;
-            mBar = 1;
+            Score = 0;
+            Stock = 2;
+            Bar = 1;
 
             enterCount = 0;
             autocount = 0;
@@ -100,9 +100,9 @@ namespace WPFBlockCrash
         private void Draw(DrawingContext dc)
         {
             DrawUtil.DrawGraph(dc, 0, 0, sselectgh);
-            DrawUtil.DrawGraph(dc, 400, 320, sdetailgh[mStage - 1]);
+            DrawUtil.DrawGraph(dc, 400, 320, sdetailgh[Stage - 1]);
 
-            switch (mStage)
+            switch (Stage)
             {
                 case 1:
                     DrawStageTitle(dc, "オナジミサン");
@@ -126,16 +126,16 @@ namespace WPFBlockCrash
                 DrawUtil.DrawGraph(dc, 60 + i * 120, 200, stagegh[i]);
             }
 
-            if (clear[mStage - 1])
+            if (clear[Stage - 1])
             {
                 DrawUtil.DrawGraph(dc, 700, 320, cleargh);
             }
 
-            DrawUtil.DrawBox(dc, 60 + (mStage - 1) * 120, 200, 160 + (mStage - 1) * 120, 270, RGB(255, 20, 30));
+            DrawUtil.DrawBox(dc, 60 + (Stage - 1) * 120, 200, 160 + (Stage - 1) * 120, 270, RGB(255, 20, 30));
             DrawUtil.DrawBox(dc, 400, 320, 750, 578, RGB(255, 20, 30));
-            DrawUtil.DrawGraph(dc, 40, 460, bargh[mBar - 1]);
-            DrawUtil.DrawString(dc, 40, 500, string.Format("SCORE：{0}", mScore),RGB(255, 120, 0));
-            DrawUtil.DrawString(dc, 40, 540, string.Format("STOCK：{0}", mStock), RGB(255, 120, 0));
+            DrawUtil.DrawGraph(dc, 40, 460, bargh[Bar - 1]);
+            DrawUtil.DrawString(dc, 40, 500, string.Format("SCORE：{0}", Score),RGB(255, 120, 0));
+            DrawUtil.DrawString(dc, 40, 540, string.Format("STOCK：{0}", Stock), RGB(255, 120, 0));
         }
 
         private void DrawStageTitle(DrawingContext dc, string stageTitle)
@@ -155,10 +155,10 @@ namespace WPFBlockCrash
                 if (input.AT)
                     ++autocount;
 
-                ++mStage;
+                ++Stage;
 
-                if (mStage > 5)
-                    mStage = 1;
+                if (Stage > 5)
+                    Stage = 1;
 
                 input.rB = false;
             }
@@ -168,10 +168,10 @@ namespace WPFBlockCrash
                 if (input.AT)
                     ++autocount;
 
-                --mStage;
+                --Stage;
 
-                if (mStage < 1)
-                    mStage = 5;
+                if (Stage < 1)
+                    Stage = 5;
 
                 input.lB = false;
             }
@@ -194,10 +194,10 @@ namespace WPFBlockCrash
 
         public void SetValue(int bar, int stage, int score, int stock)
         {
-            mBar = bar;
+            Bar = bar;
             clear[stage - 1] = true;
-            mScore = score;
-            mStock = stock;
+            Score = score;
+            Stock = stock;
         }
 
         internal void Reset()
@@ -207,8 +207,8 @@ namespace WPFBlockCrash
                 clear[i] = false;
             }
 
-            mScore = 0;
-            mStock = 2;
+            Score = 0;
+            Stock = 2;
         }
     }
 }

@@ -99,15 +99,17 @@ namespace WPFBlockCrash
         //    }
         //}
 
-        public void PushRButton()
+        public void KeyDownRButton()
         {
             input.RB = true;
+            input.key256[Input.KEY_INPUT_RIGHT] = (char)1;
             input.IsPushedKeys = true;
         }
 
-        public void PushLButton()
+        public void KeyDownLButton()
         {
             input.LB = true;
+            input.key256[Input.KEY_INPUT_LEFT] = (char)1;
             input.IsPushedKeys = true;
         }
 
@@ -116,9 +118,16 @@ namespace WPFBlockCrash
             input.barx = vx;
         }
 
-        public void PushEnterButton()
+        public void KeyDownEnterButton()
         {
             input.EB = true;
+            input.key256[Input.KEY_INPUT_RETURN] = (char)1;
+            input.IsPushedKeys = true;
+        }
+
+        public void KeyDownSpaceButton()
+        {
+            input.key256[Input.KEY_INPUT_SPACE] = (char)1;
             input.IsPushedKeys = true;
         }
 
@@ -142,5 +151,28 @@ namespace WPFBlockCrash
         private Thread th;
         private Main main;
         private Input input;
+
+        public void KeyUpSpaceButton()
+        {
+            input.key256[Input.KEY_INPUT_SPACE] = (char)0;
+        }
+
+        public void KeyUpLButton()
+        {
+            input.LB = false;
+            input.key256[Input.KEY_INPUT_LEFT] = (char)0;
+        }
+
+        public void KeyUpRButton()
+        {
+            input.RB = false;
+            input.key256[Input.KEY_INPUT_RIGHT] = (char)0;
+        }
+
+        public void KeyUpEnterButton()
+        {
+            input.EB = false;
+            input.key256[Input.KEY_INPUT_RETURN] = (char)0;
+        }
     }
 }

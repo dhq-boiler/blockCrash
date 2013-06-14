@@ -41,31 +41,36 @@ namespace WPFBlockCrash
 		private SoundPlayer playerDH;
 		
 		private int sballCount;
-		private int mLevel, mScore, mStock;
+		private int mLevel;
 
 		//private int gh;
 		private ImageSource gh;
 
 		private int act;
 		private int sumblock;
-		private int mStage;
+		//private int mStage;
 		private int accel;
-		private int barnum;
+		//private int barnum;
 		private int ballspup;
 		private int vspeed;
 		private DisplayInfo dInfo;
 
+		public int Bar { get; set; }
+		public int Stage { get; set; }
+		public int Score { get; set; }
+		public int Stock { get; set; }
+		public int sballcount { get; set; }
+
 		public bool clear;
 
-		public int Stock { get; set; }
 
 		public Control(int mbar, int stage, int score, int stock, DisplayInfo dInfo)
 		{
 			this.dInfo = dInfo;
-			barnum = mbar;
+			Bar = mbar;
 	
 			//バーとボールのインスタンスを生成
-			bar = new Bar(barnum, dInfo);
+			bar = new Bar(Bar, dInfo);
 			ball = new Ball(dInfo);
 			ballspup = 0;
 
@@ -77,10 +82,10 @@ namespace WPFBlockCrash
 			demolishFlag=false;
 			sballCount = 0;
 			clear = false;
-			mScore = score;
-			mStock = stock;
+			Score = score;
+			Stock = stock;
 			act = 0;
-			mStage = stage;
+			Stage = stage;
 			vspeed = 0;
 
 			//Random rand = new Random(Environment.TickCount);
@@ -104,7 +109,7 @@ namespace WPFBlockCrash
 			gh = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_b.png"));
 
 	
-			switch( mStage ){
+			switch( Stage ){
 			case 1: sumblock = 28;
 					//ブロックの間を5ピクセルあけて、横7列、縦4行で配置
 					for(int i=0;i<sumblock;++i){
@@ -298,7 +303,7 @@ namespace WPFBlockCrash
 				else
 					itemhandle = 0;
 
-				switch (mStage)
+				switch (Stage)
 				{
 					case 1: if (i < 7)
 							block[i].Process(dc, 0 + itemhandle);
@@ -341,7 +346,7 @@ namespace WPFBlockCrash
 			// ボールの動き
 			++ballspup; // 速度上昇カウント
 
-			switch (barnum)
+			switch (Bar)
 			{ // バーによりの速度上昇の早さが違う
 				case 1: if (ballspup % 1500 == 0)
 					{ // やさしい
@@ -377,10 +382,10 @@ namespace WPFBlockCrash
 			
 			// 得点、レベル、残機枠の表示
 			DrawUtil.DrawBox(dc, 0, 0, 800, 30, Color.FromRgb(230, 230, 230), 3, null);
-			DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", mScore), Color.FromRgb(255, 120, 0));
+			DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", Score), Color.FromRgb(255, 120, 0));
 			DrawUtil.DrawString(dc, 220, 10, string.Format("LEVEL: {0}", ball.Level), Color.FromRgb(255, 120, 0));
 
-			for (int i = 0; i < mStock; ++i)
+			for (int i = 0; i < Stock; ++i)
 			{
 				dc.DrawImage(gh, new Rect(540 + 18 * i, 7, gh.Width, gh.Height));
 			}
@@ -533,7 +538,7 @@ namespace WPFBlockCrash
 
 					if (block[i].IsDead)
 					{
-						mScore += 100 + 50 * ball.Level;
+						Score += 100 + 50 * ball.Level;
 						ball.Radius = 0;
 					}
 				}
@@ -596,7 +601,7 @@ namespace WPFBlockCrash
 					}
 
 					if (!block[i].ItemFlag)
-						mScore += 300;
+						Score += 300;
 				}
 			}
 		}
@@ -607,7 +612,7 @@ namespace WPFBlockCrash
 			switch (eItemType)
 			{
 				case EItemType.ITEMTYPE_LONG:
-					if (barnum != 3)
+					if (Bar != 3)
 					{
 						bar.ExtendWidth();
 						bdwidth += exwidth;
@@ -632,10 +637,10 @@ namespace WPFBlockCrash
 					}
 					break;
 				case EItemType.ITEMTYPE_1UP:
-					++mStock;
+					++Stock;
 					break;
 				case EItemType.ITEMTYPE_SCOREUP:
-					mScore += 2000;
+					Score += 2000;
 					break;
 			}
 		}
@@ -660,7 +665,7 @@ namespace WPFBlockCrash
 
 					if (ballX < barX - bdwidth / 2 * 2 / 3)
 					{
-						if (barnum == 3)
+						if (Bar == 3)
 							ball.LvUp(1);
 
 						ball.DX = -ball.DX;
@@ -671,7 +676,7 @@ namespace WPFBlockCrash
 					}
 					else if (ballX > barX + bdwidth / 2 * 2 / 3)
 					{
-						if (barnum == 3)
+						if (Bar == 3)
 							ball.LvUp(1);
 
 						ball.DX = -ball.DX;
@@ -682,7 +687,7 @@ namespace WPFBlockCrash
 					}
 					else
 					{
-						if (barnum == 3)
+						if (Bar == 3)
 							ball.LvUp(1);
 
 						ball.DY = -ball.DY;
@@ -701,19 +706,11 @@ namespace WPFBlockCrash
 			SmallBalls = new LinkedList<Ball>();
 
 			sballcount = 0;
-			--mStock;
+			--Stock;
 			bdwidth = bar.Width;
 			bar.Reset();
 			ball.Reset();
 			bar.IsDead = false;
 		}
-
-		public int Bar { get; set; }
-
-		public int Stage { get; set; }
-
-		public int Score { get; set; }
-
-		public int sballcount { get; set; }
 	}
 }

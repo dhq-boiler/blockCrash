@@ -79,6 +79,17 @@ namespace ScrollCrash
             NomalizeWindowSize.Visibility = System.Windows.Visibility.Hidden;
             StartCalibration.Visibility = System.Windows.Visibility.Visible;
 
+            EnterButton.ProjectionColor = Colors.Lime;
+            EnterButton.JudgementColor = Colors.Magenta;
+            EnterButton.PushedButtonBorderColor = Colors.Black;
+            EnterButton.PushedButtonBorderThickness = 2;
+            EnterButton.ThresholdCheckPercent = 5;
+            EnterButton.ShadowThresholdPercent = 1;
+            EnterButton.ThresholdDifferentPixel = 70;
+            EnterButton.ThresholdUnderAsShadow1ch = 20;
+            EnterButton.MarginLeft = EnterButton.MarginTop = EnterButton.MarginRight = EnterButton.MarginBottom = 10;
+            EnterButton.IsEnableLongTouch = false;
+
             ScrollBar.Thumb.ProjectionColor = Colors.Lime;
             ScrollBar.Thumb.JudgementColor = Colors.Magenta;
             ScrollBar.Thumb.PushedButtonBorderColor = Colors.Black;
@@ -168,6 +179,8 @@ namespace ScrollCrash
                     ////タッチボタンの初期化
                     //PrepareButton();
 
+                    EnterButton.Prepare(mainGrid, PreviewImage);
+
                     ScrollBar.PrepareScrollbar(mainGrid, PreviewImage);
 
                     ////ShadowPixelIndicator.FontSize = 30;
@@ -210,21 +223,27 @@ namespace ScrollCrash
                     switch (StageRetrieveingScrollArea)
                     {
                         case 0:
-                            if (ScrollBar.SetThumbReferenceImageIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
+                            if (EnterButton.SetReferenceImageIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
                             {
                                 StageRetrieveingScrollArea = 1;
+                            }
+                            break;
+                        case 1:
+                            if (ScrollBar.SetThumbReferenceImageIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
+                            {
+                                StageRetrieveingScrollArea = 2;
                                 ScrollBar.Thumb.Visibility = System.Windows.Visibility.Hidden;
                                 ScrollBar.PaintScrollAreaBy(ScrollBar.Thumb.ProjectionColor);
                             }
                             break;
-                        case 1:
+                        case 2:
                             if (ScrollBar.SetButtonColorBackgroundIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
                             {
-                                StageRetrieveingScrollArea = 2;
+                                StageRetrieveingScrollArea = 3;
                                 ScrollBar.PaintScrollAreaBy(ScrollBar.ScrollAreaColor);
                             }
                             break;
-                        case 2:
+                        case 3:
                             if (ScrollBar.SetScrollAreaBackgroundIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
                             {
                                 timerToRetrieveBackground.Stop();
@@ -232,6 +251,9 @@ namespace ScrollCrash
                                 ScrollBar.Thumb.Visibility = System.Windows.Visibility.Visible;
                                 ScrollBar.Thumb.ButtonTouching += new libts.WPFTouchButton.ButtonTouchingEventHandler((s, ea) => ScrollBar.ScrollProcess(s, ea));
                                 ScrollBar.ValueChanged += new EventHandler((s, ea) => Move());
+
+                                EnterButton.ButtonHandDown += new EventHandler((s, ea) => blockCrashView.KeyDownEnterButton());
+                                EnterButton.ButtonHandUp += new EventHandler((s, ea) => blockCrashView.KeyUpEnterButton());
 
                                 int ThumbValidPixels = ScrollBar.Thumb.ValidateArea.Width * ScrollBar.Thumb.ValidateArea.Height;
 
@@ -267,6 +289,8 @@ namespace ScrollCrash
                 frame.Copy(imgCap);
 
                 ProjectionTransform.transform(imgMat, imgCap, vtArray);
+
+                EnterButton.Process(imgMat, SlideChangeTime, now);
 
                 ScrollBar.Thumb.Process(imgMat, SlideChangeTime, now);
 

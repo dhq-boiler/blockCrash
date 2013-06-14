@@ -57,13 +57,12 @@ namespace WPFBlockCrash
                 Restart(input);
             }
 
-            if (input.IsPushedKeys && keycheck)
+            if (input.IsPushedKeys)
             {
                 input.rB = input.RB;
                 input.lB = input.LB;
                 input.eB = input.EB;
-                input.RB = input.LB = input.EB = false;
-                keycheck = false;
+                //input.RB = input.LB = input.EB = false;
             }
 
             switch (m_actcount)
@@ -72,7 +71,7 @@ namespace WPFBlockCrash
                     {
                         if (title.Process(input, dc))
                             m_actcount = 1;
-                        input.ClearSmaller();
+                        //input.ClearSmaller();
                     }
                     break;
                 case 1:
@@ -82,7 +81,7 @@ namespace WPFBlockCrash
                             stageSelect.SetValue(barSelect.mBar, 1, 0, 2);
                             m_actcount = 2;
                         }
-                        input.ClearSmaller();
+                        //input.ClearSmaller();
                     }
                     break;
                 case 2:
@@ -90,10 +89,10 @@ namespace WPFBlockCrash
                         if (stageSelect.Process(input, dc))
                         {
                             m_actcount = 3;
-                            stock = stageSelect.mStock;
-                            control = new Control(stageSelect.mBar, stageSelect.mStage, stageSelect.mScore, stock, dInfo);
+                            stock = stageSelect.Stock;
+                            control = new Control(stageSelect.Bar, stageSelect.Stage, stageSelect.Score, stock, dInfo);
                         }
-                        input.ClearSmaller();
+                        //input.ClearSmaller();
                     }
                     break;
                 case 3:
@@ -165,11 +164,13 @@ namespace WPFBlockCrash
                                 control = null;
                             }
                         }
-                        keycheck = true;
-                        input.ClearSmaller();
+                        //keycheck = true;
+                        //input.ClearSmaller();
                     }
                     break;
             }
+            input.ClearSmaller();
+            //input.ClearArray();
             //}
         }
 

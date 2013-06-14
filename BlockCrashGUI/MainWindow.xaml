@@ -1,0 +1,10 @@
+﻿<Window x:Class="BlockCrashGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:my="clr-namespace:WPFBlockCrash;assembly=WPFBlockCrash"
+        SizeToContent="WidthAndHeight"
+        Title="BlockCrash" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
+    <my:BlockCrashView x:Name="view"
+                       Width="800"
+                       Height="600"/>
+</Window>

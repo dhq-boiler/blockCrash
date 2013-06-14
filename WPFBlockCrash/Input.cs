@@ -8,11 +8,14 @@ namespace WPFBlockCrash
 {
     class Input
     {
+        public const int KEY_INPUT_RETURN = 0x1C;
         public const int KEY_INPUT_A = 0x1E;
+        public const int KEY_INPUT_SPACE = 0x39;
 
         public const int KEY_INPUT_LEFT = 0xCB;
         public const int KEY_INPUT_RIGHT = 0xCD;
         public const int KEY_INPUT_ESCAPE = 0x01;
+
 
         public Input()
         {
@@ -23,6 +26,8 @@ namespace WPFBlockCrash
         {
             ClearLarger();
             ClearSmaller();
+
+            key256 = new char[256];
         }
 
         public void ClearLarger()
@@ -33,6 +38,11 @@ namespace WPFBlockCrash
         public void ClearSmaller()
         {
             rB = lB = eB = false;
+        }
+
+        public void ClearArray()
+        {
+            key256 = new char[256];
         }
 
         //入力状態変数

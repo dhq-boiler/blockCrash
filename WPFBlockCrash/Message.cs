@@ -70,7 +70,7 @@ namespace WPFBlockCrash
 
         private void KeyGet(Input input)
         {
-            if (input.key256[Input.KEY_INPUT_A] == 1)
+            if (input.key256[Input.KEY_INPUT_SPACE] == 1)
                 IsDead = true;
         }
     }
