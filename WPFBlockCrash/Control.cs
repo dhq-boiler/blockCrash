@@ -19,10 +19,16 @@ namespace WPFBlockCrash
 
 		private Bar bar;
 		private Ball ball;
-		private Ball[] sBall;
+		private LinkedList<Ball> SmallBalls;
+		private List<Ball> willBeAddedSmallBalls;
 		private Block[] block;
 
-		private int bdx, bdy, blx, bly, bkx, bky;
+		//private int bdx;
+		//private int bdy;
+		//private int ballX;
+		//private int ballY;
+		//private int bkx;
+		//private int bky;
 
 		private int bdwidth, bdheight, blwidth, blheight, bkwidth, bkheight;
 
@@ -64,7 +70,8 @@ namespace WPFBlockCrash
 			ballspup = 0;
 
 			block = new Block[MAX_BLOCKCOUNT];
-			sBall = new Ball[MAX_SBALLCOUNT];
+			SmallBalls = new LinkedList<Ball>();
+			willBeAddedSmallBalls = new List<Ball>();
 
 			boundFlag=false;
 			demolishFlag=false;
@@ -278,7 +285,7 @@ namespace WPFBlockCrash
 
 		internal bool Process(Input input, DrawingContext dc)
 		{
-			bool back, sballdrop;
+			bool BallIsDead, sballdrop;
 			int itemhandle;
 			int count = 0;
 
@@ -361,33 +368,10 @@ namespace WPFBlockCrash
 				ball.spchange();
 			}
 
-			back = ball.Process(input, dc);
-
-			//ボールとバーの当たり判定
-			HitCheckBallAndBar(ball);
-
-			//ボールとブロックの当たり判定
-			HitCheckBallAndBlock(ball);
+			BallIsDead = UpdateBall(input, dc);
 
 			// 小玉があれば表示　// 謎の挙動
-			for (int i = 0; i < sballcount; ++i)
-			{
-				if (sBall[i] == null)
-					continue;
-
-				sballdrop = sBall[i].Process(input, dc);
-
-				//ボールとバーの当たり判定
-				HitCheckBallAndBar(sBall[i]);
-				//ボールとブロックの当たり判定
-
-				HitCheckBallAndBlock(sBall[i]);
-				if (sballdrop)
-				{
-					sBall[i] = null;
-					--sballcount;
-				}
-			}
+			UpdateSmallBalls(input, dc);
 
 			accel = bar.Accel; // デバック用
 			
@@ -404,7 +388,7 @@ namespace WPFBlockCrash
 			///音再生
 			SoundPlay();
 
-			if (back)
+			if (BallIsDead)
 			{
 				bar.IsDead = true;
 				ball.DX = 0;
@@ -415,18 +399,63 @@ namespace WPFBlockCrash
 				ball.DY = 0;
 
 				// 小玉があれば表示
-				for (int i = 0; i < sballcount; ++i)
+				foreach (Ball smallBall in SmallBalls)
 				{
-					if (sBall[i] == null)
-						continue;
-					sBall[i].DX = 0;
-					sBall[i].DY = 0;
+					smallBall.DX = 0;
+					smallBall.DY = 0;
 				}
+
 				vspeed = 0;
 				bar.IsDead = true;
 			}
 
-			return back;
+			return BallIsDead;
+		}
+
+		private bool UpdateBall(Input input, DrawingContext dc)
+		{
+			bool BallIsDead;
+			BallIsDead = ball.Process(input, dc);
+
+			//ボールとバーの当たり判定
+			HitCheckBallAndBar(ball);
+
+			//ボールとブロックの当たり判定
+			HitCheckBallAndBlock(ball);
+
+			return BallIsDead;
+		}
+
+		private void UpdateSmallBalls(Input input, DrawingContext dc)
+		{
+			List<Ball> willBeRemovedSmallBalls = new List<Ball>();
+			foreach (Ball smallBall in SmallBalls)
+			{
+				bool SmallBallDroped = smallBall.Process(input, dc);
+
+				HitCheckBallAndBar(smallBall);
+
+				HitCheckBallAndBlock(smallBall);
+
+				if (SmallBallDroped)
+				{
+					willBeRemovedSmallBalls.Add(smallBall);
+					--sballcount;
+				}
+			}
+
+			foreach (Ball Adding in willBeAddedSmallBalls)
+			{
+				SmallBalls.AddLast(Adding);
+			}
+
+			foreach (Ball removing in willBeRemovedSmallBalls)
+			{
+				SmallBalls.Remove(removing);
+			}
+
+			willBeAddedSmallBalls.Clear();
+			willBeRemovedSmallBalls.Clear();
 		}
 
 		private void SoundPlay()
@@ -442,20 +471,20 @@ namespace WPFBlockCrash
 		{
 			demolishFlag = false;
 
-			blx = ball.X;
-			bly = ball.Y;
+			int ballX = ball.X;
+			int ballY = ball.Y;
 
 			for (int i = 0; i < sumblock; ++i)
 			{
 				if (!block[i].IsDead)
 				{
-					bkx = block[i].X;
-					bky = block[i].Y;
+					int blockX = block[i].X;
+					int blockY = block[i].Y;
 
-					if (blx < bkx + bkwidth / 2
-						&& blx > bkx - bkwidth / 2
-						&& bly + blheight / 2 > bky - bkheight / 2
-						&& bly + blheight / 2 < bky + bkheight / 2)
+					if (ballX < blockX + bkwidth / 2
+						&& ballX > blockX - bkwidth / 2
+						&& ballY + blheight / 2 > blockY - bkheight / 2
+						&& ballY + blheight / 2 < blockY + bkheight / 2)
 					{
 						vspeed = 0;
 
@@ -465,10 +494,10 @@ namespace WPFBlockCrash
 						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 							ball.DY = -ball.DY;
 					}
-					else if (blx < bkx + bkwidth / 2
-						&& blx > bkx - bkwidth / 2
-						&& bly - blheight / 2 > bky - bkheight / 2
-						&& bly - blheight / 2 < bky + bkheight / 2)
+					else if (ballX < blockX + bkwidth / 2
+						&& ballX > blockX - bkwidth / 2
+						&& ballY - blheight / 2 > blockY - bkheight / 2
+						&& ballY - blheight / 2 < blockY + bkheight / 2)
 					{
 						vspeed = 0;
 
@@ -477,10 +506,10 @@ namespace WPFBlockCrash
 						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 							ball.DY = -ball.DY;
 					}
-					else if (blx + blwidth / 2 < bkx - bkwidth / 2 + blwidth
-						&& blx + blwidth / 2 > bkx - bkwidth / 2
-						&& bly > bky - bkheight / 2
-						&& bly < bky + bkheight / 2)
+					else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
+						&& ballX + blwidth / 2 > blockX - bkwidth / 2
+						&& ballY > blockY - bkheight / 2
+						&& ballY < blockY + bkheight / 2)
 					{
 						vspeed = 0;
 
@@ -489,10 +518,10 @@ namespace WPFBlockCrash
 						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 							ball.DX = -ball.DX;
 					}
-					else if (blx - blwidth / 2 < bkx + bkwidth / 2
-						&& blx - blwidth / 2 > bkx + bkwidth / 2 - blwidth
-						&& bly > bky - bkheight / 2
-						&& bly < bky + bkheight / 2)
+					else if (ballX - blwidth / 2 < blockX + bkwidth / 2
+						&& ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
+						&& ballY > blockY - bkheight / 2
+						&& ballY < blockY + bkheight / 2)
 					{
 						vspeed = 0;
 
@@ -510,58 +539,58 @@ namespace WPFBlockCrash
 				}
 				else if (block[i].ItemFlag)
 				{
-					bkx = block[i].X;
-					bky = block[i].Y;
+					int blockX = block[i].X;
+					int blockY = block[i].Y;
 
-					if (blx < bkx + bkwidth / 2
-						&& blx > bkx - bkwidth / 2
-						&& bly + blheight / 2 > bky - bkheight / 2
-						&& bly + blheight / 2 < bky + bkheight / 2)
+					if (ballX < blockX + bkwidth / 2
+						&& ballX > blockX - bkwidth / 2
+						&& ballY + blheight / 2 > blockY - bkheight / 2
+						&& ballY + blheight / 2 < blockY + bkheight / 2)
 					{
 						vspeed = 0;
 
 						block[i].ItemFlag = false;
 
-						ItemEffect(block[i].ItemType, blx, bly);
+						ItemEffect(block[i].ItemType, ballX, ballY);
 
 						demolishFlag = true;
 					}
-					else if (blx < bkx + bkwidth / 2
-						&& blx > bkx - bkwidth / 2
-						&& bly - blheight / 2 > bky - bkheight / 2
-						&& bly - blheight / 2 < bky + bkheight / 2)
+					else if (ballX < blockX + bkwidth / 2
+						&& ballX > blockX - bkwidth / 2
+						&& ballY - blheight / 2 > blockY - bkheight / 2
+						&& ballY - blheight / 2 < blockY + bkheight / 2)
 					{
 						vspeed = 0;
 
 						block[i].ItemFlag = false;
 
-						ItemEffect(block[i].ItemType, blx, bly);
+						ItemEffect(block[i].ItemType, ballX, ballY);
 
 						demolishFlag = true;
 					}
-					else if (blx + blwidth / 2 < bkx - bkwidth / 2 + blwidth
-						&& blx + blwidth / 2 > bkx - bkwidth / 2
-						&& bly > bky - bkheight / 2
-						&& bly < bky + bkheight / 2)
+					else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
+						&& ballX + blwidth / 2 > blockX - bkwidth / 2
+						&& ballY > blockY - bkheight / 2
+						&& ballY < blockY + bkheight / 2)
 					{
 						vspeed = 0;
 
 						block[i].ItemFlag = false;
 
-						ItemEffect(block[i].ItemType, blx, bly);
+						ItemEffect(block[i].ItemType, ballX, ballY);
 
 						demolishFlag = true;
 					}
-					else if (blx - blwidth / 2 < bkx + bkwidth / 2
-						&& blx - blwidth / 2 > bkx + bkwidth / 2 - blwidth
-						&& bly > bky - bkheight / 2
-						&& bly < bky + bkheight / 2)
+					else if (ballX - blwidth / 2 < blockX + bkwidth / 2
+						&& ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
+						&& ballY > blockY - bkheight / 2
+						&& ballY < blockY + bkheight / 2)
 					{
 						vspeed = 0;
 
 						block[i].ItemFlag = false;
 
-						ItemEffect(block[i].ItemType, blx, bly);
+						ItemEffect(block[i].ItemType, ballX, ballY);
 
 						demolishFlag = true;
 					}
@@ -572,10 +601,9 @@ namespace WPFBlockCrash
 			}
 		}
 
-		private void ItemEffect(EItemType eItemType, int blx, int bly)
+		private void ItemEffect(EItemType eItemType, int ballX, int balllY)
 		{
 			int ct = 0;
-			int index = 0;
 			switch (eItemType)
 			{
 				case EItemType.ITEMTYPE_LONG:
@@ -591,17 +619,13 @@ namespace WPFBlockCrash
 				case EItemType.ITEMTYPE_INCRESE:
 					while (true)
 					{
-						if (sBall[sballcount + index] != null)
-						{
-							++index;
-							continue;
-						}
-						if (sballcount + index >= MAX_SBALLCOUNT)
-						{
+						if (sballcount >= MAX_SBALLCOUNT)
 							break;
-						}
-						sBall[sballcount + index] = new Ball(dInfo);
-						sBall[sballcount + index].Increse(blx, bly);
+
+						Ball newSmallBall = new Ball(dInfo);
+						newSmallBall.Increse(ballX, balllY);
+						willBeAddedSmallBalls.Add(newSmallBall);
+						
 						++sballcount;
 						++ct;
 						if (ct == 3) break;
@@ -622,20 +646,19 @@ namespace WPFBlockCrash
 
 			boundFlag = ball.PlaySound;
 
-			bdx = bar.X;
-			bdy = bar.Y;
+			int barX = bar.X;
+			int barY = bar.Y;
+			int ballX = ball.X;
+			int ballY = ball.Y;
 
-			blx = ball.X;
-			bly = ball.Y;
-
-			if (Math.Abs(bdy - bly) < blheight / 2 + bdheight / 2)
+			if (Math.Abs(barY - ballY) < blheight / 2 + bdheight / 2)
 			{
-				if (bdx + bdwidth / 2 > blx
-					&& bdx - bdwidth / 2 < blx)
+				if (barX + bdwidth / 2 > ballX
+					&& barX - bdwidth / 2 < ballX)
 				{
 					ball.Radius = 20;
 
-					if (blx < bdx - bdwidth / 2 * 2 / 3)
+					if (ballX < barX - bdwidth / 2 * 2 / 3)
 					{
 						if (barnum == 3)
 							ball.LvUp(1);
@@ -646,7 +669,7 @@ namespace WPFBlockCrash
 
 						boundFlag = true;
 					}
-					else if (blx > bdx + bdwidth / 2 * 2 / 3)
+					else if (ballX > barX + bdwidth / 2 * 2 / 3)
 					{
 						if (barnum == 3)
 							ball.LvUp(1);
@@ -672,8 +695,10 @@ namespace WPFBlockCrash
 
 		internal void Reset()
 		{
-			for (int i = 0; i < sballcount; ++i)
-				sBall[i] = null;
+			//for (int i = 0; i < sballcount; ++i)
+			//    SmallBalls[i] = null;
+
+			SmallBalls = new LinkedList<Ball>();
 
 			sballcount = 0;
 			--mStock;

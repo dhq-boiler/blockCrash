@@ -189,13 +189,12 @@ namespace WPFBlockCrash
             PenetratingCount = 150;
         }
 
-        internal void Increse(int blx, int bly)
+        internal void Increse(int ballX, int ballY)
         {
             IsSmall = true;
-            //Random rand = new Random(Environment.TickCount);
             int r = (Main.rand.Next() ^ Main.rand.Next()) % 7;
-            X = blx;
-            Y = bly;
+            X = ballX;
+            Y = ballY;
             DX += r - 3;
             DY += (6 - r) - 2;
             if (DY == 0)

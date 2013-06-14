@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
@@ -35,7 +36,19 @@ namespace WPFBlockCrash
         public int Height { get; private set; }
         public int ItemWidth { get; private set; }
         public int ItemHeight { get; private set; }
-        public bool IsDead { get; set; }
+
+        private bool isdead;
+        public bool IsDead
+        {
+            get { return isdead; }
+            set
+            {
+                bool old = isdead;
+                isdead = value;
+                if (!old && isdead)
+                    Debug.WriteLine("A Block is dead now. (" + X + ", " + Y + ")");
+            }
+        }
 
         private bool itemflag;
         public bool ItemFlag

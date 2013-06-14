@@ -39,7 +39,7 @@ namespace WPFBlockCrash
 
 
             input = new Input();
-            input.AT = true;
+            //input.AT = true;
             main = new Main(new DisplayInfo() { Width = 800, Height = 600 });
 
         }

@@ -59,6 +59,8 @@ namespace ScrollCrash
 
         public const double ImageWidthStandard = 1280;
         public const double ImageHeightStandard = 800;
+        private int StageRetrieveingScrollArea;
+        private const int SecondToWaitForAppearingTouchButton = 1;
 
         public bool IsMaximized { get; set; }
 
@@ -76,6 +78,22 @@ namespace ScrollCrash
             MaximizeWindowSize.Visibility = System.Windows.Visibility.Visible;
             NomalizeWindowSize.Visibility = System.Windows.Visibility.Hidden;
             StartCalibration.Visibility = System.Windows.Visibility.Visible;
+
+            ScrollBar.Thumb.ProjectionColor = Colors.Lime;
+            ScrollBar.Thumb.JudgementColor = Colors.Magenta;
+            ScrollBar.Thumb.PushedButtonBorderColor = Colors.Black;
+            ScrollBar.Thumb.PushedButtonBorderThickness = 2;
+            ScrollBar.Thumb.ThresholdCheckPercent = 5;
+            ScrollBar.Thumb.ShadowThresholdPercent = 1;
+            ScrollBar.Thumb.ThresholdDifferentPixel = 70;
+            ScrollBar.Thumb.ThresholdUnderAsShadow1ch = 20;
+            ScrollBar.Thumb.MarginLeft =
+                ScrollBar.Thumb.MarginRight =
+                ScrollBar.Thumb.MarginTop =
+                ScrollBar.Thumb.MarginBottom = 10;
+            ScrollBar.Thumb.IsEnableLongTouch = false;
+            ScrollBar.ScrollAreaColor = Colors.LightBlue;
+            ScrollBar.PixelsPerStep = 1;
 
             timerToPreview = new DispatcherTimer();
             timerToPreview.Interval = TimeSpan.FromMilliseconds(1);
@@ -150,15 +168,15 @@ namespace ScrollCrash
                     ////タッチボタンの初期化
                     //PrepareButton();
 
+                    ScrollBar.PrepareScrollbar(mainGrid, PreviewImage);
+
                     ////ShadowPixelIndicator.FontSize = 30;
                     //infoIndicator.Content = "TouchButton's Background has been obtained.";
 
-                    blockCrashView.RunGame();
-
-                    //timerToRetrieveBackground = new DispatcherTimer();
-                    //timerToRetrieveBackground.Tick += (ss, e) => RetrieveButtonBackground(ss, e);
-                    //timerToRetrieveBackground.Interval = TimeSpan.FromMilliseconds(1);
-                    //timerToRetrieveBackground.Start();
+                    timerToRetrieveBackground = new DispatcherTimer();
+                    timerToRetrieveBackground.Tick += (ss, e) => RetrieveButtonBackground(ss, e);
+                    timerToRetrieveBackground.Interval = TimeSpan.FromMilliseconds(1);
+                    timerToRetrieveBackground.Start();
                 }
                 else if ((++calibratingCount + 1) > Max_calibratingCount)
                 {
@@ -175,6 +193,106 @@ namespace ScrollCrash
                     timerToPreview.Start();
                 }
             }
+        }
+
+        private void RetrieveButtonBackground(object ss, EventArgs e)
+        {
+            using (frame = Cv.QueryFrame(capture))
+            using (CvMat imgCap = new CvMat(480, 640, MatrixType.U8C3))
+            using (CvMat imgMat = new CvMat(480, 640, MatrixType.U8C3))
+            {
+                frame.Copy(imgCap);
+
+                ProjectionTransform.transform(imgMat, imgCap, vtArray);
+
+                try
+                {
+                    switch (StageRetrieveingScrollArea)
+                    {
+                        case 0:
+                            if (ScrollBar.SetThumbReferenceImageIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
+                            {
+                                StageRetrieveingScrollArea = 1;
+                                ScrollBar.Thumb.Visibility = System.Windows.Visibility.Hidden;
+                                ScrollBar.PaintScrollAreaBy(ScrollBar.Thumb.ProjectionColor);
+                            }
+                            break;
+                        case 1:
+                            if (ScrollBar.SetButtonColorBackgroundIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
+                            {
+                                StageRetrieveingScrollArea = 2;
+                                ScrollBar.PaintScrollAreaBy(ScrollBar.ScrollAreaColor);
+                            }
+                            break;
+                        case 2:
+                            if (ScrollBar.SetScrollAreaBackgroundIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
+                            {
+                                timerToRetrieveBackground.Stop();
+
+                                ScrollBar.Thumb.Visibility = System.Windows.Visibility.Visible;
+                                ScrollBar.Thumb.ButtonTouching += new libts.WPFTouchButton.ButtonTouchingEventHandler((s, ea) => ScrollBar.ScrollProcess(s, ea));
+                                ScrollBar.ValueChanged += new EventHandler((s, ea) => Move());
+
+                                int ThumbValidPixels = ScrollBar.Thumb.ValidateArea.Width * ScrollBar.Thumb.ValidateArea.Height;
+
+                                blockCrashView.RunGame();
+
+                                timerToProcess = new DispatcherTimer();
+                                timerToProcess.Tick += (s, ea) => ProcessingLoop(s, ea);
+                                timerToProcess.Interval = TimeSpan.FromMilliseconds(1);
+                                timerToProcess.Start();
+                            }
+                            break;
+                    }
+
+                }
+                catch (Exception)
+                {
+                    //！？
+                    throw;
+                }
+            }
+        }
+
+        private void ProcessingLoop(object s, EventArgs ea)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            using (frame = Cv.QueryFrame(capture))
+            using (CvMat imgCap = new CvMat(480, 640, MatrixType.U8C3))
+            using (CvMat imgMat = new CvMat(480, 640, MatrixType.U8C3))
+            {
+                DateTime now = DateTime.Now;
+                frame.Copy(imgCap);
+
+                ProjectionTransform.transform(imgMat, imgCap, vtArray);
+
+                ScrollBar.Thumb.Process(imgMat, SlideChangeTime, now);
+
+                imgMat.DrawRect(ScrollBar.Thumb.ButtonPosition, new CvScalar(0, 0, 255));
+                Cv.ShowImage("Screen", imgMat);
+
+                sw.Stop();
+            }
+
+            int key = Cv.WaitKey(1);
+            if (key == 0x1b)
+            {
+                Close();
+            }
+        }
+
+        private void Move()
+        {
+            int barXValue = (int)ScrollBar.Value;
+            int barXMaxValue = ScrollBar.MaxValue;
+            // 50 <= vx <= 750;
+            //blockCrashView.MoveBarTo((int)((barXValue + 50d) / range));
+            double a = barXValue / barXMaxValue; //0.0 -> 1.0
+            double b = a * 700; //0.0 -> 700.0
+            double c = b + 50; // 50.0 -> 750.0
+            blockCrashView.MoveBarTo((int)c);
         }
 
         private void MaximizeWindowSize_Click(object sender, RoutedEventArgs e)
