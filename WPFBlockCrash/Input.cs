@@ -19,21 +19,24 @@ namespace WPFBlockCrash
 
         public Input()
         {
+            RB = new KeyInput() { TimeToContinuousInput = TimeSpan.FromMilliseconds(1000) };
+            LB = new KeyInput() { TimeToContinuousInput = TimeSpan.FromMilliseconds(1000) };
+            EB = new KeyInput() { TimeToContinuousInput = TimeSpan.FromMilliseconds(1000) };
             key256 = new char[256];
         }
 
         public void Clear()
         {
-            ClearLarger();
+            //ClearLarger();
             ClearSmaller();
 
             key256 = new char[256];
         }
 
-        public void ClearLarger()
-        {
-            RB = LB = EB = false;
-        }
+        //public void ClearLarger()
+        //{
+        //    RB = LB = EB = false;
+        //}
 
         public void ClearSmaller()
         {
@@ -45,14 +48,18 @@ namespace WPFBlockCrash
             key256 = new char[256];
         }
 
-        //入力状態変数
-        public bool RB { get; set; }
+        ////入力状態変数
+        //public bool RB { get; set; }
 
-        //入力状態変数
-        public bool LB { get; set; }
+        ////入力状態変数
+        //public bool LB { get; set; }
 
-        //入力状態変数
-        public bool EB { get; set; }
+        ////入力状態変数
+        //public bool EB { get; set; }
+
+        public KeyInput RB { get; set; }
+        public KeyInput LB { get; set; }
+        public KeyInput EB { get; set; }
 
         //スレッドによる複数操作防止変数
         public bool IsPushedKeys { get; set; }

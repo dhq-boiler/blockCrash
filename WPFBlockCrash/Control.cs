@@ -40,13 +40,13 @@ namespace WPFBlockCrash
 		private SoundPlayer playerBH;
 		private SoundPlayer playerDH;
 		
-		private int sballCount;
-		private int mLevel;
+		//private int sballCount;
+		//private int mLevel;
 
 		//private int gh;
 		private ImageSource gh;
 
-		private int act;
+		//private int act;
 		private int sumblock;
 		//private int mStage;
 		private int accel;
@@ -80,11 +80,9 @@ namespace WPFBlockCrash
 
 			boundFlag=false;
 			demolishFlag=false;
-			sballCount = 0;
 			clear = false;
 			Score = score;
 			Stock = stock;
-			act = 0;
 			Stage = stage;
 			vspeed = 0;
 
@@ -290,7 +288,7 @@ namespace WPFBlockCrash
 
 		internal bool Process(Input input, DrawingContext dc)
 		{
-			bool BallIsDead, sballdrop;
+			bool BallIsDead;
 			int itemhandle;
 			int count = 0;
 
@@ -434,6 +432,7 @@ namespace WPFBlockCrash
 		private void UpdateSmallBalls(Input input, DrawingContext dc)
 		{
 			List<Ball> willBeRemovedSmallBalls = new List<Ball>();
+
 			foreach (Ball smallBall in SmallBalls)
 			{
 				bool SmallBallDroped = smallBall.Process(input, dc);

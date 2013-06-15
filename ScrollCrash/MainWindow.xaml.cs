@@ -6,6 +6,9 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace ScrollCrash
 {
@@ -74,7 +77,6 @@ namespace ScrollCrash
             bitmap = new WriteableBitmap(VGACameraWidth, VGACameraHeight, 92, 92, PixelFormats.Bgr24, null);
             calibrator = new Calibrator(new CvSize((int)ImageWidthStandard, (int)ImageHeightStandard), new CvSize(10, 7));
 
-            //ChangeWindowSize.Visibility = System.Windows.Visibility.Visible;
             MaximizeWindowSize.Visibility = System.Windows.Visibility.Visible;
             NomalizeWindowSize.Visibility = System.Windows.Visibility.Hidden;
             StartCalibration.Visibility = System.Windows.Visibility.Visible;
@@ -83,7 +85,7 @@ namespace ScrollCrash
             EnterButton.JudgementColor = Colors.Magenta;
             EnterButton.PushedButtonBorderColor = Colors.Black;
             EnterButton.PushedButtonBorderThickness = 2;
-            EnterButton.ThresholdCheckPercent = 5;
+            EnterButton.ThresholdCheckPercent = 25;
             EnterButton.ShadowThresholdPercent = 1;
             EnterButton.ThresholdDifferentPixel = 70;
             EnterButton.ThresholdUnderAsShadow1ch = 20;
@@ -94,7 +96,7 @@ namespace ScrollCrash
             ScrollBar.Thumb.JudgementColor = Colors.Magenta;
             ScrollBar.Thumb.PushedButtonBorderColor = Colors.Black;
             ScrollBar.Thumb.PushedButtonBorderThickness = 2;
-            ScrollBar.Thumb.ThresholdCheckPercent = 5;
+            ScrollBar.Thumb.ThresholdCheckPercent = 25;
             ScrollBar.Thumb.ShadowThresholdPercent = 1;
             ScrollBar.Thumb.ThresholdDifferentPixel = 70;
             ScrollBar.Thumb.ThresholdUnderAsShadow1ch = 20;
@@ -105,6 +107,7 @@ namespace ScrollCrash
             ScrollBar.Thumb.IsEnableLongTouch = false;
             ScrollBar.ScrollAreaColor = Colors.LightBlue;
             ScrollBar.PixelsPerStep = 1;
+            ScrollBar.RadiusOfSearchAreaCircle = Math.Sqrt(Math.Pow(ScrollBar.Thumb.ActualWidth, 2) + Math.Pow(ScrollBar.Thumb.ActualHeight, 2)) * 5;
 
             timerToPreview = new DispatcherTimer();
             timerToPreview.Interval = TimeSpan.FromMilliseconds(1);
@@ -155,6 +158,8 @@ namespace ScrollCrash
             timerToCalibrate.Start();
         }
 
+        private int calibrateSuccessedCount = 0;
+
         private void CalibrateCameraInputLoop(object s, EventArgs ea)
         {
             Debug.WriteLine("Trying Calibration Count:" + (calibratingCount + 1));
@@ -171,25 +176,19 @@ namespace ScrollCrash
                     //キャリブレーションの停止
                     timerToCalibrate.Stop();
 
-                    ////コントロールの切り替え
+                    //コントロールの切り替え
                     ViewCameraInputGrid.Visibility = System.Windows.Visibility.Hidden;
-                    //ProcessTouchButtonGrid.Visibility = System.Windows.Visibility.Visible;
                     ProcessGrid.Visibility = Visibility.Visible;
 
-                    ////タッチボタンの初期化
-                    //PrepareButton();
-
+                    //タッチボタン・スクロールバーの初期化
                     EnterButton.Prepare(mainGrid, PreviewImage);
-
                     ScrollBar.PrepareScrollbar(mainGrid, PreviewImage);
-
-                    ////ShadowPixelIndicator.FontSize = 30;
-                    //infoIndicator.Content = "TouchButton's Background has been obtained.";
 
                     timerToRetrieveBackground = new DispatcherTimer();
                     timerToRetrieveBackground.Tick += (ss, e) => RetrieveButtonBackground(ss, e);
                     timerToRetrieveBackground.Interval = TimeSpan.FromMilliseconds(1);
                     timerToRetrieveBackground.Start();
+
                 }
                 else if ((++calibratingCount + 1) > Max_calibratingCount)
                 {
@@ -291,10 +290,13 @@ namespace ScrollCrash
                 ProjectionTransform.transform(imgMat, imgCap, vtArray);
 
                 EnterButton.Process(imgMat, SlideChangeTime, now);
-
                 ScrollBar.Thumb.Process(imgMat, SlideChangeTime, now);
 
+                imgMat.DrawLine(new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Top),
+                    new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Bottom),
+                    new CvScalar(255, 0, 0), 3);
                 imgMat.DrawRect(ScrollBar.Thumb.ButtonPosition, new CvScalar(0, 0, 255));
+                imgMat.DrawRect(EnterButton.ButtonPosition, new CvScalar(0, 0, 255));
                 Cv.ShowImage("Screen", imgMat);
 
                 sw.Stop();
@@ -312,10 +314,10 @@ namespace ScrollCrash
             int barXValue = (int)ScrollBar.Value;
             int barXMaxValue = ScrollBar.MaxValue;
             // 50 <= vx <= 750;
-            //blockCrashView.MoveBarTo((int)((barXValue + 50d) / range));
-            double a = barXValue / barXMaxValue; //0.0 -> 1.0
+            double a = (double)barXValue / (double)barXMaxValue; //0.0 -> 1.0
             double b = a * 700; //0.0 -> 700.0
             double c = b + 50; // 50.0 -> 750.0
+            //Debug.WriteLine("a:" + a + " b:" + b + " c:" + c);
             blockCrashView.MoveBarTo((int)c);
         }
 

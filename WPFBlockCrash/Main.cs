@@ -59,9 +59,12 @@ namespace WPFBlockCrash
 
             if (input.IsPushedKeys)
             {
-                input.rB = input.RB;
-                input.lB = input.LB;
-                input.eB = input.EB;
+                input.rB = input.RB.Output;
+                input.lB = input.LB.Output;
+                input.eB = input.EB.Output;
+                //input.rB = input.RB;
+                //input.lB = input.LB;
+                //input.eB = input.EB;
                 //input.RB = input.LB = input.EB = false;
             }
 

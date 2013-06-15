@@ -36,7 +36,7 @@
   <ItemGroup>
     <Reference Include="libts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\touchscreen\libts\bin\Debug\libts.dll</HintPath>
+      <HintPath>..\..\touchscreen\libts\bin\Release_Parallel\libts.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvItmdUtil">
       <HintPath>..\..\nmbridge\Release\OpenCvItmdUtil.dll</HintPath>

@@ -83,6 +83,19 @@ namespace WPFBlockCrash
                 input.lB = false;
             }
 
+            if (input.barx < 700d / 3d * 1d && input.barx >= 50)
+            {
+                mBar = 1;
+            }
+            else if (input.barx >= 700d / 3d * 1d && input.barx < 700d / 3d * 2d)
+            {
+                mBar = 2;
+            }
+            else if (input.barx >= 700d / 3d * 2d && input.barx < 700d)
+            {
+                mBar = 3;
+            }
+
             if (input.AT)
             {
                 if (input.eB && autoCount > 10)

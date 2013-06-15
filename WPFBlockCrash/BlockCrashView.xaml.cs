@@ -23,20 +23,14 @@ namespace WPFBlockCrash
     /// </summary>
     public partial class BlockCrashView : UserControl
     {
-        //private BackgroundWorker worker;
         private DispatcherTimer timerToRun;
         private DispatcherTimer timerToRender;
-        private RenderTargetBitmap bitmap;
+        private WriteableBitmap bitmap;
+        private RenderTargetBitmap bs;
 
         public BlockCrashView()
         {
             InitializeComponent();
-
-            //worker = new BackgroundWorker();
-            //worker.DoWork += new DoWorkEventHandler(DoWork);
-            //worker.WorkerSupportsCancellation = true;
-
-
 
             input = new Input();
             //input.AT = true;
@@ -46,10 +40,11 @@ namespace WPFBlockCrash
 
         private RenderTargetBitmap CreateBitmap(int width, int height, double dpi, Action<DrawingContext> render)
         {
+            GC.Collect();
+            RenderTargetBitmap bitmap = null;
             DrawingVisual drawingVisual = new DrawingVisual();
             using (DrawingContext drawingContext = drawingVisual.RenderOpen())
             {
-                //main.ProcessLoop(input, drawingContext);
                 render(drawingContext);
             }
 
@@ -71,6 +66,9 @@ namespace WPFBlockCrash
         public void RunGame()
         {
             timerToRender = new DispatcherTimer();
+            timerToRender.Tick += timerToRender_Tick;
+            timerToRender.Interval = TimeSpan.FromMilliseconds(1);
+            timerToRender.Start();
 
             timerToRun = new DispatcherTimer();
             timerToRun.Tick += timerToRun_Tick;
@@ -78,37 +76,46 @@ namespace WPFBlockCrash
             timerToRun.Start();
         }
 
-        private void timerToRun_Tick(object sender, EventArgs e)
+        private object render_object = new object();
+
+        private void timerToRender_Tick(object sender, EventArgs e)
         {
-            main.ATMode(input);
-            RenderTargetBitmap bs = CreateBitmap(800, 600, 96, dc => main.ProcessLoop(input, dc));
-            WriteableBitmap wb = new WriteableBitmap(bs);
+            if (bs == null)
+                return;
+
+            WriteableBitmap wb = null;
+
+            lock (render_object)
+            {
+                wb = new WriteableBitmap(bs);
+            }
+
             SetBitmapToImage(image, wb);
         }
 
-        //public void BeginGame()
-        //{
-        //    worker.RunWorkerAsync();
-        //}
+        private void timerToRun_Tick(object sender, EventArgs e)
+        {
+            main.ATMode(input);
+            RenderTargetBitmap rtb = null;
+            rtb = CreateBitmap(800, 600, 96, dc => main.ProcessLoop(input, dc));
 
-        //private void DoWork(object sender, DoWorkEventArgs e)
-        //{
-        //    while (!worker.CancellationPending)
-        //    {
-        //        Dispatcher.Invoke(new Action(() => main.ProcessLoop(input, dg)));
-        //    }
-        //}
+            lock (render_object)
+            {
+                bs = rtb;
+            }
+        }
+
 
         public void KeyDownRButton()
         {
-            input.RB = true;
+            input.RB.KeyDown();
             input.key256[Input.KEY_INPUT_RIGHT] = (char)1;
             input.IsPushedKeys = true;
         }
 
         public void KeyDownLButton()
         {
-            input.LB = true;
+            input.LB.KeyDown();
             input.key256[Input.KEY_INPUT_LEFT] = (char)1;
             input.IsPushedKeys = true;
         }
@@ -120,7 +127,7 @@ namespace WPFBlockCrash
 
         public void KeyDownEnterButton()
         {
-            input.EB = true;
+            input.EB.KeyDown();
             input.key256[Input.KEY_INPUT_RETURN] = (char)1;
             input.IsPushedKeys = true;
         }
@@ -142,11 +149,11 @@ namespace WPFBlockCrash
             input.IsPushedKeys = false;
         }
 
-        //public void Finish()
-        //{
-        //    worker.CancelAsync();
-        //    //input.IsFinished = true;
-        //}
+        public void ExitGame()
+        {
+            timerToRender.Stop();
+            timerToRun.Stop();
+        }
 
         private Thread th;
         private Main main;
@@ -159,19 +166,19 @@ namespace WPFBlockCrash
 
         public void KeyUpLButton()
         {
-            input.LB = false;
+            input.LB.KeyUp();
             input.key256[Input.KEY_INPUT_LEFT] = (char)0;
         }
 
         public void KeyUpRButton()
         {
-            input.RB = false;
+            input.RB.KeyUp();
             input.key256[Input.KEY_INPUT_RIGHT] = (char)0;
         }
 
         public void KeyUpEnterButton()
         {
-            input.EB = false;
+            input.EB.KeyUp();
             input.key256[Input.KEY_INPUT_RETURN] = (char)0;
         }
     }

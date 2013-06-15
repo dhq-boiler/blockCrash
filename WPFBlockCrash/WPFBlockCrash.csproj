@@ -54,6 +54,7 @@
     <Compile Include="Control.cs" />
     <Compile Include="DisplayInfo.cs" />
     <Compile Include="DrawUtil.cs" />
+    <Compile Include="KeyInput.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="StageSelect.cs" />
     <Compile Include="Title.cs" />
