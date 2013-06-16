@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ScrollCrash
 {
@@ -66,6 +67,7 @@ namespace ScrollCrash
         private const int SecondToWaitForAppearingTouchButton = 1;
 
         public bool IsMaximized { get; set; }
+        private int CameraNumber;
 
         #endregion
 
@@ -73,7 +75,18 @@ namespace ScrollCrash
         {
             InitializeComponent();
 
-            capture = new CvCapture(0);
+            try
+            {
+                CameraNumber = Settings.Load("settings.xml").UseCameraNumber;
+            }
+            catch (IOException e)
+            {
+                Settings.Save("settings.xml", new Settings());
+                MessageBox.Show("settings.xmlを出力しました．<UseCameraNumber>に0から始まるカメラ番号を入力して再起動してください．");
+                Environment.Exit(1);
+            }
+
+            capture = new CvCapture(CameraNumber);
             bitmap = new WriteableBitmap(VGACameraWidth, VGACameraHeight, 92, 92, PixelFormats.Bgr24, null);
             calibrator = new Calibrator(new CvSize((int)ImageWidthStandard, (int)ImageHeightStandard), new CvSize(10, 7));
 
