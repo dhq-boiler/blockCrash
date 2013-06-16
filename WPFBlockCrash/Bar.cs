@@ -63,7 +63,7 @@ namespace WPFBlockCrash
         {
             bool IsPushedAnyKey = false;
 
-            if (input.barx != 0) //怪しい…
+            if (!input.AT && input.barx != 0) 
             {
                 X = input.barx;
                 IsPushedAnyKey = true;

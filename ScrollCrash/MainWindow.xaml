@@ -68,12 +68,11 @@
                 <RowDefinition Height="600" />
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            <Grid Grid.Column="0"
-                  Grid.Row="0">
-                <libts:WPFTouchButton x:Name="EnterButton"
-                                      Width="150"
-                                      Height="150" />
-            </Grid>
+            <libts:WPFTouchButton x:Name="EnterButton"
+                                  Grid.Column="0"
+                                  Grid.Row="1"
+                                  Width="150"
+                                  Height="150" />
             <my:BlockCrashView x:Name="blockCrashView"
                                Grid.Column="1"
                                Grid.Row="0"
@@ -84,6 +83,16 @@
                                       Grid.Row="1"
                                       Width="800"
                                       Height="150" />
+            <Label x:Name="StatusInfoIndicator"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3"
+                   Grid.Row="0"
+                   Grid.RowSpan="2"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   FontFamily="Consolas"
+                   FontSize="60"
+                   Foreground="White">Status Information</Label>
         </Grid>
     </Grid>
 </Window>

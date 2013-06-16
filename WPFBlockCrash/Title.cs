@@ -44,6 +44,11 @@ namespace WPFBlockCrash
 
         private void KeyGet(Input input)
         {
+            if (input.barx == 750)
+            {
+                input.AT = true;
+            }
+
             if (input.rB || input.lB || input.eB) //いずれかのボタンが押されている
             {
                 IsDead = true;

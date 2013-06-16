@@ -157,7 +157,7 @@ namespace WPFBlockCrash
 
         private Thread th;
         private Main main;
-        private Input input;
+        public Input input { get; set; }
 
         public void KeyUpSpaceButton()
         {

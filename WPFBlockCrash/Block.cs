@@ -112,6 +112,7 @@ namespace WPFBlockCrash
             IsDead = false;
 
             //Random rand = new Random(Environment.TickCount);
+#if false
             int r = Main.rand.Next() % 5;
             if (r == 1)
             {
@@ -123,6 +124,10 @@ namespace WPFBlockCrash
                 ItemFlag = false;
                 ItemType = EItemType.ITEMTYPE_NO;
             }
+#else
+            ItemFlag = true;
+            ItemType = EItemType.ITEMTYPE_INCRESE;
+#endif
 
             this.X = x;
             this.Y = y;

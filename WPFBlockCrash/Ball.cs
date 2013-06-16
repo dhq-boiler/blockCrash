@@ -75,6 +75,8 @@ namespace WPFBlockCrash
 
         internal void spchange()
         {
+            if (IsSmall)
+                return;
             //Random rand = new Random(Environment.TickCount);
             int r = Main.rand.Next() % 5;
             DX += r - 6;
@@ -105,7 +107,7 @@ namespace WPFBlockCrash
         {
             if (input.eB)
             {
-                if (ActCount == 0)
+                if (ActCount == 0 && !IsSmall)
                 {
                     DX = 3;
                     DY = -3;

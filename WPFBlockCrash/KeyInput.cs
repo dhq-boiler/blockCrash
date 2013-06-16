@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
-    class KeyInput
+    public class KeyInput
     {
         private bool ispushed;
         public bool Output

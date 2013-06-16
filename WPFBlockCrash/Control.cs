@@ -14,7 +14,7 @@ namespace WPFBlockCrash
 {
 	class Control
 	{
-		private const int MAX_SBALLCOUNT = 20;
+        private const int MAX_SBALLCOUNT = 100;
 		private const int MAX_BLOCKCOUNT = 100;
 
 		private Bar bar;

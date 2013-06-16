@@ -13,6 +13,7 @@ namespace WPFBlockCrash
         private int count;
         private string message;
         private DisplayInfo dInfo;
+        private DateTime? BeginDisplayTime;
 
         public bool IsDead { get; set; }
 
@@ -70,8 +71,12 @@ namespace WPFBlockCrash
 
         private void KeyGet(Input input)
         {
-            if (input.key256[Input.KEY_INPUT_SPACE] == 1)
+            //if (input.key256[Input.KEY_INPUT_SPACE] == 1)
+            if (BeginDisplayTime == null)
+                BeginDisplayTime = DateTime.Now;
+            else if ((DateTime.Now - BeginDisplayTime.Value).TotalSeconds >= 1)
                 IsDead = true;
+            IsDead = false;
         }
     }
 }

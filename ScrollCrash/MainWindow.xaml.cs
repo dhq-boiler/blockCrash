@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO;
+using WPFBlockCrash;
 
 namespace ScrollCrash
 {
@@ -71,6 +72,8 @@ namespace ScrollCrash
 
         #endregion
 
+        private Input input;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -100,7 +103,7 @@ namespace ScrollCrash
             EnterButton.PushedButtonBorderThickness = 2;
             EnterButton.ThresholdCheckPercent = 25;
             EnterButton.ShadowThresholdPercent = 1;
-            EnterButton.ThresholdDifferentPixel = 70;
+            EnterButton.ThresholdDifferentPixel = 100;
             EnterButton.ThresholdUnderAsShadow1ch = 20;
             EnterButton.MarginLeft = EnterButton.MarginTop = EnterButton.MarginRight = EnterButton.MarginBottom = 10;
             EnterButton.IsEnableLongTouch = false;
@@ -111,7 +114,7 @@ namespace ScrollCrash
             ScrollBar.Thumb.PushedButtonBorderThickness = 2;
             ScrollBar.Thumb.ThresholdCheckPercent = 25;
             ScrollBar.Thumb.ShadowThresholdPercent = 1;
-            ScrollBar.Thumb.ThresholdDifferentPixel = 70;
+            ScrollBar.Thumb.ThresholdDifferentPixel = 100;
             ScrollBar.Thumb.ThresholdUnderAsShadow1ch = 20;
             ScrollBar.Thumb.MarginLeft =
                 ScrollBar.Thumb.MarginRight =
@@ -121,6 +124,10 @@ namespace ScrollCrash
             ScrollBar.ScrollAreaColor = Colors.LightBlue;
             ScrollBar.PixelsPerStep = 1;
             ScrollBar.RadiusOfSearchAreaCircle = Math.Sqrt(Math.Pow(ScrollBar.Thumb.ActualWidth, 2) + Math.Pow(ScrollBar.Thumb.ActualHeight, 2)) * 5;
+
+            input = new Input();
+            blockCrashView.input = input;
+            StatusInfoIndicator.Content = "Auto Mode";
 
             timerToPreview = new DispatcherTimer();
             timerToPreview.Interval = TimeSpan.FromMilliseconds(1);
@@ -288,6 +295,9 @@ namespace ScrollCrash
             }
         }
 
+        private DateTime ChangedDisplayInfomationTime;
+        private readonly TimeSpan InformationDisplayInterval = TimeSpan.FromSeconds(1);
+
         private void ProcessingLoop(object s, EventArgs ea)
         {
             Stopwatch sw = new Stopwatch();
@@ -305,12 +315,36 @@ namespace ScrollCrash
                 EnterButton.Process(imgMat, SlideChangeTime, now);
                 ScrollBar.Thumb.Process(imgMat, SlideChangeTime, now);
 
+#if Debug
                 imgMat.DrawLine(new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Top),
                     new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Bottom),
                     new CvScalar(255, 0, 0), 3);
                 imgMat.DrawRect(ScrollBar.Thumb.ButtonPosition, new CvScalar(0, 0, 255));
                 imgMat.DrawRect(EnterButton.ButtonPosition, new CvScalar(0, 0, 255));
                 Cv.ShowImage("Screen", imgMat);
+#endif
+                if (input.AT && (DateTime.Now - ChangedDisplayInfomationTime).TotalSeconds >= 1)
+                {
+                    switch (StatusInfoIndicator.Visibility)
+                    {
+                        case System.Windows.Visibility.Visible:
+                            StatusInfoIndicator.Visibility = System.Windows.Visibility.Hidden;
+                            break;
+                        case System.Windows.Visibility.Hidden:
+                            StatusInfoIndicator.Visibility = System.Windows.Visibility.Visible;
+                            break;
+                    }
+
+                    ChangedDisplayInfomationTime = DateTime.Now;
+                }
+                else if (input.AT)
+                {
+
+                }
+                else
+                {
+                    StatusInfoIndicator.Visibility = System.Windows.Visibility.Hidden;
+                }
 
                 sw.Stop();
             }

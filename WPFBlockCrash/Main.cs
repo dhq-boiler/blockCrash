@@ -10,12 +10,23 @@ namespace WPFBlockCrash
 {
     class Main
     {
+        enum EActType
+        {
+            TITLE,
+            BAR_SELECT,
+            STAGE_SELECT,
+            CONTROL
+        }
+
         private StageSelect stageSelect;
         private Control control;
         private Message message;
         private BarSelect barSelect;
         private Title title;
-        private int m_actcount;
+
+        //private int m_actcount;
+        private EActType ActType;
+
         private int act;
         private int stock;
         private int c;
@@ -32,7 +43,8 @@ namespace WPFBlockCrash
             title = new Title();
             barSelect = new BarSelect();
             stageSelect = new StageSelect();
-            m_actcount = 0;
+            //m_actcount = 0;
+            ActType = EActType.TITLE;
             act = 0;
             stock = 0;
             keycheck = true;
@@ -47,16 +59,6 @@ namespace WPFBlockCrash
 
             DrawUtil.DrawBox(dc, 0, 0, 800, 600, Color.FromRgb(0, 0, 0), 1, Color.FromRgb(0, 0, 0));
 
-            if (input.AT) //自動化状態
-            {
-                ATMode(input);
-            }
-
-            if (automode && input.AT == false)
-            {
-                Restart(input);
-            }
-
             if (input.IsPushedKeys)
             {
                 input.rB = input.RB.Output;
@@ -68,37 +70,61 @@ namespace WPFBlockCrash
                 //input.RB = input.LB = input.EB = false;
             }
 
-            switch (m_actcount)
+            if (input.AT) //自動化状態
             {
-                case 0:
+                ATMode(input);
+
+                if (input.barx == 50)
+                {
+                    input.AT = false;
+                    Restart(input);
+                }
+            }
+
+            //if (automode && input.AT == false)
+            //{
+                //Restart(input);
+            //}
+
+            //switch (m_actcount)
+            switch (ActType)
+            {
+                //case 0:
+                case EActType.TITLE:
                     {
                         if (title.Process(input, dc))
-                            m_actcount = 1;
+                            //m_actcount = 1;
+                            ActType = EActType.BAR_SELECT;
                         //input.ClearSmaller();
                     }
                     break;
-                case 1:
+                //case 1:
+                case EActType.BAR_SELECT:
                     {
                         if (barSelect.Process(input, dc))
                         {
                             stageSelect.SetValue(barSelect.mBar, 1, 0, 2);
-                            m_actcount = 2;
+                            //m_actcount = 2;
+                            ActType = EActType.STAGE_SELECT;
                         }
                         //input.ClearSmaller();
                     }
                     break;
-                case 2:
+                //case 2:
+                case EActType.STAGE_SELECT:
                     {
                         if (stageSelect.Process(input, dc))
                         {
-                            m_actcount = 3;
+                            //m_actcount = 3;
+                            ActType = EActType.CONTROL;
                             stock = stageSelect.Stock;
                             control = new Control(stageSelect.Bar, stageSelect.Stage, stageSelect.Score, stock, dInfo);
                         }
                         //input.ClearSmaller();
                     }
                     break;
-                case 3:
+                //case 3:
+                case EActType.CONTROL:
                     {
                         if (control.Process(input, dc))
                         {
@@ -129,8 +155,13 @@ namespace WPFBlockCrash
 
                                 if (message.Process(input, dc))
                                 {
-                                    m_actcount = 0;
+                                    //m_actcount = 0;
+                                    ActType = EActType.TITLE;
                                     act = 0;
+                                    title.IsDead = false;
+                                    
+                                    barSelect.IsDead = false;
+
                                     stageSelect.Reset();
                                     //stageSelect.SetFlag(false);
                                     stageSelect.IsDead = false;
@@ -149,17 +180,19 @@ namespace WPFBlockCrash
 
                             if (message.Process(input, dc))
                             {
-                                if (input.AT)
-                                {
-                                    m_actcount = 1;
+                                //if (input.AT) // 疲れるからタイトルへ
+                               // {
+                                    //m_actcount = 1;
+                                ActType = EActType.TITLE;
                                     //barSelect.SetFlag(false);
+                                title.IsDead = false;
                                     barSelect.IsDead = false;
-                                }
-                                else
-                                {
-                                    m_actcount = 2;
-                                    stageSelect.SetValue(control.Bar, control.Stage, control.Score, control.Stock);
-                                }
+                                ///}
+                                //else
+                               // {
+                                //    m_actcount = 2;
+                                //    stageSelect.SetValue(control.Bar, control.Stage, control.Score, control.Stock);
+                                //}
                                 act = 0;
                                 //stageSelect.SetFlag(false);
                                 stageSelect.IsDead = false;
@@ -193,15 +226,19 @@ namespace WPFBlockCrash
             keycheck = true;
             automode = false;
 
-            switch (m_actcount)
+            //switch (m_actcount)
+            switch (ActType)
             {
-                case 0 :
+                //case 0 :
+                case EActType.TITLE:
                     break;
-                case 1:
+                //case 1:
+                case EActType.BAR_SELECT:
                     //barSelect.SetFlag(false);
                     barSelect.IsDead = false;
                     break;
-                case 2:
+                //case 2:
+                case EActType.STAGE_SELECT:
                     //barSelect.SetFlag(false);
                     barSelect.IsDead = false;
                     //stageSelect.SetFlag(false);
@@ -210,7 +247,8 @@ namespace WPFBlockCrash
                     break;
             }
 
-            m_actcount = 0;
+            //m_actcount = 0;
+            ActType = EActType.TITLE;
         }
 
         public void ATMode(Input input)

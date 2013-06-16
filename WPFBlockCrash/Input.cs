@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
-    class Input
+    public class Input
     {
         public const int KEY_INPUT_RETURN = 0x1C;
         public const int KEY_INPUT_A = 0x1E;
