@@ -14,7 +14,7 @@ namespace WPFBlockCrash
 {
 	class Control
 	{
-        private const int MAX_SBALLCOUNT = 100;
+		private const int MAX_SBALLCOUNT = 20;
 		private const int MAX_BLOCKCOUNT = 100;
 
 		private Bar bar;
@@ -22,35 +22,20 @@ namespace WPFBlockCrash
 		private LinkedList<Ball> SmallBalls;
 		private List<Ball> willBeAddedSmallBalls;
 		private Block[] block;
-
-		//private int bdx;
-		//private int bdy;
-		//private int ballX;
-		//private int ballY;
-		//private int bkx;
-		//private int bky;
-
+		
 		private int bdwidth, bdheight, blwidth, blheight, bkwidth, bkheight;
 
 		private int exwidth;
 		private bool boundFlag;
 		private bool demolishFlag;
 
-		//private int bh, dh;
 		private SoundPlayer playerBH;
 		private SoundPlayer playerDH;
 		
-		//private int sballCount;
-		//private int mLevel;
-
-		//private int gh;
 		private ImageSource gh;
 
-		//private int act;
 		private int sumblock;
-		//private int mStage;
 		private int accel;
-		//private int barnum;
 		private int ballspup;
 		private int vspeed;
 		private DisplayInfo dInfo;
@@ -85,8 +70,6 @@ namespace WPFBlockCrash
 			Stock = stock;
 			Stage = stage;
 			vspeed = 0;
-
-			//Random rand = new Random(Environment.TickCount);
 	
 			//バーの幅と高さ
 			bdwidth = bar.Width;
@@ -276,7 +259,6 @@ namespace WPFBlockCrash
 						else if(i>58 && i<64)
 							block[i]= new Block(550+50*(i-59),50+28*13);
 
-						//block[i].SetHalfFlag(true);
 						block[i].HalfFlag = true;
 					}
 					break;

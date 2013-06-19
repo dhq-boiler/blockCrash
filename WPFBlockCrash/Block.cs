@@ -112,7 +112,7 @@ namespace WPFBlockCrash
             IsDead = false;
 
             //Random rand = new Random(Environment.TickCount);
-#if false
+#if true
             int r = Main.rand.Next() % 5;
             if (r == 1)
             {
