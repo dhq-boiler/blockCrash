@@ -38,6 +38,7 @@ namespace WPFBlockCrash
             Penetrability = EPenetrability.NON_PENETRATING;
             PenetratingCount = 0;
             IsSmall = false;
+            IsNewCount = 0;
             Level = 1;
         }
 
@@ -96,6 +97,10 @@ namespace WPFBlockCrash
                 --PenetratingCount;
                 if (PenetratingCount == 0)
                     Penetrability = EPenetrability.NON_PENETRATING;
+            }
+            if (IsNewCount > 0)
+            {
+                --IsNewCount;
             }
 
             Draw(dc);
@@ -169,6 +174,7 @@ namespace WPFBlockCrash
         public int PenetratingCount { get; set; }
 
         public bool IsSmall { get; set; }
+        public int IsNewCount { get; set; }
 
         internal void Reset()
         {
@@ -194,6 +200,7 @@ namespace WPFBlockCrash
         internal void Increse(int ballX, int ballY)
         {
             IsSmall = true;
+            IsNewCount = 10; 
             int r = (Main.rand.Next() ^ Main.rand.Next()) % 7;
             X = ballX;
             Y = ballY;

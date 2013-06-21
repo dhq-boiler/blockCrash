@@ -43,6 +43,7 @@ namespace WPFBlockCrash
         public int ItemHeight { get; private set; }
 
         private bool isdead;
+        public bool scrollStop;
         public bool IsDead
         {
             get { return isdead; }
@@ -86,6 +87,7 @@ namespace WPFBlockCrash
             set
             {
                 scroll = value;
+                scrollStop = false;
             }
         }
 
@@ -175,29 +177,34 @@ namespace WPFBlockCrash
             //}
             //else
             //{
+            if (!scrollStop) // スクロールストップフラグが立ってたらストップ
+            {
+                if (scroll == 1)
+                { // 右スクロール
+                    ++X;
+                    if (X + Width / 2 >= 800)
+                    { //画面外に出たら逆の画面へ
+                        scrollcount = X + Width / 2 - 800;
+                    }
+                    if (X - Width / 2 >= 800)
+                    {
+                        X -= 800;
+                        scrollcount = 0;
+                    }
+                }
 
-            if (scroll == 1) { // 右スクロール
-                ++X;
-                if (X + Width / 2 >= 800){ //画面外に出たら逆の画面へ
-                    scrollcount = X + Width / 2 - 800;
-                }
-                if (X - Width / 2 >= 800)
-                {
-                    X -= 800;
-                    scrollcount = 0;
-                }
-            }
-
-            if (scroll == -1) { // 左スクロール
-                --X;
-                if (X - Width / 2 < 0)
-                { //画面外に出たら逆の画面へ
-                    scrollcount = X + Width / 2 + 800;
-                }
-                if (X + Width / 2 < 0)
-                {
-                    X += 800;
-                    scrollcount = 0;
+                if (scroll == -1)
+                { // 左スクロール
+                    --X;
+                    if (X - Width / 2 < 0)
+                    { //画面外に出たら逆の画面へ
+                        scrollcount = X + Width / 2 + 800;
+                    }
+                    if (X + Width / 2 < 0)
+                    {
+                        X += 800;
+                        scrollcount = 0;
+                    }
                 }
             }
 

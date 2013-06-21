@@ -139,7 +139,7 @@ namespace WPFBlockCrash
 
                                 if (message.Process(input, dc))
                                 {
-                                    control.Reset();
+                                    control.Reset(); // 残機を減らしゲームを続行
                                     --stock;
                                     act = 0;
                                     message = null;

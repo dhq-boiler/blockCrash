@@ -361,7 +361,7 @@ namespace WPFBlockCrash
 
 			BallIsDead = UpdateBall(input, dc);
 
-			// 小玉があれば表示　// 謎の挙動
+			// 小玉があれば表示
 			UpdateSmallBalls(input, dc);
 
 			accel = bar.Accel; // デバック用
@@ -381,6 +381,8 @@ namespace WPFBlockCrash
 
 			if (BallIsDead)
 			{
+                for(int i = 0; i < sumblock; ++i)
+                    block[i].scrollStop = true;
 				bar.IsDead = true;
 				ball.DX = 0;
 			}
@@ -408,11 +410,14 @@ namespace WPFBlockCrash
 			bool BallIsDead;
 			BallIsDead = ball.Process(input, dc);
 
-			//ボールとバーの当たり判定
+			// ボールとバーの当たり判定
 			HitCheckBallAndBar(ball);
 
-			//ボールとブロックの当たり判定
+			// ボールとブロックの当たり判定
 			HitCheckBallAndBlock(ball);
+
+            // ボールとボールの衝突判定
+            HitCheckBallAndBall(ball);
 
 			return BallIsDead;
 		}
@@ -428,6 +433,9 @@ namespace WPFBlockCrash
 				HitCheckBallAndBar(smallBall);
 
 				HitCheckBallAndBlock(smallBall);
+
+                // ボールとボールの衝突判定
+                HitCheckBallAndBall(smallBall);
 
 				if (SmallBallDroped)
 				{
@@ -619,7 +627,7 @@ namespace WPFBlockCrash
 			}
 		}
 
-		private void ItemEffect(EItemType eItemType, int ballX, int balllY)
+		private void ItemEffect(EItemType eItemType, int ballX, int ballY)
 		{
 			int ct = 0;
 			switch (eItemType)
@@ -641,9 +649,8 @@ namespace WPFBlockCrash
 							break;
 
 						Ball newSmallBall = new Ball(dInfo);
-						newSmallBall.Increse(ballX, balllY);
+						newSmallBall.Increse(ballX, ballY);
 						willBeAddedSmallBalls.Add(newSmallBall);
-						
 						++sballcount;
 						++ct;
 						if (ct == 3) break;
@@ -711,6 +718,36 @@ namespace WPFBlockCrash
 			}
 		}
 
+        private void HitCheckBallAndBall(Ball ball) // ボールとボールの衝突判定
+        {
+            boundFlag = false;
+
+            boundFlag = ball.PlaySound;
+
+            int ballX = ball.X;
+            int ballY = ball.Y;
+
+            foreach (Ball smallBall in SmallBalls)
+            {
+                if (smallBall == ball) // 捜査対象が同じならコンティニュー
+                    continue;
+                if (smallBall.IsNewCount > 0) // 増えたばかりならコンティニュー
+                    continue;
+
+                if ((ballX - smallBall.X) * (ballX - smallBall.X) + (ballY - smallBall.Y) * (ballY - smallBall.Y) <= 20 * 20)
+                {// 衝突判定
+
+                    ball.DX = -ball.DX;
+                    ball.DY = -ball.DY;
+                    smallBall.DX = -smallBall.DX;
+                    smallBall.DY = -smallBall.DY;
+
+                    boundFlag = true;
+                }
+            }
+        }
+        
+
 		internal void Reset()
 		{
 			//for (int i = 0; i < sballcount; ++i)
@@ -723,7 +760,9 @@ namespace WPFBlockCrash
 			bdwidth = bar.Width;
 			bar.Reset();
 			ball.Reset();
-			bar.IsDead = false;
+            for (int i = 0; i < sumblock; ++i)
+                block[i].scrollStop = false;
+            bar.IsDead = false;
 		}
 	}
 }
