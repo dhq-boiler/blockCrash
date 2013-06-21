@@ -28,6 +28,11 @@ namespace WPFBlockCrash
         private bool half;
         private int count;
 
+        // スクロールブロック用変数,0=スクロールなし,1=右スクロール,-1=左スクロール
+        private int scroll = 0;
+        // スクロールカウント
+        private int scrollcount = 0;
+
         public EItemType ItemType { get; private set; }
 
         public int X { get; private set; }
@@ -73,6 +78,14 @@ namespace WPFBlockCrash
                 {
                     Width /= 2;
                 }
+            }
+        }
+        // ブロックのスクロールを制御する関数
+        public int ScrollFlag
+        {
+            set
+            {
+                scroll = value;
             }
         }
 
@@ -143,39 +156,82 @@ namespace WPFBlockCrash
 
         private void Draw(DrawingContext dc, int blockhandle)
         {
-            if (half)
-            {
-                if (!IsDead)
-                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
-                else if (ItemFlag)
-                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
-                else
+            //if (half)
+            //{
+            //    if (!IsDead)
+            //        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
+            //    else if (ItemFlag)
+            //        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+            //    else
+            //    {
+            //        if (count < 20)
+            //        {
+            //            dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
+            //            DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
+            //            dc.Pop();
+            //            ++count;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+
+            if (scroll == 1) { // 右スクロール
+                ++X;
+                if (X + Width / 2 >= 800){ //画面外に出たら逆の画面へ
+                    scrollcount = X + Width / 2 - 800;
+                }
+                if (X - Width / 2 >= 800)
                 {
-                    if (count < 20)
-                    {
-                        dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
-                        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
-                        dc.Pop();
-                        ++count;
-                    }
+                    X -= 800;
+                    scrollcount = 0;
                 }
             }
-            else
+
+            if (scroll == -1) { // 左スクロール
+                --X;
+                if (X - Width / 2 < 0)
+                { //画面外に出たら逆の画面へ
+                    scrollcount = X + Width / 2 + 800;
+                }
+                if (X + Width / 2 < 0)
+                {
+                    X += 800;
+                    scrollcount = 0;
+                }
+            }
+
+            if (!IsDead)
             {
-                if (!IsDead)
-                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
-                else if (ItemFlag)
-                    DrawUtil.DrawExtendGraph(dc, X - ItemWidth / 2, Y - ItemHeight / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                if (scrollcount > 0)
+                    DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, gh[blockhandle]);
+                DrawUtil.DrawExtendGraph(dc, X - Width / 2 , Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
+            }
+            else if (ItemFlag)
+                if (half)
+                {
+                    if (scrollcount > 0)
+                        DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, itemgh[(int)ItemType]);
+                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                }
                 else
                 {
-                    if (count < 20)
-                    {
-                        dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
-                        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
-                        dc.Pop();
-                        ++count;
-                    }
+                    if (scrollcount > 0)
+                        DrawUtil.DrawExtendGraph(dc, scrollcount - ItemWidth, Y - Height / 2, scrollcount, Y + Height / 2, itemgh[(int)ItemType]);
+                    DrawUtil.DrawExtendGraph(dc, X - ItemWidth / 2, Y - ItemHeight / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
                 }
+            else
+            {
+                if (count < 20)
+                {
+                    dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
+                    if (scrollcount > 0)
+                        DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
+                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
+                    dc.Pop();
+                    ++count;
+                }
+                // }
             }
         }
     }

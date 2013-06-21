@@ -103,7 +103,7 @@ namespace WPFBlockCrash
                     {
                         if (barSelect.Process(input, dc))
                         {
-                            stageSelect.SetValue(barSelect.mBar, 1, 0, 2);
+                            stageSelect.SetValue(barSelect.mBar, 0, 0, 2);
                             //m_actcount = 2;
                             ActType = EActType.STAGE_SELECT;
                         }

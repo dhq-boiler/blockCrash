@@ -160,6 +160,10 @@ namespace WPFBlockCrash
 							block[i]= new Block(55+(8+180)*(i-40),30*11+15);
 						else
 							block[i]= new Block(145+(8+180)*(i-44),30*12+15);
+                        if (i % 2 == 0)
+                            block[i].ScrollFlag = 1;
+                        else
+                            block[i].ScrollFlag = -1;
 					}
 					break;
 			case 4: sumblock = 44;
@@ -260,8 +264,10 @@ namespace WPFBlockCrash
 							block[i]= new Block(550+50*(i-59),50+28*13);
 
 						block[i].HalfFlag = true;
+                        block[i].ScrollFlag = 1;
 					}
 					break;
+
 			}
 
 			bkwidth = block[0].Width;
@@ -460,62 +466,75 @@ namespace WPFBlockCrash
 			int ballX = ball.X;
 			int ballY = ball.Y;
 
-			for (int i = 0; i < sumblock; ++i)
-			{
-				if (!block[i].IsDead)
-				{
-					int blockX = block[i].X;
-					int blockY = block[i].Y;
+            for (int i = 0; i < sumblock; ++i)
+            {
+                if (!block[i].IsDead)
+                {
+                    int blockendX = 0;
+                    int blockX = block[i].X;
+                    int blockY = block[i].Y;
 
-					if (ballX < blockX + bkwidth / 2
-						&& ballX > blockX - bkwidth / 2
-						&& ballY + blheight / 2 > blockY - bkheight / 2
-						&& ballY + blheight / 2 < blockY + bkheight / 2)
-					{
-						vspeed = 0;
+                    if (blockX - bkwidth / 2 < 0)
+                        blockendX = blockX - bkwidth / 2 + 800;
+                    if (blockX + bkwidth / 2 >= 800)
+                        blockendX = blockX + bkwidth / 2 - 800;
 
-						block[i].IsDead = true;
-						demolishFlag = true;
+                    for (int j = 0; j < 2; ++j)
+                    {
+                        if (ballX < blockX + bkwidth / 2
+                            && ballX > blockX - bkwidth / 2
+                            && ballY + blheight / 2 > blockY - bkheight / 2
+                            && ballY + blheight / 2 < blockY + bkheight / 2)
+                        {
+                            vspeed = 0;
 
-						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-							ball.DY = -ball.DY;
-					}
-					else if (ballX < blockX + bkwidth / 2
-						&& ballX > blockX - bkwidth / 2
-						&& ballY - blheight / 2 > blockY - bkheight / 2
-						&& ballY - blheight / 2 < blockY + bkheight / 2)
-					{
-						vspeed = 0;
+                            block[i].IsDead = true;
+                            demolishFlag = true;
 
-						block[i].IsDead = true;
-						demolishFlag = true;
-						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-							ball.DY = -ball.DY;
-					}
-					else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
-						&& ballX + blwidth / 2 > blockX - bkwidth / 2
-						&& ballY > blockY - bkheight / 2
-						&& ballY < blockY + bkheight / 2)
-					{
-						vspeed = 0;
+                            if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                                ball.DY = -ball.DY;
+                        }
+                        else if (ballX < blockX + bkwidth / 2
+                            && ballX > blockX - bkwidth / 2
+                            && ballY - blheight / 2 > blockY - bkheight / 2
+                            && ballY - blheight / 2 < blockY + bkheight / 2)
+                        {
+                            vspeed = 0;
 
-						block[i].IsDead = true;
-						demolishFlag = true;
-						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-							ball.DX = -ball.DX;
-					}
-					else if (ballX - blwidth / 2 < blockX + bkwidth / 2
-						&& ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
-						&& ballY > blockY - bkheight / 2
-						&& ballY < blockY + bkheight / 2)
-					{
-						vspeed = 0;
+                            block[i].IsDead = true;
+                            demolishFlag = true;
+                            if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                                ball.DY = -ball.DY;
+                        }
+                        else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
+                            && ballX + blwidth / 2 > blockX - bkwidth / 2
+                            && ballY > blockY - bkheight / 2
+                            && ballY < blockY + bkheight / 2)
+                        {
+                            vspeed = 0;
 
-						block[i].IsDead = true;
-						demolishFlag = true;
-						if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-							ball.DX = -ball.DX;
-					}
+                            block[i].IsDead = true;
+                            demolishFlag = true;
+                            if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                                ball.DX = -ball.DX;
+                        }
+                        else if (ballX - blwidth / 2 < blockX + bkwidth / 2
+                            && ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
+                            && ballY > blockY - bkheight / 2
+                            && ballY < blockY + bkheight / 2)
+                        {
+                            vspeed = 0;
+
+                            block[i].IsDead = true;
+                            demolishFlag = true;
+                            if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                                ball.DX = -ball.DX;
+                        }
+                        if (blockendX != 0)
+                            blockX = blockendX;
+                        else
+                            break;
+                    }
 
 					if (block[i].IsDead)
 					{
@@ -525,61 +544,74 @@ namespace WPFBlockCrash
 				}
 				else if (block[i].ItemFlag)
 				{
+                    int blockendX = 0;
 					int blockX = block[i].X;
 					int blockY = block[i].Y;
 
-					if (ballX < blockX + bkwidth / 2
-						&& ballX > blockX - bkwidth / 2
-						&& ballY + blheight / 2 > blockY - bkheight / 2
-						&& ballY + blheight / 2 < blockY + bkheight / 2)
-					{
-						vspeed = 0;
+                    if (blockX - bkwidth / 2 < 0)
+                        blockendX = blockX - bkwidth / 2 + 800;
+                    if (blockX + bkwidth / 2 >= 800)
+                        blockendX = blockX + bkwidth / 2 - 800;
 
-						block[i].ItemFlag = false;
+                    for (int j = 0; j < 2; ++j)
+                    {
+                        if (ballX < blockX + bkwidth / 2
+                            && ballX > blockX - bkwidth / 2
+                            && ballY + blheight / 2 > blockY - bkheight / 2
+                            && ballY + blheight / 2 < blockY + bkheight / 2)
+                        {
+                            vspeed = 0;
 
-						ItemEffect(block[i].ItemType, ballX, ballY);
+                            block[i].ItemFlag = false;
 
-						demolishFlag = true;
-					}
-					else if (ballX < blockX + bkwidth / 2
-						&& ballX > blockX - bkwidth / 2
-						&& ballY - blheight / 2 > blockY - bkheight / 2
-						&& ballY - blheight / 2 < blockY + bkheight / 2)
-					{
-						vspeed = 0;
+                            ItemEffect(block[i].ItemType, ballX, ballY);
 
-						block[i].ItemFlag = false;
+                            demolishFlag = true;
+                        }
+                        else if (ballX < blockX + bkwidth / 2
+                            && ballX > blockX - bkwidth / 2
+                            && ballY - blheight / 2 > blockY - bkheight / 2
+                            && ballY - blheight / 2 < blockY + bkheight / 2)
+                        {
+                            vspeed = 0;
 
-						ItemEffect(block[i].ItemType, ballX, ballY);
+                            block[i].ItemFlag = false;
 
-						demolishFlag = true;
-					}
-					else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
-						&& ballX + blwidth / 2 > blockX - bkwidth / 2
-						&& ballY > blockY - bkheight / 2
-						&& ballY < blockY + bkheight / 2)
-					{
-						vspeed = 0;
+                            ItemEffect(block[i].ItemType, ballX, ballY);
 
-						block[i].ItemFlag = false;
+                            demolishFlag = true;
+                        }
+                        else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
+                            && ballX + blwidth / 2 > blockX - bkwidth / 2
+                            && ballY > blockY - bkheight / 2
+                            && ballY < blockY + bkheight / 2)
+                        {
+                            vspeed = 0;
 
-						ItemEffect(block[i].ItemType, ballX, ballY);
+                            block[i].ItemFlag = false;
 
-						demolishFlag = true;
-					}
-					else if (ballX - blwidth / 2 < blockX + bkwidth / 2
-						&& ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
-						&& ballY > blockY - bkheight / 2
-						&& ballY < blockY + bkheight / 2)
-					{
-						vspeed = 0;
+                            ItemEffect(block[i].ItemType, ballX, ballY);
 
-						block[i].ItemFlag = false;
+                            demolishFlag = true;
+                        }
+                        else if (ballX - blwidth / 2 < blockX + bkwidth / 2
+                            && ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
+                            && ballY > blockY - bkheight / 2
+                            && ballY < blockY + bkheight / 2)
+                        {
+                            vspeed = 0;
 
-						ItemEffect(block[i].ItemType, ballX, ballY);
+                            block[i].ItemFlag = false;
 
-						demolishFlag = true;
-					}
+                            ItemEffect(block[i].ItemType, ballX, ballY);
+
+                            demolishFlag = true;
+                        }
+                        if (blockendX != 0)
+                            blockX = blockendX;
+                        else
+                            break;
+                    }
 
 					if (!block[i].ItemFlag)
 						Score += 300;

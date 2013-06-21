@@ -216,7 +216,8 @@ namespace WPFBlockCrash
         public void SetValue(int bar, int stage, int score, int stock)
         {
             Bar = bar;
-            clear[stage - 1] = true;
+            if(stage != 0)
+                clear[stage - 1] = true;
             Score = score;
             Stock = stock;
         }
