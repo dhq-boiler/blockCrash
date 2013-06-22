@@ -200,7 +200,7 @@ namespace WPFBlockCrash
         internal void Increse(int ballX, int ballY)
         {
             IsSmall = true;
-            IsNewCount = 10; 
+            IsNewCount = 30; 
             int r = (Main.rand.Next() ^ Main.rand.Next()) % 7;
             X = ballX;
             Y = ballY;

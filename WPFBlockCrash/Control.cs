@@ -738,9 +738,9 @@ namespace WPFBlockCrash
                 {// 衝突判定
 
                     ball.DX = -ball.DX;
-                    ball.DY = -ball.DY;
+                    ball.DY = ball.DY;
                     smallBall.DX = -smallBall.DX;
-                    smallBall.DY = -smallBall.DY;
+                    smallBall.DY = smallBall.DY;
 
                     boundFlag = true;
                 }
