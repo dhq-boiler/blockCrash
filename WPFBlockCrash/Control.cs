@@ -391,6 +391,9 @@ namespace WPFBlockCrash
 				ball.DX = 0;
 				ball.DY = 0;
 
+                for (int i = 0; i < sumblock; ++i)
+                    block[i].scrollStop = true;
+
 				// 小玉があれば表示
 				foreach (Ball smallBall in SmallBalls)
 				{
@@ -552,6 +555,8 @@ namespace WPFBlockCrash
 				}
 				else if (block[i].ItemFlag)
 				{
+                    if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        continue;
                     int blockendX = 0;
 					int blockX = block[i].X;
 					int blockY = block[i].Y;

@@ -33,6 +33,9 @@ namespace WPFBlockCrash
         // スクロールカウント
         private int scrollcount = 0;
 
+        // スクロール時にブロック破壊と同時にアイテムを取得しないように変数を実装
+        public int matchlesscount = 0;
+
         public EItemType ItemType { get; private set; }
 
         public int X { get; private set; }
@@ -51,6 +54,9 @@ namespace WPFBlockCrash
             {
                 bool old = isdead;
                 isdead = value;
+                if (value == true && ItemFlag) {
+                    matchlesscount = 10; // 10フレーム無敵に                    
+                }
                 if (!old && isdead)
                     Debug.WriteLine("A Block is dead now. (" + X + ", " + Y + ")");
             }
@@ -154,29 +160,12 @@ namespace WPFBlockCrash
         internal void Process(DrawingContext dc, int blockhandle)
         {
             Draw(dc, blockhandle);
+            if (matchlesscount > 0)
+                --matchlesscount;
         }
 
         private void Draw(DrawingContext dc, int blockhandle)
         {
-            //if (half)
-            //{
-            //    if (!IsDead)
-            //        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
-            //    else if (ItemFlag)
-            //        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
-            //    else
-            //    {
-            //        if (count < 20)
-            //        {
-            //            dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
-            //            DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
-            //            dc.Pop();
-            //            ++count;
-            //        }
-            //    }
-            //}
-            //else
-            //{
             if (!scrollStop) // スクロールストップフラグが立ってたらストップ
             {
                 if (scroll == 1)
@@ -238,7 +227,6 @@ namespace WPFBlockCrash
                     dc.Pop();
                     ++count;
                 }
-                // }
             }
         }
     }
