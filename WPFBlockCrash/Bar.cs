@@ -17,6 +17,7 @@ namespace WPFBlockCrash
         private DisplayInfo dInfo;
         private int mBar;
         private int moldBar;
+        private int accelcount;
 
         public Bar(int barnum, DisplayInfo dInfo)
         {
@@ -49,7 +50,10 @@ namespace WPFBlockCrash
             {
                 //キー処理
                 if (!KeyGet(input))
+                {
                     Accel = 0;
+                    accelcount = 0;
+                }
             }
 
             //描画処理
@@ -84,13 +88,29 @@ namespace WPFBlockCrash
             if (input.key256[Input.KEY_INPUT_LEFT] == 1)
             {
                 X -= SPEED;
-                Accel = -1;
+                ++accelcount;
+
+                if (accelcount < 25)
+                    Accel = -1;
+                else if (accelcount < 50)
+                    Accel = -2;
+                else
+                    Accel = -3;
+
                 IsPushedAnyKey = true;
             }
             else if (input.key256[Input.KEY_INPUT_RIGHT] == 1)
             {
                 X += SPEED;
-                Accel = 1;
+                ++accelcount;
+
+                if (accelcount < 25)
+                    Accel = 1;
+                else if (accelcount < 50)
+                    Accel = 2;
+                else
+                    Accel = 3;
+                
                 IsPushedAnyKey = true;
             }
             else if (input.key256[Input.KEY_INPUT_ESCAPE] == 1)

@@ -10,6 +10,9 @@ namespace WPFBlockCrash
     class Ball
     {
         public bool ballstop { get; set; }
+        public int xoffset { get; set; }
+        public int baccel { get; set; } 
+        public int acbectl { get; set; } // 加速の向き
 
         public enum EPenetrability
         {
@@ -43,6 +46,9 @@ namespace WPFBlockCrash
             IsNewCount = 0;
             Level = 1;
             ballstop = false;
+            xoffset = 0;
+            baccel = 0;
+            acbectl = 0;
         }
 
         public void Draw(DrawingContext dc)
@@ -122,10 +128,39 @@ namespace WPFBlockCrash
                     ActCount = 1;
                 }
                 else if (ballstop) {
-                    DX = 2+Level;
-                    DY = -(2+Level);
+                    Y = Y - 5;
+                    switch (baccel) {
+                        case 0:     DX = (2 + Level)*acbectl;
+                                    DY = -(2 + Level);
+                                    break;
+                        case 1:     DX = (3 + Level) * acbectl;
+                                    DY = -(3 + Level);
+                                    break;
+                        case 2:     DX = (4 + Level) * acbectl;
+                                    DY = -(3 + Level);
+                                    break;
+                        case 3:     DX = (5 + Level)*acbectl;
+                                    DY = -(3 + Level);
+                                    break;
+                    }
+
                     ballstop = false;
                 }
+            }
+        }
+        public void BarAccel(int bac)
+        {
+            baccel = bac;
+            if (baccel == 0)
+            {
+                acbectl = 1;
+            }
+            else if (baccel > 0)
+                acbectl = 1;
+            else
+            {
+                acbectl = -1;
+                baccel = -baccel;
             }
         }
 
@@ -196,6 +231,9 @@ namespace WPFBlockCrash
             IsDead = false;
             Radius = 1;
             Level = 1;
+            xoffset = 0;
+            baccel = 0;
+            acbectl = 0;
         }
 
         internal void PowerUp()

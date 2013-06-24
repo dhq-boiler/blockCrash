@@ -149,7 +149,7 @@ namespace WPFBlockCrash
             }
 #else
             ItemFlag = true;
-            ItemType = EItemType.ITEMTYPE_BALLCATCHER;
+            ItemType = EItemType.ITEMTYPE_INCRESE;
 #endif
 
             this.X = x;

@@ -47,7 +47,6 @@ namespace WPFBlockCrash
 		public int sballcount { get; set; }
         public bool ballcatch { get; set; }
 		public bool clear;
-        private int xoffset;
 
 
 		public Control(int mbar, int stage, int score, int stock, DisplayInfo dInfo)
@@ -72,8 +71,7 @@ namespace WPFBlockCrash
 			Stage = stage;
 			vspeed = 0;
             ballcatch = false;
-            xoffset = 0; // バーの中心点からボールがどれくらいずれているか
-	
+
 			//バーの幅と高さ
 			bdwidth = bar.Width;
 			bdheight = bar.Height;
@@ -332,8 +330,15 @@ namespace WPFBlockCrash
 				ball.X = bar.MX;
 			}
             if (ball.ballstop) {
-                ball.X = bar.MX + xoffset;
-                //小玉ようにボールの方にオフセットをつける
+                ball.X = bar.MX + ball.xoffset;
+            }
+            foreach (Ball smallBall in SmallBalls)
+            {
+                if (smallBall.ballstop){ // ボールが止まっていれば
+                    smallBall.X = bar.MX + smallBall.xoffset;
+                    smallBall.Y = 527;
+
+                }
             }
 
 
@@ -372,17 +377,25 @@ namespace WPFBlockCrash
 			// 小玉があれば表示
 			UpdateSmallBalls(input, dc);
 
-			accel = bar.Accel; // デバック用
+			accel = bar.Accel; 
 			
 			// 得点、レベル、残機枠の表示
 			DrawUtil.DrawBox(dc, 0, 0, 800, 30, Color.FromRgb(230, 230, 230), 3, null);
 			DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", Score), Color.FromRgb(255, 120, 0));
 			DrawUtil.DrawString(dc, 220, 10, string.Format("LEVEL: {0}", ball.Level), Color.FromRgb(255, 120, 0));
+            //デバック用
+            DrawUtil.DrawString(dc, 20, 400, string.Format("ACCEL: {0}", accel), Color.FromRgb(255, 120, 0));
 
-			for (int i = 0; i < Stock; ++i)
-			{
-				dc.DrawImage(gh, new Rect(540 + 18 * i, 7, gh.Width, gh.Height));
-			}
+            for (int i = 0; i < Stock; ++i)
+            {
+                dc.DrawImage(gh, new Rect(540 + 18 * i, 7, gh.Width, gh.Height));
+            }
+            ball.BarAccel(accel);
+            // 小玉があれば表示
+            foreach (Ball smallBall in SmallBalls)
+            {
+                smallBall.BarAccel(accel);
+            }
 
 			///音再生
 			SoundPlay();
@@ -701,19 +714,17 @@ namespace WPFBlockCrash
 				{
 					ball.Radius = 20;
 
-                    if (Bar == 3)
-                        ball.LvUp(1);
                     if (ballcatch)
-                    { //バールがバーにくっつく状態
-                        ball.Y = ball.Y - 5;
+                    { // ボールがバーにくっつく状態
                         ball.DX = ball.DY = 0;
                         ball.ballstop = true;
                         if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
-                            xoffset = ball.X - bar.MX;
+                            ball.xoffset = ball.X - bar.MX;
                     }
 					else if (ballX < barX - bdwidth / 2 * 2 / 3)
 					{
-                        
+                        if (Bar == 3)
+                            ball.LvUp(1);
 
 						ball.DX = -ball.DX;
 						ball.DY = -ball.DY;
@@ -723,7 +734,8 @@ namespace WPFBlockCrash
 					}
 					else if (ballX > barX + bdwidth / 2 * 2 / 3)
 					{
-
+                        if (Bar == 3)
+                            ball.LvUp(1);
 						ball.DX = -ball.DX;
 						ball.DY = -ball.DY;
 						ball.Y = ball.Y - 5;
@@ -732,7 +744,8 @@ namespace WPFBlockCrash
 					}
 					else
 					{
-
+                        if (Bar == 3)
+                            ball.LvUp(1);
 						ball.DY = -ball.DY;
 						ball.Y = ball.Y - 5;
 						boundFlag = true;
@@ -781,6 +794,7 @@ namespace WPFBlockCrash
             bar.BallCatch(false);
 			sballcount = 0;
 			--Stock;
+            vspeed = 0;
 			bdwidth = bar.Width;
 			bar.Reset();
 			ball.Reset();
