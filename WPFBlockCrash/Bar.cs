@@ -16,16 +16,18 @@ namespace WPFBlockCrash
         private ImageSource[] gh;
         private DisplayInfo dInfo;
         private int mBar;
+        private int moldBar;
 
         public Bar(int barnum, DisplayInfo dInfo)
         {
             this.dInfo = dInfo;
-            mBar = barnum - 1;
+            mBar = moldBar = barnum - 1;
 
-            gh = new ImageSource[3];
+            gh = new ImageSource[4];
             gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "bar.bmp"));
             gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "barsecond.bmp"));
             gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "barthird.bmp"));
+            gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "barcatcher.bmp"));
 
             BitmapImage bi = gh[0] as BitmapImage;
 
@@ -117,6 +119,17 @@ namespace WPFBlockCrash
         /// 加速 -なら左，+なら右
         /// </summary>
         public int Accel { get; set; }
+
+        public void BallCatch( bool on ){ // ボールがバーにくっつく状態
+            if (on && mBar != 3)
+            {
+                moldBar = mBar;
+                mBar = 3;
+                   
+            }
+            else if(!on)
+                mBar = moldBar;
+        }
 
         internal void Reset()
         {

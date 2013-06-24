@@ -45,8 +45,9 @@ namespace WPFBlockCrash
 		public int Score { get; set; }
 		public int Stock { get; set; }
 		public int sballcount { get; set; }
-
+        public bool ballcatch { get; set; }
 		public bool clear;
+        private int xoffset;
 
 
 		public Control(int mbar, int stage, int score, int stock, DisplayInfo dInfo)
@@ -70,6 +71,8 @@ namespace WPFBlockCrash
 			Stock = stock;
 			Stage = stage;
 			vspeed = 0;
+            ballcatch = false;
+            xoffset = 0; // バーの中心点からボールがどれくらいずれているか
 	
 			//バーの幅と高さ
 			bdwidth = bar.Width;
@@ -328,6 +331,11 @@ namespace WPFBlockCrash
 			{
 				ball.X = bar.MX;
 			}
+            if (ball.ballstop) {
+                ball.X = bar.MX + xoffset;
+                //小玉ようにボールの方にオフセットをつける
+            }
+
 
 			// ボールの動き
 			++ballspup; // 速度上昇カウント
@@ -667,6 +675,10 @@ namespace WPFBlockCrash
 				case EItemType.ITEMTYPE_SCOREUP:
 					Score += 2000;
 					break;
+                case EItemType.ITEMTYPE_BALLCATCHER:
+                    bar.BallCatch( true );
+                    ballcatch = true;
+                    break;
 			}
 		}
 
@@ -681,6 +693,7 @@ namespace WPFBlockCrash
 			int ballX = ball.X;
 			int ballY = ball.Y;
 
+
 			if (Math.Abs(barY - ballY) < blheight / 2 + bdheight / 2)
 			{
 				if (barX + bdwidth / 2 > ballX
@@ -688,10 +701,19 @@ namespace WPFBlockCrash
 				{
 					ball.Radius = 20;
 
-					if (ballX < barX - bdwidth / 2 * 2 / 3)
+                    if (Bar == 3)
+                        ball.LvUp(1);
+                    if (ballcatch)
+                    { //バールがバーにくっつく状態
+                        ball.Y = ball.Y - 5;
+                        ball.DX = ball.DY = 0;
+                        ball.ballstop = true;
+                        if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
+                            xoffset = ball.X - bar.MX;
+                    }
+					else if (ballX < barX - bdwidth / 2 * 2 / 3)
 					{
-						if (Bar == 3)
-							ball.LvUp(1);
+                        
 
 						ball.DX = -ball.DX;
 						ball.DY = -ball.DY;
@@ -701,8 +723,6 @@ namespace WPFBlockCrash
 					}
 					else if (ballX > barX + bdwidth / 2 * 2 / 3)
 					{
-						if (Bar == 3)
-							ball.LvUp(1);
 
 						ball.DX = -ball.DX;
 						ball.DY = -ball.DY;
@@ -712,8 +732,6 @@ namespace WPFBlockCrash
 					}
 					else
 					{
-						if (Bar == 3)
-							ball.LvUp(1);
 
 						ball.DY = -ball.DY;
 						ball.Y = ball.Y - 5;
@@ -759,7 +777,8 @@ namespace WPFBlockCrash
 			//    SmallBalls[i] = null;
 
 			SmallBalls = new LinkedList<Ball>();
-
+            ballcatch = false;
+            bar.BallCatch(false);
 			sballcount = 0;
 			--Stock;
 			bdwidth = bar.Width;

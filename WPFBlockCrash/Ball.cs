@@ -9,6 +9,8 @@ namespace WPFBlockCrash
 {
     class Ball
     {
+        public bool ballstop { get; set; }
+
         public enum EPenetrability
         {
             NON_PENETRATING,
@@ -40,6 +42,7 @@ namespace WPFBlockCrash
             IsSmall = false;
             IsNewCount = 0;
             Level = 1;
+            ballstop = false;
         }
 
         public void Draw(DrawingContext dc)
@@ -117,6 +120,11 @@ namespace WPFBlockCrash
                     DX = 3;
                     DY = -3;
                     ActCount = 1;
+                }
+                else if (ballstop) {
+                    DX = 2+Level;
+                    DY = -(2+Level);
+                    ballstop = false;
                 }
             }
         }

@@ -16,6 +16,7 @@ namespace WPFBlockCrash
         ITEMTYPE_INCRESE,
         ITEMTYPE_1UP,
         ITEMTYPE_SCOREUP,
+        ITEMTYPE_BALLCATCHER,
         ITEMTYPE_NO
     }
 
@@ -23,7 +24,7 @@ namespace WPFBlockCrash
     {
         private static bool IsFirstInstance = true;
         private static ImageSource[] gh = new ImageSource[8];
-        private static ImageSource[] itemgh = new ImageSource[5];
+        private static ImageSource[] itemgh = new ImageSource[6];
 
         private bool half;
         private int count;
@@ -102,7 +103,7 @@ namespace WPFBlockCrash
             if (IsFirstInstance)
             {
                 gh = new ImageSource[8];
-                itemgh = new ImageSource[5];
+                itemgh = new ImageSource[6];
 
                 gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "block1.bmp")) { CreateOptions = BitmapCreateOptions.None };
                 gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "block2.bmp")) { CreateOptions = BitmapCreateOptions.None };
@@ -118,6 +119,7 @@ namespace WPFBlockCrash
                 itemgh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_increse.bmp")) { CreateOptions = BitmapCreateOptions.None };
                 itemgh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_1up.bmp")) { CreateOptions = BitmapCreateOptions.None };
                 itemgh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_scoreup.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                itemgh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_mag.bmp")) { CreateOptions = BitmapCreateOptions.None };
 
                 IsFirstInstance = false;
             }
@@ -134,20 +136,20 @@ namespace WPFBlockCrash
 
             //Random rand = new Random(Environment.TickCount);
 #if true
-            int r = Main.rand.Next() % 5;
+            int r = Main.rand.Next() % 6;
             if (r == 1)
             {
-                ItemFlag = true;
-                ItemType = (EItemType)(Main.rand.Next() % 5);
+                itemflag = true;
+                ItemType = (EItemType)(Main.rand.Next() % 6);
             }
             else
             {
-                ItemFlag = false;
+                itemflag = false;
                 ItemType = EItemType.ITEMTYPE_NO;
             }
 #else
             ItemFlag = true;
-            ItemType = EItemType.ITEMTYPE_INCRESE;
+            ItemType = EItemType.ITEMTYPE_BALLCATCHER;
 #endif
 
             this.X = x;
