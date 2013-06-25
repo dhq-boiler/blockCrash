@@ -17,7 +17,8 @@ namespace WPFBlockCrash
             TITLE,
             BAR_SELECT,
             STAGE_SELECT,
-            CONTROL
+            CONTROL,
+            RANKING
         }
 
         private StageSelect stageSelect;
@@ -25,6 +26,7 @@ namespace WPFBlockCrash
         private Message message;
         private BarSelect barSelect;
         private Title title;
+        private Ranking ranking;
 
         //private int m_actcount;
         private EActType ActType;
@@ -157,18 +159,8 @@ namespace WPFBlockCrash
 
                                 if (message.Process(input, dc))
                                 {
-                                    //m_actcount = 0;
-                                    ActType = EActType.TITLE;
-                                    act = 0;
-                                    title.IsDead = false;
-                                    
-                                    barSelect.IsDead = false;
-
-                                    stageSelect.Reset();
-                                    //stageSelect.SetFlag(false);
-                                    stageSelect.IsDead = false;
-                                    message = null;
-                                    control = null;
+                                    ActType = EActType.RANKING;
+                                    ranking = new Ranking(stageSelect.Score, stageSelect.Bar, dInfo);
                                 }
                             }
                         }
@@ -182,29 +174,37 @@ namespace WPFBlockCrash
 
                             if (message.Process(input, dc))
                             {
-                                //if (input.AT) // 疲れるからタイトルへ
-                               // {
-                                    //m_actcount = 1;
-                                ActType = EActType.TITLE;
-                                    //barSelect.SetFlag(false);
-                                title.IsDead = false;
-                                    barSelect.IsDead = false;
-                                ///}
-                                //else
-                               // {
-                                //    m_actcount = 2;
-                                //    stageSelect.SetValue(control.Bar, control.Stage, control.Score, control.Stock);
-                                //}
-                                act = 0;
-                                //stageSelect.SetFlag(false);
-                                stageSelect.IsDead = false;
-                                message = null;
-                                control = null;
+                                ActType = EActType.RANKING;
+                                ranking = new Ranking(stageSelect.Score, stageSelect.Bar, dInfo);
                             }
                         }
-                        //keycheck = true;
-                        //input.ClearSmaller();
                     }
+                    break;
+                case EActType.RANKING: {
+                    if(ranking.Process(input,dc))
+                    {
+                        //if (input.AT) // 疲れるからタイトルへ
+                        // {
+                        //m_actcount = 1;
+                        ActType = EActType.TITLE;
+                        //barSelect.SetFlag(false);
+                        title.IsDead = false;
+                        barSelect.IsDead = false;
+                        ///}
+                        //else
+                        // {
+                        //    m_actcount = 2;
+                        //    stageSelect.SetValue(control.Bar, control.Stage, control.Score, control.Stock);
+                        //}
+                        act = 0;
+                        stageSelect.Reset();
+                        //stageSelect.SetFlag(false);
+                        stageSelect.IsDead = false;
+                        message = null;
+                        control = null;
+                        ranking = null;
+                    }
+                }
                     break;
             }
             input.ClearSmaller();
@@ -278,13 +278,5 @@ namespace WPFBlockCrash
                 }
             }
         }
-        // セーブデータ作成
-        public class SaveGameData{
-            //public string PlayerName; // 名前入力用
-            public int Score;
-            public int BarNum;
-            public DateTime Date; // 日付用
-        }
-        SaveGameData[] saved = new SaveGameData[20];
     }
 }

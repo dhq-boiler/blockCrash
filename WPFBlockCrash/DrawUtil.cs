@@ -46,6 +46,12 @@ namespace WPFBlockCrash
                 new Rect(new Point(x1, y1), new Point(x2, y2)));
         }
 
+        public static void DrawLine(DrawingContext dc, int x1, int y1, int x2, int y2, Color? penColor)
+        {
+            dc.DrawLine(
+            penColor.HasValue ? new Pen(new SolidColorBrush(penColor.Value), 3) : null,new Point(x1,y1),new Point(x2,y2));
+        }
+
         public static void DrawGraph(DrawingContext dc, int x, int y, ImageSource imageSource)
         {
             DrawGraph(dc, x, y, (int)imageSource.Width, (int)imageSource.Height, imageSource);

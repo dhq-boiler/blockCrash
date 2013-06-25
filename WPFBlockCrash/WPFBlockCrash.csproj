@@ -56,6 +56,7 @@
     <Compile Include="DrawUtil.cs" />
     <Compile Include="KeyInput.cs" />
     <Compile Include="Message.cs" />
+    <Compile Include="Ranking.cs" />
     <Compile Include="StageSelect.cs" />
     <Compile Include="Title.cs" />
     <Page Include="BlockCrashView.xaml">

@@ -136,7 +136,7 @@ namespace WPFBlockCrash
 
             //Random rand = new Random(Environment.TickCount);
 #if true
-            int r = Main.rand.Next() % 6;
+            int r = Main.rand.Next() % 5;
             if (r == 1)
             {
                 itemflag = true;
