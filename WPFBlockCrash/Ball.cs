@@ -25,8 +25,8 @@ namespace WPFBlockCrash
             this.dInfo = dInfo;
             gh = new ImageSource[3];
             gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_a.png"));
-            gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.bmp"));
-            gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball3.bmp"));
+            gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.png"));
+            gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball3.png"));
 
             Width = (int)gh[0].Width;
             Height = (int)gh[0].Height;
