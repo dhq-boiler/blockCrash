@@ -5,9 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Xml.Serialization;
 
 namespace WPFBlockCrash
 {
+
     class Main
     {
         enum EActType
@@ -264,7 +266,7 @@ namespace WPFBlockCrash
                     c = 0;
 
                     //Random rand = new Random(Environment.TickCount);
-
+                    
                     int r = rand.Next() % 3;
 
                     if (r == 0)
@@ -276,5 +278,13 @@ namespace WPFBlockCrash
                 }
             }
         }
+        // セーブデータ作成
+        public class SaveGameData{
+            //public string PlayerName; // 名前入力用
+            public int Score;
+            public int BarNum;
+            public DateTime Date; // 日付用
+        }
+        SaveGameData[] saved = new SaveGameData[20];
     }
 }
