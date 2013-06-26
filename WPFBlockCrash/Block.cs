@@ -17,7 +17,8 @@ namespace WPFBlockCrash
         ITEMTYPE_1UP,
         ITEMTYPE_SCOREUP,
         ITEMTYPE_BALLCATCHER,
-        ITEMTYPE_NO
+        ITEMTYPE_NO,
+        
     }
 
     class Block
@@ -48,6 +49,7 @@ namespace WPFBlockCrash
 
         private bool isdead;
         public bool scrollStop;
+        public bool barextend;
         public bool IsDead
         {
             get { return isdead; }
@@ -98,7 +100,7 @@ namespace WPFBlockCrash
             }
         }
 
-        public Block(int x, int y)
+        public Block(int x, int y,bool extendon)
         {
             if (IsFirstInstance)
             {
@@ -132,15 +134,23 @@ namespace WPFBlockCrash
             ItemWidth = (int)bsitem.PixelWidth;
             ItemHeight = (int)bsitem.PixelHeight;
 
+            barextend = extendon;
             IsDead = false;
 
             //Random rand = new Random(Environment.TickCount);
 #if true
             int r = Main.rand.Next() % 5;
+            //int r = 1; デバック用
             if (r == 1)
             {
                 itemflag = true;
-                ItemType = (EItemType)(Main.rand.Next() % 6);
+                if (barextend) // バーが伸びる状態
+                    ItemType = (EItemType)(Main.rand.Next() % 6);
+                else {
+                     ItemType = (EItemType)((Main.rand.Next() % 5) + 1 );
+                }
+                    
+                
             }
             else
             {

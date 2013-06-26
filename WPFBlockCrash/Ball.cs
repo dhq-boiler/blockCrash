@@ -121,13 +121,8 @@ namespace WPFBlockCrash
         {
             if (input.eB)
             {
-                if (ActCount == 0 && !IsSmall)
+                if (ActCount == 0 && !IsSmall ||ballstop)
                 {
-                    DX = 3;
-                    DY = -3;
-                    ActCount = 1;
-                }
-                else if (ballstop) {
                     Y = Y - 5;
                     switch (baccel) {
                         case 0:     DX = (2 + Level)*acbectl;
@@ -143,7 +138,7 @@ namespace WPFBlockCrash
                                     DY = -(3 + Level);
                                     break;
                     }
-
+                    ActCount = 1;
                     ballstop = false;
                 }
             }
