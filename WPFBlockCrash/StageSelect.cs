@@ -53,14 +53,14 @@ namespace WPFBlockCrash
             stagegh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage3mini.png"));
             stagegh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage4mini.png"));
             stagegh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage5mini.png"));
-            stagegh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_a.png"));
+            stagegh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball.png"));
 
             sdetailgh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage1.png"));
             sdetailgh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage2.png"));
             sdetailgh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage3.png"));
             sdetailgh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage4.png"));
             sdetailgh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage5.png"));
-            sdetailgh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_a.png"));
+            sdetailgh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball.png"));
 
             sselectgh = new BitmapImage(new Uri(Main.ResourceDirectory, "stageselect.png"));
             cleargh = new BitmapImage(new Uri(Main.ResourceDirectory, "clearstar.png"));
