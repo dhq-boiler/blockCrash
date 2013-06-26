@@ -47,12 +47,16 @@ namespace WPFBlockCrash
 		public int sballcount { get; set; }
         public bool ballcatch { get; set; }
 		public bool clear;
-
+        private int alphacombo { get; set; }
+        private int combocount { get; set; }
+        private bool comboon { get; set; }
+        private int combooncount { get; set; }
 
 		public Control(int mbar, int stage, int score, int stock, DisplayInfo dInfo)
 		{
 			this.dInfo = dInfo;
 			Bar = mbar;
+
 
             bool extendon = true;
             if (mbar == 3)
@@ -75,6 +79,10 @@ namespace WPFBlockCrash
 			Stage = stage;
 			vspeed = 0;
             ballcatch = false;
+            combocount = 0;
+            comboon = false;
+            combooncount = 0;
+            alphacombo = 0;
 
 			//バーの幅と高さ
 			bdwidth = bar.Width;
@@ -392,6 +400,29 @@ namespace WPFBlockCrash
 			DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", Score), Color.FromRgb(255, 120, 0));
 			DrawUtil.DrawString(dc, 220, 10, string.Format("LEVEL: {0}", ball.Level), Color.FromRgb(255, 120, 0));
             //デバック用
+            // コンボ表示　邪魔にならないよう透明化処理する  
+            if (combocount > 1)
+            {
+                DrawUtil.DrawString(dc, 20, 400, string.Format("{0} COMBO!", combocount), Color.FromRgb(255, 120, 0));
+                combooncount = 0;
+                comboon = true;
+                alphacombo = combocount;
+            }
+            if(combocount == 0 && comboon)
+            {
+                if (combooncount < 20)
+                {
+                    dc.PushOpacity((255d / 40) * (20 - combooncount) / byte.MaxValue);
+                    DrawUtil.DrawString(dc, 20, 400, string.Format("{0} COMBO!", alphacombo), Color.FromRgb(255, 120, 0));
+                    dc.Pop();
+                    ++combooncount;
+                }
+                else
+                {
+                    comboon = false;
+                    alphacombo = 0;
+                }
+            }
             //DrawUtil.DrawString(dc, 20, 400, string.Format("ACCEL: {0}", accel), Color.FromRgb(255, 120, 0));
 
             for (int i = 0; i < Stock; ++i)
@@ -579,7 +610,8 @@ namespace WPFBlockCrash
 
 					if (block[i].IsDead)
 					{
-						Score += 100 + 50 * ball.Level;
+                        ++combocount; 
+						Score += 100 + 50 * ball.Level + combocount * 100;
 						ball.Radius = 0;
 					}
 				}
@@ -684,6 +716,7 @@ namespace WPFBlockCrash
 							break;
 
 						Ball newSmallBall = new Ball(dInfo);
+                        newSmallBall.ballstop = false;
 						newSmallBall.Increse(ballX, ballY);
 						willBeAddedSmallBalls.Add(newSmallBall);
 						++sballcount;
@@ -695,7 +728,7 @@ namespace WPFBlockCrash
 					++Stock;
 					break;
 				case EItemType.ITEMTYPE_SCOREUP:
-					Score += 2000;
+					Score += 5000;
 					break;
                 case EItemType.ITEMTYPE_BALLCATCHER:
                     bar.BallCatch( true );
@@ -729,9 +762,11 @@ namespace WPFBlockCrash
                         ball.ballstop = true;
                         if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
                             ball.xoffset = ball.X - bar.MX;
+                        combocount = 0;
                     }
 					else if (ballX < barX - bdwidth / 2 * 2 / 3)
 					{
+                        combocount = 0;
                         if (Bar == 3)
                             ball.LvUp(1);
 
@@ -743,6 +778,7 @@ namespace WPFBlockCrash
 					}
 					else if (ballX > barX + bdwidth / 2 * 2 / 3)
 					{
+                        combocount = 0;
                         if (Bar == 3)
                             ball.LvUp(1);
 						ball.DX = -ball.DX;
@@ -753,6 +789,10 @@ namespace WPFBlockCrash
 					}
 					else
 					{
+                        if (ballX < barX + 10 && ballX > barX - 10) {
+                            ball.Penetration();
+                        }
+                        combocount = 0;
                         if (Bar == 3)
                             ball.LvUp(1);
 						ball.DY = -ball.DY;
@@ -805,7 +845,8 @@ namespace WPFBlockCrash
 			--Stock;
             vspeed = 0;
 			bdwidth = bar.Width;
-			bar.Reset();
+            combocount = 0;
+            bar.Reset();
 			ball.Reset();
             for (int i = 0; i < sumblock; ++i)
                 block[i].scrollStop = false;

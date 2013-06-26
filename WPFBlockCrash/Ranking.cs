@@ -86,7 +86,7 @@ namespace WPFBlockCrash
                     { // デバック用に最下位は0を入力
                         saved[i].Score = 0;
                     }
-                    else // 数値は最上位が300000,/iでどうです
+                    else // 数値は最上位が30000,
                         saved[i].Score = 30000 - (i + 1)*1500;
                     // BarNumはランダムで
                     saved[i].BarNum = Main.rand.Next() % 3;

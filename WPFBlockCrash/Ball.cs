@@ -23,10 +23,11 @@ namespace WPFBlockCrash
         public Ball(DisplayInfo dInfo)
         {
             this.dInfo = dInfo;
-            gh = new ImageSource[3];
+            gh = new ImageSource[4];
             gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_a.png"));
             gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.png"));
             gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball3.png"));
+            gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball3.png"));
 
             Width = (int)gh[0].Width;
             Height = (int)gh[0].Height;
@@ -56,7 +57,10 @@ namespace WPFBlockCrash
             ImageSource src = null;
 
             if (Penetrability == EPenetrability.PENETRATING)
-                src = gh[1];
+                if(IsSmall)
+                    src = gh[3];
+                else
+                    src = gh[1];
             else if (IsSmall)
                 src = gh[2];
             else
@@ -252,11 +256,17 @@ namespace WPFBlockCrash
             acbectl = 0;
         }
 
-        internal void PowerUp()
+        internal void PowerUp() // アイテム取得による貫通化
         {
             if (!IsSmall)
                 Penetrability = EPenetrability.PENETRATING;
             PenetratingCount = 150;
+        }
+
+        internal void Penetration() // バー中央ヒットによる貫通化
+        {
+            Penetrability = EPenetrability.PENETRATING;
+            PenetratingCount = 50;
         }
 
         internal void Increse(int ballX, int ballY)
