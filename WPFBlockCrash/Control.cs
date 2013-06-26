@@ -423,6 +423,7 @@ namespace WPFBlockCrash
 				}
 
 				vspeed = 0;
+                Score += ball.Level * Stock; 
 				bar.IsDead = true;
 			}
 

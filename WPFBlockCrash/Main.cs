@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using System.Xml.Serialization;
 
 namespace WPFBlockCrash
 {
@@ -26,7 +25,7 @@ namespace WPFBlockCrash
         private Message message;
         private BarSelect barSelect;
         private Title title;
-        private Ranking ranking;
+        public Ranking ranking;
 
         //private int m_actcount;
         private EActType ActType;
@@ -160,7 +159,7 @@ namespace WPFBlockCrash
                                 if (message.Process(input, dc))
                                 {
                                     ActType = EActType.RANKING;
-                                    ranking = new Ranking(stageSelect.Score, stageSelect.Bar, dInfo);
+                                    ranking = new Ranking(control.Score,control.Bar, dInfo);
                                 }
                             }
                         }
@@ -175,7 +174,7 @@ namespace WPFBlockCrash
                             if (message.Process(input, dc))
                             {
                                 ActType = EActType.RANKING;
-                                ranking = new Ranking(stageSelect.Score, stageSelect.Bar, dInfo);
+                                ranking = new Ranking(control.Score, control.Bar, dInfo);
                             }
                         }
                     }

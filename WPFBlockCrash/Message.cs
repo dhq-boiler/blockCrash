@@ -12,6 +12,7 @@ namespace WPFBlockCrash
         private int pattern;
         private int count;
         private string message;
+        private string message2;
         private DisplayInfo dInfo;
         private DateTime? BeginDisplayTime;
 
@@ -32,6 +33,7 @@ namespace WPFBlockCrash
                     break;
                 case 2:
                     message = "CLEAR!!";
+                    message2 = "残機に応じてスコアにボーナスが乗ります!!";
                     break;
                 case 3:
                     message = "GAME OVER!!";
@@ -57,7 +59,9 @@ namespace WPFBlockCrash
                 dc.PushOpacity(128d / byte.MaxValue);
                 DrawUtil.DrawBox(dc, 0, 0, dInfo.Width, dInfo.Height, RGB(30, 30, 30));
                 dc.Pop();
-                DrawUtil.DrawString(dc, 250, 300, message, RGB(255, 255, 255), 32);
+                DrawUtil.DrawString(dc, 300, 300, message, RGB(255, 255, 255), 32);
+                if(pattern == 2) // クリアなら
+                    DrawUtil.DrawString(dc, 150, 350, message2, RGB(255, 255, 255), 32);
                 --count;
             }
             else
