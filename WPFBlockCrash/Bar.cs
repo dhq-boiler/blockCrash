@@ -42,6 +42,7 @@ namespace WPFBlockCrash
             Y = 540;
             EnlargementFactor = 2;
             IsDead = false;
+            IsMove = false;
         }
 
         internal bool Process(Input input, DrawingContext dc)
@@ -81,12 +82,14 @@ namespace WPFBlockCrash
 
             if (!input.AT && input.barx != 0) 
             {
+                IsMove = true;
                 X = input.barx;
                 IsPushedAnyKey = true;
             }
 
             if (input.key256[Input.KEY_INPUT_LEFT] == 1)
             {
+                IsMove = true;
                 X -= SPEED;
                 ++accelcount;
 
@@ -101,6 +104,7 @@ namespace WPFBlockCrash
             }
             else if (input.key256[Input.KEY_INPUT_RIGHT] == 1)
             {
+                IsMove = true;
                 X += SPEED;
                 ++accelcount;
 
@@ -134,6 +138,7 @@ namespace WPFBlockCrash
         public int Height { get; set; }
         public int MX { get; set; }
         public bool IsDead { get; set; }
+        public bool IsMove { get; set; } // 動いたかどうか
 
         /// <summary>
         /// 加速 -なら左，+なら右

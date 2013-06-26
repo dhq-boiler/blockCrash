@@ -610,8 +610,11 @@ namespace WPFBlockCrash
 
 					if (block[i].IsDead)
 					{
+                        int nonmovebonus = 0;
+                        if (!bar.IsMove)
+                            nonmovebonus = 500;
                         ++combocount; 
-						Score += 100 + 50 * ball.Level + combocount * 100;
+						Score += 100 + 50 * ball.Level + combocount * 100 + nonmovebonus;
 						ball.Radius = 0;
 					}
 				}
@@ -763,10 +766,12 @@ namespace WPFBlockCrash
                         if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
                             ball.xoffset = ball.X - bar.MX;
                         combocount = 0;
+                        bar.IsMove = false;
                     }
 					else if (ballX < barX - bdwidth / 2 * 2 / 3)
 					{
                         combocount = 0;
+                        bar.IsMove = false;
                         if (Bar == 3)
                             ball.LvUp(1);
 
@@ -779,6 +784,7 @@ namespace WPFBlockCrash
 					else if (ballX > barX + bdwidth / 2 * 2 / 3)
 					{
                         combocount = 0;
+                        bar.IsMove = false;
                         if (Bar == 3)
                             ball.LvUp(1);
 						ball.DX = -ball.DX;
@@ -794,6 +800,7 @@ namespace WPFBlockCrash
                             ball.LvUp(1); // 速度が上がって短時間貫通化
                         }
                         combocount = 0;
+                        bar.IsMove = false;
                         if (Bar == 3)
                             ball.LvUp(1);
 						ball.DY = -ball.DY;
