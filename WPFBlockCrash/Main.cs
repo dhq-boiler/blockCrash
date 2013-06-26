@@ -152,7 +152,7 @@ namespace WPFBlockCrash
                             {
                                 if (act == 0)
                                 {
-                                    message = new Message(3, 200, dInfo);
+                                    message = new Message(3, 120, dInfo);
                                     ++act;
                                 }
 

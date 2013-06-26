@@ -181,29 +181,29 @@ namespace WPFBlockCrash
             for (int i = 0; i < 20; ++i)
             {
                 if (i == index) { // 今回の記録
-                    DrawUtil.DrawLine(dc, 25, -595 + i * 40 + scorey, 650, -600 + i * 40 + scorey, Color.FromRgb(255, 0, 0));
+                    DrawUtil.DrawLine(dc, 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey, Color.FromRgb(255, 0, 0));
 
-                    DrawUtil.DrawString(dc, 40, -630 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 255, 100), 32);
-                    DrawUtil.DrawString(dc, 150, -630 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 255, 100), 32);
-                    DrawUtil.DrawGraph(dc, 300, -625 + i * 40 + scorey, gh[saved[i].BarNum]);
-                    DrawUtil.DrawString(dc, 450, -630 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 255, 100), 32);
-                    DrawUtil.DrawGraph(dc, 650, -640 + i * 40 + scorey, newgh);
+                    DrawUtil.DrawString(dc, 40, -670 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 255, 100), 32);
+                    DrawUtil.DrawString(dc, 150, -670 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 255, 100), 32);
+                    DrawUtil.DrawGraph(dc, 300, -665 + i * 40 + scorey, gh[saved[i].BarNum]);
+                    DrawUtil.DrawString(dc, 450, -670 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 255, 100), 32);
+                    DrawUtil.DrawGraph(dc, 650, -680 + i * 40 + scorey, newgh);
                 }
                 else {
-                    DrawUtil.DrawLine(dc, 25, -595 + i * 40 + scorey, 650, -600 + i * 40 + scorey, Color.FromRgb(230, 230, 230));
+                    DrawUtil.DrawLine(dc, 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey, Color.FromRgb(230, 230, 230));
 
-                    DrawUtil.DrawString(dc, 40, -630 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 120, 0), 32);
-                    DrawUtil.DrawString(dc, 150, -630 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 120, 0), 32);
-                    DrawUtil.DrawGraph(dc, 300, -625 + i * 40 + scorey, gh[saved[i].BarNum]);
-                    DrawUtil.DrawString(dc, 450, -630 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 120, 0), 32);
+                    DrawUtil.DrawString(dc, 40, -670 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 120, 0), 32);
+                    DrawUtil.DrawString(dc, 150, -670 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 120, 0), 32);
+                    DrawUtil.DrawGraph(dc, 300, -665 + i * 40 + scorey, gh[saved[i].BarNum]);
+                    DrawUtil.DrawString(dc, 450, -670 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 120, 0), 32);
                 }
                 
             }
             DrawUtil.DrawGraph(dc, 0, 0, rankGh);
-            DrawUtil.DrawString(dc, 40, 220, string.Format("RANK"), Color.FromRgb(255, 255, 255), 32);
-            DrawUtil.DrawString(dc, 150, 220, string.Format("SCORE"), Color.FromRgb(255, 255, 255), 32);
-            DrawUtil.DrawString(dc, 300, 220, string.Format("BARTYPE"), Color.FromRgb(255, 255, 255), 32);
-            DrawUtil.DrawString(dc, 480, 220, string.Format("DATE"), Color.FromRgb(255, 255, 255), 32);
+            DrawUtil.DrawString(dc, 40, 180, string.Format("RANK"), Color.FromRgb(255, 255, 255), 32);
+            DrawUtil.DrawString(dc, 150, 180, string.Format("SCORE"), Color.FromRgb(255, 255, 255), 32);
+            DrawUtil.DrawString(dc, 300, 180, string.Format("BARTYPE"), Color.FromRgb(255, 255, 255), 32);
+            DrawUtil.DrawString(dc, 480, 180, string.Format("DATE"), Color.FromRgb(255, 255, 255), 32);
 
             if (scorey < 900 && scroll)
                 scorey += 4 * scrollspeed;
