@@ -15,6 +15,7 @@ namespace WPFBlockCrash
     {
         private DisplayInfo dInfo;
         private ImageSource[] gh;
+        private ImageSource newgh;
         public SaveGameData[] saved = new SaveGameData[20];
 
         public Ranking(int score, int barnum, DisplayInfo dInfo)
@@ -23,11 +24,12 @@ namespace WPFBlockCrash
 
             try
             {
-                rankGh = new BitmapImage(new Uri(Main.ResourceDirectory, "barselect.png"));
+                rankGh = new BitmapImage(new Uri(Main.ResourceDirectory, "ranking.png"));
                 gh = new ImageSource[3];
                 gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "bar.bmp"));
                 gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "barsecond.bmp"));
                 gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "barthird.bmp"));
+                newgh = new BitmapImage(new Uri(Main.ResourceDirectory, "new.bmp"));
             }
             catch (Exception e)
             {
@@ -68,11 +70,15 @@ namespace WPFBlockCrash
             XmlSerializer serializer = new XmlSerializer(typeof(SaveGameData[]));
             System.IO.FileStream fs1;
             try { // あれば開く　場所はC:\Users\大輔\Desktop\TSBBC\blockcrash\BlockCrashGUI\bin\Debug
-                fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Open);
-                saved = (SaveGameData[])serializer.Deserialize(fs1);
+                System.IO.FileStream fs2;
+                fs2 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Open); // 読み込み
+                saved = (SaveGameData[])serializer.Deserialize(fs2);
+                fs2.Close();
+                fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create); // 再作成
             }
-            catch (Exception e) { // 開けなかったらCreate
-                fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create);
+            catch (Exception e)
+            { // 開けなかったらCreate
+                fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create); //作成
                 for (int i = 0; i < 20; ++i)
                 { // 配列20
                     saved[i] = new SaveGameData();
@@ -178,6 +184,7 @@ namespace WPFBlockCrash
                     DrawUtil.DrawString(dc, 150, -630 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 255, 100), 32);
                     DrawUtil.DrawGraph(dc, 300, -625 + i * 40 + scorey, gh[saved[i].BarNum]);
                     DrawUtil.DrawString(dc, 450, -630 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 255, 100), 32);
+                    DrawUtil.DrawGraph(dc, 650, -640 + i * 40 + scorey, newgh);
                 }
                 else {
                     DrawUtil.DrawLine(dc, 25, -595 + i * 40 + scorey, 650, -600 + i * 40 + scorey, Color.FromRgb(230, 230, 230));

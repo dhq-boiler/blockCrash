@@ -32,13 +32,13 @@ namespace WPFBlockCrash
 
             BitmapImage bi = gh[0] as BitmapImage;
 
-            Width = (int)bi.PixelWidth;
+            if (mBar == 2) // 2ならバーは小さくする
+                Width = (int)bi.PixelWidth/2;
+            else
+                Width = (int)bi.PixelWidth;
             Height = (int)bi.PixelHeight;
-
-            //if (barnum == 2) // 2ならバーは小さくする
-            //    X = dInfo.Width / 4;
-            //else
-                X = dInfo.Width / 2;
+    
+            X = dInfo.Width / 2;
             Y = 540;
             EnlargementFactor = 2;
             IsDead = false;
@@ -64,15 +64,15 @@ namespace WPFBlockCrash
 
         private void Draw(DrawingContext dc)
         {
-            if (mBar == 2){ // 2ならバーは小さくする
-                DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 8, Y - Height / 2,
-                X + Width * EnlargementFactor / 8, Y + Height / 2, gh[mBar]);
-            }
-            else
-            {
+            //if (mBar == 2){ // 2ならバーは小さくする
+            //    DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 8, Y - Height / 2,
+            //    X + Width * EnlargementFactor / 8, Y + Height / 2, gh[mBar]);
+            //}
+            //else
+            //{
                 DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 4, Y - Height / 2,
                 X + Width * EnlargementFactor / 4, Y + Height / 2, gh[mBar]);
-            }
+            //}
         }
 
         private bool KeyGet(Input input)
