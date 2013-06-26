@@ -34,33 +34,33 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="libts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\touchscreen\libts\bin\Release_Parallel\libts.dll</HintPath>
+    <Reference Include="libts">
+      <HintPath>..\..\..\..\..\..\Git\touchscreen\libts\bin\release_parallel\libts.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="OpenCvItmdUtil">
-      <HintPath>..\..\nmbridge\Release\OpenCvItmdUtil.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Git\nmbridge\release_parallel\OpenCvItmdUtil.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp">
-      <HintPath>..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.Blob">
-      <HintPath>..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.Blob.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.Blob.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.CPlusPlus">
-      <HintPath>..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.CPlusPlus.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.CPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.DebuggerVisualizers">
-      <HintPath>..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.DebuggerVisualizers.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.DebuggerVisualizers.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.Extensions">
-      <HintPath>..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.Extensions.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.MachineLearning">
-      <HintPath>..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.MachineLearning.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.MachineLearning.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.UserInterface">
-      <HintPath>..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.UserInterface.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\OpenCvSharp-2.3.1-x86-20120519\OpenCvSharp.UserInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

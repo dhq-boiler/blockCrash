@@ -351,17 +351,18 @@ namespace WPFBlockCrash
 
 			switch (Bar)
 			{ // バーによりの速度上昇の早さが違う
-				case 1: if (ballspup % 1500 == 0)
+
+				case 1: if (ballspup % 1500 == 0 && !ball.ballstop)
 					{ // やさしい
 						ball.LvUp(1);
 					}
 					break;
-				case 2: if (ballspup % 1000 == 0)
+                case 2: if (ballspup % 1000 == 0 && !ball.ballstop)
 					{ // ふつう
 						ball.LvUp(1);
 					}
 					break;
-				case 3: if (ballspup % 800 == 0)
+                case 3: if (ballspup % 800 == 0 && !ball.ballstop)
 					{ // 難しい
 						ball.LvUp(1);
 					}

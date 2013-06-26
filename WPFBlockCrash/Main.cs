@@ -77,7 +77,7 @@ namespace WPFBlockCrash
             {
                 ATMode(input);
 
-                if (input.barx == 50)
+                if (input.barx == 50 || (input.eB && input.lB && input.rB))
                 {
                     input.AT = false;
                     Restart(input);

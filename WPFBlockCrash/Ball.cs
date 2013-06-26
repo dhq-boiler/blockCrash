@@ -45,7 +45,7 @@ namespace WPFBlockCrash
             IsSmall = false;
             IsNewCount = 0;
             Level = 1;
-            ballstop = false;
+            ballstop = true;
             xoffset = 0;
             baccel = 0;
             acbectl = 0;
@@ -121,22 +121,41 @@ namespace WPFBlockCrash
         {
             if (input.eB)
             {
-                if (ActCount == 0 && !IsSmall ||ballstop)
+                if (ActCount == 0 && !IsSmall || ballstop)
                 {
-                    Y = Y - 5;
-                    switch (baccel) {
-                        case 0:     DX = (2 + Level)*acbectl;
-                                    DY = -(2 + Level);
-                                    break;
-                        case 1:     DX = (3 + Level) * acbectl;
-                                    DY = -(3 + Level);
-                                    break;
-                        case 2:     DX = (4 + Level) * acbectl;
-                                    DY = -(3 + Level);
-                                    break;
-                        case 3:     DX = (5 + Level)*acbectl;
-                                    DY = -(3 + Level);
-                                    break;
+                    if (input.AT) {
+                        Y = Y - 5;
+                        int r = Main.rand.Next() % 1;
+                        int rx = (Main.rand.Next() % 5) + 1;
+                        int ry = (Main.rand.Next() % 5) + 1;
+                        if (r == 0)
+                        {
+                            DX = rx;
+                            DY = -ry;
+                        }
+                        else {
+                            DX = -rx;
+                            DY = -ry;
+                        }
+                    }
+                    else
+                    {
+                        Y = Y - 5;
+                        switch (baccel)
+                        {
+                            case 0: DX = (2 + Level) * acbectl;
+                                DY = -(2 + Level);
+                                break;
+                            case 1: DX = (3 + Level) * acbectl;
+                                DY = -(3 + Level);
+                                break;
+                            case 2: DX = (4 + Level) * acbectl;
+                                DY = -(3 + Level);
+                                break;
+                            case 3: DX = (5 + Level) * acbectl;
+                                DY = -(3 + Level);
+                                break;
+                        }
                     }
                     ActCount = 1;
                     ballstop = false;
@@ -225,7 +244,9 @@ namespace WPFBlockCrash
             ActCount = 0;
             IsDead = false;
             Radius = 1;
-            Level = 1;
+            Level -= 5;
+            if (Level < 1)
+                Level = 1;
             xoffset = 0;
             baccel = 0;
             acbectl = 0;

@@ -26,6 +26,7 @@ namespace WPFBlockCrash
             selectSoundFlag = false;
             decisionSoundFlag = false;
             IsDead = false;
+            atcount = 0;
 
             sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
             dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
@@ -49,9 +50,17 @@ namespace WPFBlockCrash
                 input.AT = true;
             }
 
-            if (input.rB || input.lB || input.eB) //いずれかのボタンが押されている
+            if (input.rB || input.eB) //いずれかのボタンが押されている
             {
                 IsDead = true;
+            }
+            if (input.lB) //左ボタンがおしっぱ
+            {
+                ++atcount;
+                if (atcount > 100)
+                {
+                    input.AT = true;
+                }
             }
         }
 
@@ -66,6 +75,7 @@ namespace WPFBlockCrash
         public bool IsDead { get; set; }
         public bool selectSoundFlag { get; private set; }
         public bool decisionSoundFlag { get; private set; }
+        public int atcount { get; private set; }
         private SoundPlayer sh;
         private SoundPlayer dh;
     }

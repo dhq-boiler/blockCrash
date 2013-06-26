@@ -87,7 +87,7 @@ namespace WPFBlockCrash
                         saved[i].Score = 0;
                     }
                     else // 数値は最上位が300000,/iでどうです
-                        saved[i].Score = 300000 / (i + 1);
+                        saved[i].Score = 30000 - (i + 1)*1500;
                     // BarNumはランダムで
                     saved[i].BarNum = Main.rand.Next() % 3;
                     saved[i].Year = iYear;
@@ -141,32 +141,35 @@ namespace WPFBlockCrash
 
         private void KeyGet(Input input)
         {
-            if (input.eB)
-            {
-                if (end || !scroll)
+           
+                if (input.eB)
                 {
-                    IsDead = true;
+                    if (end || !scroll)
+                    {
+                        IsDead = true;
+                    }
+                    else
+                        scrollspeed = 2;
                 }
                 else
-                    scrollspeed = 2;
-            }
-            else
-                scrollspeed = 1;
-
-            if (input.lB)
-            {
-                if (scorey > 0)
+                    scrollspeed = 1;
+                if (!input.AT)
                 {
-                    scorey -= 20;
-                    scroll = false;
+                if (input.lB)
+                {
+                    if (scorey > 0)
+                    {
+                        scorey -= 20;
+                        scroll = false;
+                    }
                 }
-            }
-            if (input.rB)
-            {
-                if (scorey < 900)
+                if (input.rB)
                 {
-                    scorey += 20;
-                    scroll = false;
+                    if (scorey < 900)
+                    {
+                        scorey += 20;
+                        scroll = false;
+                    }
                 }
             }
         }
