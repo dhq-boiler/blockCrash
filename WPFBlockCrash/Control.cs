@@ -347,27 +347,30 @@ namespace WPFBlockCrash
 
 
 			// ボールの動き
-			++ballspup; // 速度上昇カウント
+            if (!ball.ballstop)
+            {
+                ++ballspup; // 速度上昇カウント
 
-			switch (Bar)
-			{ // バーによりの速度上昇の早さが違う
+                switch (Bar)
+                { // バーによりの速度上昇の早さが違う
 
-				case 1: if (ballspup % 1500 == 0 && !ball.ballstop)
-					{ // やさしい
-						ball.LvUp(1);
-					}
-					break;
-                case 2: if (ballspup % 1000 == 0 && !ball.ballstop)
-					{ // ふつう
-						ball.LvUp(1);
-					}
-					break;
-                case 3: if (ballspup % 800 == 0 && !ball.ballstop)
-					{ // 難しい
-						ball.LvUp(1);
-					}
-					break;
-			}
+                    case 1: if (ballspup % 1500 == 0)
+                        { // やさしい
+                            ball.LvUp(1);
+                        }
+                        break;
+                    case 2: if (ballspup % 1000 == 0)
+                        { // ふつう
+                            ball.LvUp(1);
+                        }
+                        break;
+                    case 3: if (ballspup % 800 == 0)
+                        { // 難しい
+                            ball.LvUp(1);
+                        }
+                        break;
+                }
+            }
 
 			++vspeed; // 進まなくなったとき用カウントの増加
 
