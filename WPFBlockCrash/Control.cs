@@ -791,6 +791,7 @@ namespace WPFBlockCrash
 					{
                         if (ballX < barX + 10 && ballX > barX - 10) {
                             ball.Penetration();
+                            ball.LvUp(1); // 速度が上がって短時間貫通化
                         }
                         combocount = 0;
                         if (Bar == 3)

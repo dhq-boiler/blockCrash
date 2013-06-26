@@ -24,10 +24,10 @@ namespace WPFBlockCrash
         {
             this.dInfo = dInfo;
             gh = new ImageSource[4];
-            gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_a.png"));
-            gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.png"));
-            gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball3.png"));
-            gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball3.png"));
+            gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball.png"));
+            gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_pene.png"));
+            gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.png"));
+            gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2_pene.png"));
 
             Width = (int)gh[0].Width;
             Height = (int)gh[0].Height;
@@ -57,10 +57,12 @@ namespace WPFBlockCrash
             ImageSource src = null;
 
             if (Penetrability == EPenetrability.PENETRATING)
-                if(IsSmall)
+            {
+                if (IsSmall)
                     src = gh[3];
                 else
                     src = gh[1];
+            }
             else if (IsSmall)
                 src = gh[2];
             else
