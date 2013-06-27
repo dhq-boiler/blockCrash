@@ -77,7 +77,7 @@ namespace WPFBlockCrash
                 //DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 4, Y - Height / 2,
                 //X + Width * EnlargementFactor / 4, Y + Height / 2, gh[mBar]);
             g.DrawImage(gh[mBar], X - Width * EnlargementFactor / 4, Y - Height / 2,
-                X + Width * EnlargementFactor / 4, Y + Height / 2);
+                Width * EnlargementFactor / 2, Height);
             //}
         }
 

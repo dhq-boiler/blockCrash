@@ -24,8 +24,9 @@ namespace WPFBlockCrash
     /// </summary>
     public partial class BlockCrashView : UserControl
     {
+        private Main main;
+        public Input input;
         private DispatcherTimer timerToRun;
-        //private RenderTargetBitmap bitmap;
         private WriteableBitmap bitmap;
 
         public BlockCrashView()
@@ -38,21 +39,24 @@ namespace WPFBlockCrash
             main = new Main(new DisplayInfo() { Width = 800, Height = 600 });
         }
 
-        private WriteableBitmap CreateBitmap(int width, int height, double dpi, Action<Graphics> render)
+        private WriteableBitmap RenderBitmap(int width, int height, double dpi, Action<Graphics> Run_Main_ProcessLoop)
         {
-            bitmap.Lock();
-            var bmp = new Bitmap(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.BackBufferStride, System.Drawing.Imaging.PixelFormat.Format24bppRgb, bitmap.BackBuffer);
-
-            Graphics g = Graphics.FromImage(bmp);
-
-            render(g);
-
-            g.Dispose();
-            bmp.Dispose();
-
-            bitmap.AddDirtyRect(new Int32Rect(0, 0, 800, 600));
-            bitmap.Unlock();
-
+            try
+            {
+                bitmap.Lock();
+                using (var bmp = new Bitmap(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.BackBufferStride, System.Drawing.Imaging.PixelFormat.Format24bppRgb, bitmap.BackBuffer))
+                {
+                    using (Graphics g = Graphics.FromImage(bmp))
+                    {
+                        Run_Main_ProcessLoop(g);
+                    }
+                }
+                bitmap.AddDirtyRect(new Int32Rect(0, 0, 800, 600));
+            }
+            finally
+            {
+                bitmap.Unlock();
+            }
             return bitmap;
         }
 
@@ -75,7 +79,7 @@ namespace WPFBlockCrash
         private void timerToRun_Tick(object sender, EventArgs e)
         {
             main.ATMode(input);
-            SetBitmapToImage(image, CreateBitmap(800, 600, 96, g => main.ProcessLoop(input, g)));
+            SetBitmapToImage(image, RenderBitmap(800, 600, 96, g => main.ProcessLoop(input, g)));
         }
 
 
@@ -126,10 +130,6 @@ namespace WPFBlockCrash
         {
             timerToRun.Stop();
         }
-
-        private Thread th;
-        private Main main;
-        public Input input { get; set; }
 
         public void KeyUpSpaceButton()
         {

@@ -19,7 +19,7 @@ namespace WPFBlockCrash
         private Image newgh;
         public SaveGameData[] saved = new SaveGameData[20];
 
-        private readonly Font font = new Font("Consolas", 32);
+        private readonly Font font = new Font("Consolas", 20);
 
         public Ranking(int score, int barnum, DisplayInfo dInfo)
         {

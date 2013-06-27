@@ -17,7 +17,7 @@ namespace WPFBlockCrash
         private DisplayInfo dInfo;
         private DateTime? BeginDisplayTime;
 
-        private readonly Font font = new Font("Consolas", 32);
+        private readonly Font font = new Font("Consolas", 20);
 
         public bool IsDead { get; set; }
 

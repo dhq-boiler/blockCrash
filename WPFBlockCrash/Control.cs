@@ -402,9 +402,9 @@ namespace WPFBlockCrash
 			//DrawUtil.DrawBox(dc, 0, 0, 800, 30, Color.FromRgb(230, 230, 230), 3, null);
 			g.DrawRectangle(new System.Drawing.Pen(RGB(230, 230, 230), 3), 0, 0, 800, 30);
 			//DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", Score), Color.FromRgb(255, 120, 0));
-			g.DrawString(string.Format("SCORE: {0}", Score), font, RGB(255, 120, 0), 20, 10);
+			g.DrawString(string.Format("SCORE: {0}", Score), font, RGB(255, 120, 0), 20, 5);
 			//DrawUtil.DrawString(dc, 220, 10, string.Format("LEVEL: {0}", ball.Level), Color.FromRgb(255, 120, 0));
-			g.DrawString(string.Format("LEVEL: {0}", ball.Level), font, RGB(255, 120, 0), 220, 10);
+			g.DrawString(string.Format("LEVEL: {0}", ball.Level), font, RGB(255, 120, 0), 220, 5);
 			//デバック用
 			// コンボ表示　邪魔にならないよう透明化処理する  
 			if (combocount > 1)
