@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace WPFBlockCrash
 {
@@ -55,12 +55,13 @@ namespace WPFBlockCrash
             c = 0;
         }
 
-        public void ProcessLoop(Input input, DrawingContext dc)
+        public void ProcessLoop(Input input, Graphics g)
         {
             //using (DrawingContext dc = dg.Open())
             //{
 
-            DrawUtil.DrawBox(dc, 0, 0, 800, 600, Color.FromRgb(0, 0, 0), 1, Color.FromRgb(0, 0, 0));
+            //DrawUtil.DrawBox(dc, 0, 0, 800, 600, Color.FromRgb(0, 0, 0), 1, Color.FromRgb(0, 0, 0));
+            g.DrawRectangle(new System.Drawing.Pen(Brushes.Black), 0, 0, 800, 600);
 
             if (input.IsPushedKeys)
             {
@@ -95,7 +96,7 @@ namespace WPFBlockCrash
                 //case 0:
                 case EActType.TITLE:
                     {
-                        if (title.Process(input, dc))
+                        if (title.Process(input, g))
                             //m_actcount = 1;
                             ActType = EActType.BAR_SELECT;
                         //input.ClearSmaller();
@@ -104,7 +105,7 @@ namespace WPFBlockCrash
                 //case 1:
                 case EActType.BAR_SELECT:
                     {
-                        if (barSelect.Process(input, dc))
+                        if (barSelect.Process(input, g))
                         {
                             stageSelect.SetValue(barSelect.mBar, 0, 0, 2);
                             //m_actcount = 2;
@@ -116,7 +117,7 @@ namespace WPFBlockCrash
                 //case 2:
                 case EActType.STAGE_SELECT:
                     {
-                        if (stageSelect.Process(input, dc))
+                        if (stageSelect.Process(input, g))
                         {
                             //m_actcount = 3;
                             ActType = EActType.CONTROL;
@@ -140,7 +141,7 @@ namespace WPFBlockCrash
                                     ++act;
                                 }
 
-                                if (message.Process(input, dc))
+                                if (message.Process(input, g))
                                 {
                                     control.Reset(); // 残機を減らしゲームを続行
                                     --stock;
@@ -156,7 +157,7 @@ namespace WPFBlockCrash
                                     ++act;
                                 }
 
-                                if (message.Process(input, dc))
+                                if (message.Process(input, g))
                                 {
                                     ActType = EActType.RANKING;
                                     ranking = new Ranking(control.Score,control.Bar, dInfo);
@@ -171,7 +172,7 @@ namespace WPFBlockCrash
                                 ++act;
                             }
 
-                            if (message.Process(input, dc))
+                            if (message.Process(input, g))
                             {
                                 ActType = EActType.RANKING;
                                 ranking = new Ranking(control.Score, control.Bar, dInfo);
@@ -180,7 +181,7 @@ namespace WPFBlockCrash
                     }
                     break;
                 case EActType.RANKING: {
-                    if(ranking.Process(input,dc))
+                    if(ranking.Process(input,g))
                     {
                         //if (input.AT) // 疲れるからタイトルへ
                         // {

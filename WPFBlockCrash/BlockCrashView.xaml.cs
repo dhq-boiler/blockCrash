@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -24,30 +25,29 @@ namespace WPFBlockCrash
     public partial class BlockCrashView : UserControl
     {
         private DispatcherTimer timerToRun;
-        private RenderTargetBitmap bitmap;
+        //private RenderTargetBitmap bitmap;
+        private WriteableBitmap bitmap;
 
         public BlockCrashView()
         {
             InitializeComponent();
 
+            bitmap = new WriteableBitmap(800, 600, 92, 92, PixelFormats.Bgr24, null);
+
             input = new Input();
             main = new Main(new DisplayInfo() { Width = 800, Height = 600 });
         }
 
-        private RenderTargetBitmap CreateBitmap(int width, int height, double dpi, Action<DrawingContext> render)
+        private WriteableBitmap CreateBitmap(int width, int height, double dpi, Action<Graphics> render)
         {
-            //ガベージコレクションが必要か要検証
-            //GC.Collect();
+            bitmap.Lock();
+            var bmp = new Bitmap(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.BackBufferStride, System.Drawing.Imaging.PixelFormat.Format24bppRgb, bitmap.BackBuffer);
 
-            DrawingVisual drawingVisual = new DrawingVisual();
-            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
-            {
-                render(drawingContext);
-            }
+            Graphics g = Graphics.FromImage(bmp);
 
-            if (bitmap == null)
-                bitmap = new RenderTargetBitmap(width, height, dpi, dpi, PixelFormats.Default);
-            bitmap.Render(drawingVisual);
+            render(g);
+
+            bitmap.Unlock();
 
             return bitmap;
         }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -24,8 +24,8 @@ namespace WPFBlockCrash
     class Block
     {
         private static bool IsFirstInstance = true;
-        private static ImageSource[] gh = new ImageSource[8];
-        private static ImageSource[] itemgh = new ImageSource[6];
+        private static Image[] gh = new Image[8];
+        private static Image[] itemgh = new Image[6];
 
         private bool half;
         private int count;
@@ -104,35 +104,35 @@ namespace WPFBlockCrash
         {
             if (IsFirstInstance)
             {
-                gh = new ImageSource[8];
-                itemgh = new ImageSource[6];
+                gh = new Image[8];
+                itemgh = new Image[6];
 
-                gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "block1.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "block2.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "block3.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "block4.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "block1in.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "block2in.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[6] = new BitmapImage(new Uri(Main.ResourceDirectory, "block3in.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[7] = new BitmapImage(new Uri(Main.ResourceDirectory, "block4in.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[0] = new Bitmap(Main.ResourceDirectory + "block1.bmp");
+                gh[1] = new Bitmap(Main.ResourceDirectory + "block2.bmp");
+                gh[2] = new Bitmap(Main.ResourceDirectory + "block3.bmp");
+                gh[3] = new Bitmap(Main.ResourceDirectory + "block4.bmp");
+                gh[4] = new Bitmap(Main.ResourceDirectory + "block1in.bmp");
+                gh[5] = new Bitmap(Main.ResourceDirectory + "block2in.bmp");
+                gh[6] = new Bitmap(Main.ResourceDirectory + "block3in.bmp");
+                gh[7] = new Bitmap(Main.ResourceDirectory + "block4in.bmp");
 
-                itemgh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_long.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_powerup.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_increse.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_1up.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_scoreup.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_mag.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                itemgh[0] = new Bitmap(Main.ResourceDirectory + "item_long.bmp");
+                itemgh[1] = new Bitmap(Main.ResourceDirectory + "item_powerup.bmp");
+                itemgh[2] = new Bitmap(Main.ResourceDirectory + "item_increse.bmp");
+                itemgh[3] = new Bitmap(Main.ResourceDirectory + "item_1up.bmp");
+                itemgh[4] = new Bitmap(Main.ResourceDirectory + "item_scoreup.bmp");
+                itemgh[5] = new Bitmap(Main.ResourceDirectory + "item_mag.bmp");
 
                 IsFirstInstance = false;
             }
 
-            BitmapImage bs = gh[0] as BitmapImage;
-            BitmapImage bsitem = itemgh[0] as BitmapImage;
+            Bitmap bs = gh[0] as Bitmap;
+            Bitmap bsitem = itemgh[0] as Bitmap;
                         
-            Width = (int)bs.PixelWidth;
-            Height = (int)bs.PixelHeight;
-            ItemWidth = (int)bsitem.PixelWidth;
-            ItemHeight = (int)bsitem.PixelHeight;
+            Width = (int)bs.Width;
+            Height = (int)bs.Height;
+            ItemWidth = (int)bsitem.Width;
+            ItemHeight = (int)bsitem.Height;
 
             barextend = extendon;
             IsDead = false;
@@ -169,14 +169,14 @@ namespace WPFBlockCrash
             half = false;
         }
 
-        internal void Process(DrawingContext dc, int blockhandle)
+        internal void Process(Graphics g, int blockhandle)
         {
-            Draw(dc, blockhandle);
+            Draw(g, blockhandle);
             if (matchlesscount > 0)
                 --matchlesscount;
         }
 
-        private void Draw(DrawingContext dc, int blockhandle)
+        private void Draw(Graphics g, int blockhandle)
         {
             if (!scrollStop) // スクロールストップフラグが立ってたらストップ
             {
@@ -212,31 +212,40 @@ namespace WPFBlockCrash
             if (!IsDead)
             {
                 if (scrollcount > 0)
-                    DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, gh[blockhandle]);
-                DrawUtil.DrawExtendGraph(dc, X - Width / 2 , Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
+                    //DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, gh[blockhandle]);
+                    g.DrawImage(gh[blockhandle], scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2);
+                //DrawUtil.DrawExtendGraph(dc, X - Width / 2 , Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
+                g.DrawImage(gh[blockhandle], X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2);
             }
             else if (ItemFlag)
                 if (half)
                 {
                     if (scrollcount > 0)
-                        DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, itemgh[(int)ItemType]);
-                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                        //DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, itemgh[(int)ItemType]);
+                        g.DrawImage(itemgh[(int)ItemType], scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2);
+                    //DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                    g.DrawImage(itemgh[(int)ItemType], X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2);
                 }
                 else
                 {
                     if (scrollcount > 0)
-                        DrawUtil.DrawExtendGraph(dc, scrollcount - ItemWidth, Y - Height / 2, scrollcount, Y + Height / 2, itemgh[(int)ItemType]);
-                    DrawUtil.DrawExtendGraph(dc, X - ItemWidth / 2, Y - ItemHeight / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                        //DrawUtil.DrawExtendGraph(dc, scrollcount - ItemWidth, Y - Height / 2, scrollcount, Y + Height / 2, itemgh[(int)ItemType]);
+                        g.DrawImage(itemgh[(int)ItemType], scrollcount - ItemWidth, Y - Height / 2, scrollcount, Y + Height / 2);
+                    //DrawUtil.DrawExtendGraph(dc, X - ItemWidth / 2, Y - ItemHeight / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                    g.DrawImage(itemgh[(int)ItemType], X - ItemWidth / 2, Y - ItemHeight / 2, X + Width / 2, Y + Height / 2);
                 }
             else
             {
                 if (count < 20)
                 {
-                    dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
+                    float opacity = (255f / 40) * (20 - count) / byte.MaxValue;
+                    //dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
                     if (scrollcount > 0)
-                        DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
-                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
-                    dc.Pop();
+                        //DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
+                        g.DrawImage(WasItem ? DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity) : DrawUtil.SetOpacity(gh[blockhandle], opacity), scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2);
+                    //DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
+                    g.DrawImage(WasItem ? DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity) : DrawUtil.SetOpacity(gh[blockhandle], opacity), X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2);
+                    //dc.Pop();
                     ++count;
                 }
             }

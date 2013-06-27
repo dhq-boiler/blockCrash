@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace WPFBlockCrash
         public int SPEED = 8;
 
         private int EnlargementFactor;
-        private ImageSource[] gh;
+        private Image[] gh;
         private DisplayInfo dInfo;
         private int mBar;
         private int moldBar;
@@ -23,22 +24,22 @@ namespace WPFBlockCrash
         {
             this.dInfo = dInfo;
             mBar = moldBar = barnum - 1;
-            gh = new ImageSource[4];
-            gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "bar.bmp"));
-            gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "barsecond.bmp"));
-            gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "barthird.bmp"));
-            gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "barcatcher.bmp"));
+            gh = new Image[4];
+            gh[0] = new Bitmap(Main.ResourceDirectory + "bar.bmp");
+            gh[1] = new Bitmap(Main.ResourceDirectory + "barsecond.bmp");
+            gh[2] = new Bitmap(Main.ResourceDirectory + "barthird.bmp");
+            gh[3] = new Bitmap(Main.ResourceDirectory + "barcatcher.bmp");
 
-            BitmapImage bi = gh[0] as BitmapImage;
+            Bitmap bi = gh[0] as Bitmap;
 
             if (mBar == 2)
             {// 2ならバーは小さくする
-                Width = (int)bi.PixelWidth / 2;
+                Width = (int)bi.Width / 2;
                 SPEED = 16;
             }
             else
-                Width = (int)bi.PixelWidth;
-            Height = (int)bi.PixelHeight;
+                Width = (int)bi.Width;
+            Height = (int)bi.Height;
     
             X = dInfo.Width / 2;
             Y = 540;
@@ -47,7 +48,7 @@ namespace WPFBlockCrash
             IsMove = false;
         }
 
-        internal bool Process(Input input, DrawingContext dc)
+        internal bool Process(Input input, Graphics g)
         {
             if (!IsDead)
             {
@@ -60,12 +61,12 @@ namespace WPFBlockCrash
             }
 
             //描画処理
-            Draw(dc);
+            Draw(g);
 
             return IsDead;
         }
 
-        private void Draw(DrawingContext dc)
+        private void Draw(Graphics g)
         {
             //if (mBar == 2){ // 2ならバーは小さくする
             //    DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 8, Y - Height / 2,
@@ -73,8 +74,10 @@ namespace WPFBlockCrash
             //}
             //else
             //{
-                DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 4, Y - Height / 2,
-                X + Width * EnlargementFactor / 4, Y + Height / 2, gh[mBar]);
+                //DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 4, Y - Height / 2,
+                //X + Width * EnlargementFactor / 4, Y + Height / 2, gh[mBar]);
+            g.DrawImage(gh[mBar], X - Width * EnlargementFactor / 4, Y - Height / 2,
+                X + Width * EnlargementFactor / 4, Y + Height / 2);
             //}
         }
 

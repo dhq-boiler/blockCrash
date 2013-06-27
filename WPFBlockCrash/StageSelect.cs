@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Media;
 using System.Text;
@@ -11,12 +12,12 @@ namespace WPFBlockCrash
 {
     class StageSelect
     {
-        private ImageSource[] bargh;
-        private ImageSource ballgh;
-        private ImageSource[] stagegh;
-        private ImageSource[] sdetailgh;
-        private ImageSource sselectgh;
-        private ImageSource cleargh;
+        private Image[] bargh;
+        private Image ballgh;
+        private Image[] stagegh;
+        private Image[] sdetailgh;
+        private Image sselectgh;
+        private Image cleargh;
         private bool[] clear;
         private bool selectFlag;
         private bool decisionFlag;
@@ -25,6 +26,8 @@ namespace WPFBlockCrash
         private int keycount;
         private int enterCount;
         private int autocount;
+
+        private readonly Font
 
         public int Score { get; set; }
         public int Stock { get; set; }
@@ -35,35 +38,35 @@ namespace WPFBlockCrash
 
         public StageSelect()
         {
-            bargh = new ImageSource[3];
-            stagegh = new ImageSource[6];
-            sdetailgh = new ImageSource[6];
+            bargh = new Image[3];
+            stagegh = new Image[6];
+            sdetailgh = new Image[6];
             clear = new bool[6];
 
             Stage = 1;
 
-            bargh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "bar.bmp"));
-            bargh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "barsecond.bmp"));
-            bargh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "barthird.bmp"));
+            bargh[0] = new Bitmap(Main.ResourceDirectory + "bar.bmp");
+            bargh[1] = new Bitmap(Main.ResourceDirectory + "barsecond.bmp");
+            bargh[2] = new Bitmap(Main.ResourceDirectory + "barthird.bmp");
 
-            ballgh = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_b.png"));
+            ballgh = new Bitmap(Main.ResourceDirectory + "ball_b.png");
 
-            stagegh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage1mini.png"));
-            stagegh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage2mini.png"));
-            stagegh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage3mini.png"));
-            stagegh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage4mini.png"));
-            stagegh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage5mini.png"));
-            stagegh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball.png"));
+            stagegh[0] = new Bitmap(Main.ResourceDirectory + "stage1mini.png");
+            stagegh[1] = new Bitmap(Main.ResourceDirectory + "stage2mini.png");
+            stagegh[2] = new Bitmap(Main.ResourceDirectory + "stage3mini.png");
+            stagegh[3] = new Bitmap(Main.ResourceDirectory + "stage4mini.png");
+            stagegh[4] = new Bitmap(Main.ResourceDirectory + "stage5mini.png");
+            stagegh[5] = new Bitmap(Main.ResourceDirectory + "ball.png");
 
-            sdetailgh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage1.png"));
-            sdetailgh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage2.png"));
-            sdetailgh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage3.png"));
-            sdetailgh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage4.png"));
-            sdetailgh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "stage5.png"));
-            sdetailgh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball.png"));
+            sdetailgh[0] = new Bitmap(Main.ResourceDirectory + "stage1.png");
+            sdetailgh[1] = new Bitmap(Main.ResourceDirectory + "stage2.png");
+            sdetailgh[2] = new Bitmap(Main.ResourceDirectory + "stage3.png");
+            sdetailgh[3] = new Bitmap(Main.ResourceDirectory + "stage4.png");
+            sdetailgh[4] = new Bitmap(Main.ResourceDirectory + "stage5.png");
+            sdetailgh[5] = new Bitmap(Main.ResourceDirectory + "ball.png");
 
-            sselectgh = new BitmapImage(new Uri(Main.ResourceDirectory, "stageselect.png"));
-            cleargh = new BitmapImage(new Uri(Main.ResourceDirectory, "clearstar.png"));
+            sselectgh = new Bitmap(Main.ResourceDirectory + "stageselect.png");
+            cleargh = new Bitmap(Main.ResourceDirectory + "clearstar.png");
 
             selectFlag = false;
             decisionFlag = false;
@@ -86,26 +89,29 @@ namespace WPFBlockCrash
             autocount = 0;
         }
 
-        public bool Process(Input input, DrawingContext dc)
+        public bool Process(Input input, Graphics g)
         {
             //キー処理
             KeyGet(input);
 
             //描画処理
-            Draw(dc);
+            Draw(g);
 
             return IsDead;
         }
 
-        private void Draw(DrawingContext dc)
+        private void Draw(Graphics g)
         {
-            DrawUtil.DrawGraph(dc, 0, 0, sselectgh);
-            DrawUtil.DrawGraph(dc, 400, 320, sdetailgh[Stage - 1]);
+            //DrawUtil.DrawGraph(dc, 0, 0, sselectgh);
+            g.DrawImage(sselectgh, 0, 0);
+            //DrawUtil.DrawGraph(dc, 400, 320, sdetailgh[Stage - 1]);
+            g.DrawImage(sdetailgh[Stage - 1], 400, 320);
 
             switch (Stage)
             {
                 case 1:
-                    DrawStageTitle(dc, "オナジミサン");
+                    //DrawStageTitle(dc, "オナジミサン");
+                    DrawStageTitle(g, "オナジミサン");
                     break;
                 case 2:
                     DrawStageTitle(dc, "4つの塔");
@@ -136,6 +142,11 @@ namespace WPFBlockCrash
             DrawUtil.DrawGraph(dc, 40, 460, bargh[Bar - 1]);
             DrawUtil.DrawString(dc, 40, 500, string.Format("SCORE：{0}", Score),RGB(255, 120, 0));
             DrawUtil.DrawString(dc, 40, 540, string.Format("STOCK：{0}", Stock), RGB(255, 120, 0));
+        }
+
+        private void DrawStageTitle(Graphics g, string p)
+        {
+            g.DrawString(p, font, )
         }
 
         private void DrawStageTitle(DrawingContext dc, string stageTitle)

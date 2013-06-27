@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+//using System.Windows.Media;
+//using System.Windows.Media.Imaging;
+using System.Drawing;
 
 namespace WPFBlockCrash
 {
@@ -23,11 +24,16 @@ namespace WPFBlockCrash
         public Ball(DisplayInfo dInfo)
         {
             this.dInfo = dInfo;
-            gh = new ImageSource[4];
-            gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball.png"));
-            gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_pene.png"));
-            gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.png"));
-            gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2_pene.png"));
+            //gh = new ImageSource[4];
+            gh = new Image[4];
+            gh[0] = new Bitmap(Main.ResourceDirectory + "ball.png");
+            gh[1] = new Bitmap(Main.ResourceDirectory + "ball_pene.png");
+            gh[2] = new Bitmap(Main.ResourceDirectory + "ball2.png");
+            gh[3] = new Bitmap(Main.ResourceDirectory + "ball2_pene.png");
+            //gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball.png"));
+            //gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_pene.png"));
+            //gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.png"));
+            //gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2_pene.png"));
 
             Width = (int)gh[0].Width;
             Height = (int)gh[0].Height;
@@ -52,9 +58,10 @@ namespace WPFBlockCrash
             acbectl = 0;
         }
 
-        public void Draw(DrawingContext dc)
+        public void Draw(Graphics g)
         {
-            ImageSource src = null;
+            //System.Windows.Media.ImageSource src = null;
+            Image src = null;
 
             if (Penetrability == EPenetrability.PENETRATING)
             {
@@ -68,7 +75,8 @@ namespace WPFBlockCrash
             else
                 src = gh[0];
 
-            DrawUtil.DrawGraph(dc, X - Width / 2, Y - Height / 2, src);
+            //DrawUtil.DrawGraph(dc, X - Width / 2, Y - Height / 2, src);
+            g.DrawImage(src, X - Width / 2, Y - Height / 2);
         }
 
         internal void LvUp(int incLv)
@@ -99,7 +107,7 @@ namespace WPFBlockCrash
             DY += (10 - r) - 6;
         }
 
-        internal bool Process(Input input, DrawingContext dc)
+        internal bool Process(Input input, Graphics g)
         {
             if (ActCount != 0 || IsSmall)
                 Move();
@@ -118,7 +126,7 @@ namespace WPFBlockCrash
                 --IsNewCount;
             }
 
-            Draw(dc);
+            Draw(g);
 
             return IsDead;
         }
@@ -218,7 +226,7 @@ namespace WPFBlockCrash
         }
 
 
-        private ImageSource[] gh;
+        private Image[] gh;
         private DisplayInfo dInfo;
         public int ActCount { get; set; }
         public int X { get; set; }
