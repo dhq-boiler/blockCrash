@@ -21,7 +21,7 @@ namespace WPFBlockCrash
         private int keyCount;
         private int autoCount;
 
-        private readonly Font font = new Font("Consolas", 20);
+        private readonly Font font = new Font("Consolas", 16);
 
         public BarSelect()
         {
@@ -194,9 +194,9 @@ namespace WPFBlockCrash
             }
 
             //DrawUtil.DrawBox(dc, 80, 190 + (mBar - 1) * 120, 250, 224 + (mBar - 1) * 120, RGB(255, 20, 30));
-            g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.FromArgb(255, 20, 30)), 80, 190 + (mBar - 1) * 120, 250, 224 + (mBar - 1) * 120);
+            g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.FromArgb(255, 20, 30)), 80, 190 + (mBar - 1) * 120, 170, 40);
             //DrawUtil.DrawBox(dc, 400, 220, 750, 478, RGB(255, 20, 30));
-            g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.FromArgb(255, 20, 30)), 400, 220, 750, 478);
+            g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.FromArgb(255, 20, 30)), 400, 220, 370, 250);
         }
 
         //private Color RGB(byte r, byte g, byte b)

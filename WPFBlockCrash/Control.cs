@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Media;
@@ -32,7 +33,7 @@ namespace WPFBlockCrash
 		private SoundPlayer playerBH;
 		private SoundPlayer playerDH;
 		
-		private ImageSource gh;
+		private System.Drawing.Image gh;
 
 		private int sumblock;
 		private int accel;
@@ -40,17 +41,19 @@ namespace WPFBlockCrash
 		private int vspeed;
 		private DisplayInfo dInfo;
 
+		private readonly Font font = new Font("Consolas", 16);
+
 		public int Bar { get; set; }
 		public int Stage { get; set; }
 		public int Score { get; set; }
 		public int Stock { get; set; }
 		public int sballcount { get; set; }
-        public bool ballcatch { get; set; }
+		public bool ballcatch { get; set; }
 		public bool clear;
-        private int alphacombo { get; set; }
-        private int combocount { get; set; }
-        private bool comboon { get; set; }
-        private int combooncount { get; set; }
+		private int alphacombo { get; set; }
+		private int combocount { get; set; }
+		private bool comboon { get; set; }
+		private int combooncount { get; set; }
 
 		public Control(int mbar, int stage, int score, int stock, DisplayInfo dInfo)
 		{
@@ -58,9 +61,9 @@ namespace WPFBlockCrash
 			Bar = mbar;
 
 
-            bool extendon = true;
-            if (mbar == 3)
-                extendon = false;
+			bool extendon = true;
+			if (mbar == 3)
+				extendon = false;
 	
 			//バーとボールのインスタンスを生成
 			bar = new Bar(Bar, dInfo);
@@ -78,11 +81,11 @@ namespace WPFBlockCrash
 			Stock = stock;
 			Stage = stage;
 			vspeed = 0;
-            ballcatch = false;
-            combocount = 0;
-            comboon = false;
-            combooncount = 0;
-            alphacombo = 0;
+			ballcatch = false;
+			combocount = 0;
+			comboon = false;
+			combooncount = 0;
+			alphacombo = 0;
 
 			//バーの幅と高さ
 			bdwidth = bar.Width;
@@ -100,7 +103,7 @@ namespace WPFBlockCrash
 			playerDH = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
 
 			// 残機表示の読み込み
-			gh = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_b.png"));
+			gh = new Bitmap(Main.ResourceDirectory + "ball_b.png");
 
 	
 			switch( Stage ){
@@ -108,176 +111,176 @@ namespace WPFBlockCrash
 					//ブロックの間を5ピクセルあけて、横7列、縦4行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<7)
-                            block[i] = new Block(80 + (5 + 100) * i, 50 * 1 + 10, extendon);
+							block[i] = new Block(80 + (5 + 100) * i, 50 * 1 + 10, extendon);
 						else if(i>6 && i<14)
-                            block[i] = new Block(80 + (5 + 100) * (i - 7), 50 * 2 + 10, extendon);
+							block[i] = new Block(80 + (5 + 100) * (i - 7), 50 * 2 + 10, extendon);
 						else if(i>13 && i<21)
-                            block[i] = new Block(80 + (5 + 100) * (i - 14), 50 * 3 + 10, extendon);
+							block[i] = new Block(80 + (5 + 100) * (i - 14), 50 * 3 + 10, extendon);
 						else
-                            block[i] = new Block(80 + (5 + 100) * (i - 21), 50 * 4 + 10, extendon);
+							block[i] = new Block(80 + (5 + 100) * (i - 21), 50 * 4 + 10, extendon);
 					}
 					break;
 			case 2: sumblock = 48;
 					//ブロックの上下間を30ピクセルあけて、横4列、縦12行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<4)
-                            block[i] = new Block(50 + (8 + 225) * i, 30 * 1 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * i, 30 * 1 + 15, extendon);
 						else if(i>3 && i<8)
-                            block[i] = new Block(50 + (8 + 225) * (i - 4), 30 * 2 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 4), 30 * 2 + 15, extendon);
 						else if(i>7 && i<12)
-                            block[i] = new Block(50 + (8 + 225) * (i - 8), 30 * 3 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 8), 30 * 3 + 15, extendon);
 						else if(i>11 && i<16)
-                            block[i] = new Block(50 + (8 + 225) * (i - 12), 30 * 4 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 12), 30 * 4 + 15, extendon);
 						else if(i>15 && i<20)
-                            block[i] = new Block(50 + (8 + 225) * (i - 16), 30 * 5 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 16), 30 * 5 + 15, extendon);
 						else if(i>19 && i<24)
-                            block[i] = new Block(50 + (8 + 225) * (i - 20), 30 * 6 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 20), 30 * 6 + 15, extendon);
 						else if(i>23 && i<28)
-                            block[i] = new Block(50 + (8 + 225) * (i - 24), 30 * 7 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 24), 30 * 7 + 15, extendon);
 						else if(i>27 && i<32)
-                            block[i] = new Block(50 + (8 + 225) * (i - 28), 30 * 8 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 28), 30 * 8 + 15, extendon);
 						else if(i>31 && i<36)
-                            block[i] = new Block(50 + (8 + 225) * (i - 32), 30 * 9 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 32), 30 * 9 + 15, extendon);
 						else if(i>35 && i<40)
-                            block[i] = new Block(50 + (8 + 225) * (i - 36), 30 * 10 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 36), 30 * 10 + 15, extendon);
 						else if(i>39 && i<44)
-                            block[i] = new Block(50 + (8 + 225) * (i - 40), 30 * 11 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 40), 30 * 11 + 15, extendon);
 						else
-                            block[i] = new Block(50 + (8 + 225) * (i - 44), 30 * 12 + 15, extendon);
+							block[i] = new Block(50 + (8 + 225) * (i - 44), 30 * 12 + 15, extendon);
 					}
 					break;
 			case 3: sumblock = 48;
 					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<4)
-                            block[i] = new Block(55 + (8 + 180) * i, 30 * 1 + 15, extendon);
+							block[i] = new Block(55 + (8 + 180) * i, 30 * 1 + 15, extendon);
 						else if(i>3 && i<8)
-                            block[i] = new Block(145 + (8 + 180) * (i - 4), 30 * 2 + 15, extendon);
+							block[i] = new Block(145 + (8 + 180) * (i - 4), 30 * 2 + 15, extendon);
 						else if(i>7 && i<12)
-                            block[i] = new Block(55 + (8 + 180) * (i - 8), 30 * 3 + 15, extendon);
+							block[i] = new Block(55 + (8 + 180) * (i - 8), 30 * 3 + 15, extendon);
 						else if(i>11 && i<16)
-                            block[i] = new Block(145 + (8 + 180) * (i - 12), 30 * 4 + 15, extendon);
+							block[i] = new Block(145 + (8 + 180) * (i - 12), 30 * 4 + 15, extendon);
 						else if(i>15 && i<20)
-                            block[i] = new Block(55 + (8 + 180) * (i - 16), 30 * 5 + 15, extendon);
+							block[i] = new Block(55 + (8 + 180) * (i - 16), 30 * 5 + 15, extendon);
 						else if(i>19 && i<24)
-                            block[i] = new Block(145 + (8 + 180) * (i - 20), 30 * 6 + 15, extendon);
+							block[i] = new Block(145 + (8 + 180) * (i - 20), 30 * 6 + 15, extendon);
 						else if(i>23 && i<28)
-                            block[i] = new Block(55 + (8 + 180) * (i - 24), 30 * 7 + 15, extendon);
+							block[i] = new Block(55 + (8 + 180) * (i - 24), 30 * 7 + 15, extendon);
 						else if(i>27 && i<32)
-                            block[i] = new Block(145 + (8 + 180) * (i - 28), 30 * 8 + 15, extendon);
+							block[i] = new Block(145 + (8 + 180) * (i - 28), 30 * 8 + 15, extendon);
 						else if(i>31 && i<36)
-                            block[i] = new Block(55 + (8 + 180) * (i - 32), 30 * 9 + 15, extendon);
+							block[i] = new Block(55 + (8 + 180) * (i - 32), 30 * 9 + 15, extendon);
 						else if(i>35 && i<40)
-                            block[i] = new Block(145 + (8 + 180) * (i - 36), 30 * 10 + 15, extendon);
+							block[i] = new Block(145 + (8 + 180) * (i - 36), 30 * 10 + 15, extendon);
 						else if(i>39 && i<44)
-                            block[i] = new Block(55 + (8 + 180) * (i - 40), 30 * 11 + 15, extendon);
+							block[i] = new Block(55 + (8 + 180) * (i - 40), 30 * 11 + 15, extendon);
 						else
-                            block[i] = new Block(145 + (8 + 180) * (i - 44), 30 * 12 + 15, extendon);
-                        if (i % 2 == 0)
-                            block[i].ScrollFlag = 1;
-                        else
-                            block[i].ScrollFlag = -1;
+							block[i] = new Block(145 + (8 + 180) * (i - 44), 30 * 12 + 15, extendon);
+						if (i % 2 == 0)
+							block[i].ScrollFlag = 1;
+						else
+							block[i].ScrollFlag = -1;
 					}
 					break;
 			case 4: sumblock = 44;
 					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<1)
-                            block[i] = new Block(400, 28 * 1 + 15, extendon);
+							block[i] = new Block(400, 28 * 1 + 15, extendon);
 						else if(i>0 && i<3)
-                            block[i] = new Block(350 + 100 * (i - 1), 28 * 2 + 15, extendon);
+							block[i] = new Block(350 + 100 * (i - 1), 28 * 2 + 15, extendon);
 						else if(i>2 && i<5)
-                            block[i] = new Block(300 + 200 * (i - 3), 28 * 3 + 15, extendon);
+							block[i] = new Block(300 + 200 * (i - 3), 28 * 3 + 15, extendon);
 						else if(i>4 && i<7)
-                            block[i] = new Block(250 + 300 * (i - 5), 28 * 4 + 15, extendon);
+							block[i] = new Block(250 + 300 * (i - 5), 28 * 4 + 15, extendon);
 						else if(i>6 && i<9)
-                            block[i] = new Block(200 + 400 * (i - 7), 28 * 5 + 15, extendon);
+							block[i] = new Block(200 + 400 * (i - 7), 28 * 5 + 15, extendon);
 						else if(i>8 && i<11)
-                            block[i] = new Block(150 + 500 * (i - 9), 28 * 6 + 15, extendon);
+							block[i] = new Block(150 + 500 * (i - 9), 28 * 6 + 15, extendon);
 						else if(i>10 && i<13)
-                            block[i] = new Block(100 + 600 * (i - 11), 28 * 7 + 15, extendon);
+							block[i] = new Block(100 + 600 * (i - 11), 28 * 7 + 15, extendon);
 						else if(i>12 && i<15)
-                            block[i] = new Block(50 + 700 * (i - 13), 28 * 8 + 15, extendon);
+							block[i] = new Block(50 + 700 * (i - 13), 28 * 8 + 15, extendon);
 						else if(i>14 && i<17)
-                            block[i] = new Block(100 + 600 * (i - 15), 28 * 9 + 15, extendon);
+							block[i] = new Block(100 + 600 * (i - 15), 28 * 9 + 15, extendon);
 						else if(i>16 && i<19)
-                            block[i] = new Block(150 + 500 * (i - 17), 28 * 10 + 15, extendon);
+							block[i] = new Block(150 + 500 * (i - 17), 28 * 10 + 15, extendon);
 						else if(i>18 && i<21)
-                            block[i] = new Block(200 + 400 * (i - 19), 28 * 11 + 15, extendon);
+							block[i] = new Block(200 + 400 * (i - 19), 28 * 11 + 15, extendon);
 						else if(i>20 && i<23)
-                            block[i] = new Block(250 + 300 * (i - 21), 28 * 12 + 15, extendon);
+							block[i] = new Block(250 + 300 * (i - 21), 28 * 12 + 15, extendon);
 						else if(i>22 && i<25)
-                            block[i] = new Block(300 + 200 * (i - 23), 28 * 13 + 15, extendon);
+							block[i] = new Block(300 + 200 * (i - 23), 28 * 13 + 15, extendon);
 						else if(i>24 && i<27)
-                            block[i] = new Block(350 + 100 * (i - 25), 28 * 14 + 15, extendon);
+							block[i] = new Block(350 + 100 * (i - 25), 28 * 14 + 15, extendon);
 						else if(i>26 && i<28)
-                            block[i] = new Block(400, 28 * 15 + 15, extendon);
+							block[i] = new Block(400, 28 * 15 + 15, extendon);
 						else if(i>27 && i<29)
-                            block[i] = new Block(400, 28 * 4 + 15, extendon);
+							block[i] = new Block(400, 28 * 4 + 15, extendon);
 						else if(i>28 && i<31)
-                            block[i] = new Block(350 + 100 * (i - 29), 28 * 5 + 15, extendon);
+							block[i] = new Block(350 + 100 * (i - 29), 28 * 5 + 15, extendon);
 						else if(i>30 && i<33)
-                            block[i] = new Block(300 + 200 * (i - 31), 28 * 6 + 15, extendon);
+							block[i] = new Block(300 + 200 * (i - 31), 28 * 6 + 15, extendon);
 						else if(i>32 && i<35)
-                            block[i] = new Block(250 + 300 * (i - 33), 28 * 7 + 15, extendon);
+							block[i] = new Block(250 + 300 * (i - 33), 28 * 7 + 15, extendon);
 						else if(i>34 && i<37)
-                            block[i] = new Block(200 + 400 * (i - 35), 28 * 8 + 15, extendon);
+							block[i] = new Block(200 + 400 * (i - 35), 28 * 8 + 15, extendon);
 						else if(i>36 && i<39)
-                            block[i] = new Block(250 + 300 * (i - 37), 28 * 9 + 15, extendon);
+							block[i] = new Block(250 + 300 * (i - 37), 28 * 9 + 15, extendon);
 						else if(i>38 && i<41)
-                            block[i] = new Block(300 + 200 * (i - 39), 28 * 10 + 15, extendon);
+							block[i] = new Block(300 + 200 * (i - 39), 28 * 10 + 15, extendon);
 						else if(i>40 && i<43)
-                            block[i] = new Block(350 + 100 * (i - 41), 28 * 11 + 15, extendon);
+							block[i] = new Block(350 + 100 * (i - 41), 28 * 11 + 15, extendon);
 						else
-                            block[i] = new Block(400, 28 * 12 + 15, extendon);
+							block[i] = new Block(400, 28 * 12 + 15, extendon);
 					}
 					break;
 				case 5: sumblock = 64;
 					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<4)
-                            block[i] = new Block(50 + 50 * i, 50, extendon);
+							block[i] = new Block(50 + 50 * i, 50, extendon);
 						else if(i>3 && i<16)
-                            block[i] = new Block(125, 50 + 28 * (i - 3), extendon);
+							block[i] = new Block(125, 50 + 28 * (i - 3), extendon);
 						else if(i>15 && i<20)
-                            block[i] = new Block(50 + 50 * (i - 16), 50 + 28 * 13, extendon);
+							block[i] = new Block(50 + 50 * (i - 16), 50 + 28 * 13, extendon);
 
 						else if(i>19 && i<21)
-                            block[i] = new Block(375, 50, extendon);
+							block[i] = new Block(375, 50, extendon);
 						else if(i>20 && i<23)
-                            block[i] = new Block(325 + 100 * (i - 21), 50 + 28 * 1, extendon);
+							block[i] = new Block(325 + 100 * (i - 21), 50 + 28 * 1, extendon);
 						else if(i>22 && i<25)
-                            block[i] = new Block(275 + 200 * (i - 23), 50 + 28 * 2, extendon);
+							block[i] = new Block(275 + 200 * (i - 23), 50 + 28 * 2, extendon);
 						else if(i>24 && i<27)
-                            block[i] = new Block(250 + 250 * (i - 25), 50 + 28 * 3, extendon);
+							block[i] = new Block(250 + 250 * (i - 25), 50 + 28 * 3, extendon);
 						else if(i>26 && i<29)
-                            block[i] = new Block(250 + 250 * (i - 27), 50 + 28 * 4, extendon);
+							block[i] = new Block(250 + 250 * (i - 27), 50 + 28 * 4, extendon);
 						else if(i>28 && i<33)
-                            block[i] = new Block(250, 50 + 28 * (i - 24), extendon);
+							block[i] = new Block(250, 50 + 28 * (i - 24), extendon);
 						else if(i>32 && i<35)
-                            block[i] = new Block(250 + 250 * (i - 33), 50 + 28 * 9, extendon);
+							block[i] = new Block(250 + 250 * (i - 33), 50 + 28 * 9, extendon);
 						else if(i>34 && i<37)
-                            block[i] = new Block(250 + 250 * (i - 35), 50 + 28 * 10, extendon);
+							block[i] = new Block(250 + 250 * (i - 35), 50 + 28 * 10, extendon);
 						else if(i>36 && i<39)
-                            block[i] = new Block(275 + 200 * (i - 37), 50 + 28 * 11, extendon);
+							block[i] = new Block(275 + 200 * (i - 37), 50 + 28 * 11, extendon);
 						else if(i>38 && i<41)
-                            block[i] = new Block(325 + 100 * (i - 39), 50 + 28 * 12, extendon);
+							block[i] = new Block(325 + 100 * (i - 39), 50 + 28 * 12, extendon);
 						else if(i>40 && i<42)
-                            block[i] = new Block(375, 50 + 28 * 13, extendon);
+							block[i] = new Block(375, 50 + 28 * 13, extendon);
 
 						else if(i>41 && i<44)
-                            block[i] = new Block(550 + 50 * (i - 42), 50, extendon);
+							block[i] = new Block(550 + 50 * (i - 42), 50, extendon);
 						else if(i>43 && i<55)
-                            block[i] = new Block(575, 50 + 28 * (i - 43), extendon);
+							block[i] = new Block(575, 50 + 28 * (i - 43), extendon);
 						else if(i>54 && i<57)
-                            block[i] = new Block(575 + 175 * (i - 55), 50 + 28 * 11, extendon);
+							block[i] = new Block(575 + 175 * (i - 55), 50 + 28 * 11, extendon);
 						else if(i>56 && i<59)
-                            block[i] = new Block(575 + 175 * (i - 57), 50 + 28 * 12, extendon);
+							block[i] = new Block(575 + 175 * (i - 57), 50 + 28 * 12, extendon);
 						else if(i>58 && i<64)
-                            block[i] = new Block(550 + 50 * (i - 59), 50 + 28 * 13, extendon);
+							block[i] = new Block(550 + 50 * (i - 59), 50 + 28 * 13, extendon);
 
 						block[i].HalfFlag = true;
-                        block[i].ScrollFlag = 1;
+						block[i].ScrollFlag = 1;
 					}
 					break;
 
@@ -287,7 +290,7 @@ namespace WPFBlockCrash
 			bkheight = block[0].Height;
 		}
 
-		internal bool Process(Input input, DrawingContext dc)
+		internal bool Process(Input input, Graphics g)
 		{
 			bool BallIsDead;
 			int itemhandle;
@@ -305,22 +308,22 @@ namespace WPFBlockCrash
 				switch (Stage)
 				{
 					case 1: if (i < 7)
-							block[i].Process(dc, 0 + itemhandle);
+							block[i].Process(g, 0 + itemhandle);
 						else if (i > 6 && i < 14)
-							block[i].Process(dc, 1 + itemhandle);
+							block[i].Process(g, 1 + itemhandle);
 						else if (i > 13 && i < 21)
-							block[i].Process(dc, 2 + itemhandle);
+							block[i].Process(g, 2 + itemhandle);
 						else
-							block[i].Process(dc, 3 + itemhandle);
+							block[i].Process(g, 3 + itemhandle);
 						break;
 					default: if (i % 4 == 0)
-							block[i].Process(dc, 0 + itemhandle);
+							block[i].Process(g, 0 + itemhandle);
 						else if (i % 4 == 1)
-							block[i].Process(dc, 1 + itemhandle);
+							block[i].Process(g, 1 + itemhandle);
 						else if (i % 4 == 2)
-							block[i].Process(dc, 2 + itemhandle);
+							block[i].Process(g, 2 + itemhandle);
 						else
-							block[i].Process(dc, 3 + itemhandle);
+							block[i].Process(g, 3 + itemhandle);
 						break;
 
 				}
@@ -335,50 +338,50 @@ namespace WPFBlockCrash
 				bar.X = ball.X;
 			}
 			//バーの処理
-			bar.Process(input, dc);
+			bar.Process(input, g);
 
 			if (ball.ActCount == 0)
 			{
 				ball.X = bar.MX;
 			}
-            if (ball.ballstop) {
-                ball.X = bar.MX + ball.xoffset;
-            }
-            foreach (Ball smallBall in SmallBalls)
-            {
-                if (smallBall.ballstop){ // ボールが止まっていれば
-                    smallBall.X = bar.MX + smallBall.xoffset;
-                    smallBall.Y = 527;
+			if (ball.ballstop) {
+				ball.X = bar.MX + ball.xoffset;
+			}
+			foreach (Ball smallBall in SmallBalls)
+			{
+				if (smallBall.ballstop){ // ボールが止まっていれば
+					smallBall.X = bar.MX + smallBall.xoffset;
+					smallBall.Y = 527;
 
-                }
-            }
+				}
+			}
 
 
 			// ボールの動き
-            if (!ball.ballstop)
-            {
-                ++ballspup; // 速度上昇カウント
+			if (!ball.ballstop)
+			{
+				++ballspup; // 速度上昇カウント
 
-                switch (Bar)
-                { // バーによりの速度上昇の早さが違う
+				switch (Bar)
+				{ // バーによりの速度上昇の早さが違う
 
-                    case 1: if (ballspup % 1500 == 0)
-                        { // やさしい
-                            ball.LvUp(1);
-                        }
-                        break;
-                    case 2: if (ballspup % 1000 == 0)
-                        { // ふつう
-                            ball.LvUp(1);
-                        }
-                        break;
-                    case 3: if (ballspup % 800 == 0)
-                        { // 難しい
-                            ball.LvUp(1);
-                        }
-                        break;
-                }
-            }
+					case 1: if (ballspup % 1500 == 0)
+						{ // やさしい
+							ball.LvUp(1);
+						}
+						break;
+					case 2: if (ballspup % 1000 == 0)
+						{ // ふつう
+							ball.LvUp(1);
+						}
+						break;
+					case 3: if (ballspup % 800 == 0)
+						{ // 難しい
+							ball.LvUp(1);
+						}
+						break;
+				}
+			}
 
 			++vspeed; // 進まなくなったとき用カウントの増加
 
@@ -388,61 +391,67 @@ namespace WPFBlockCrash
 				ball.spchange();
 			}
 
-			BallIsDead = UpdateBall(input, dc);
+			BallIsDead = UpdateBall(input, g);
 
 			// 小玉があれば表示
-			UpdateSmallBalls(input, dc);
+			UpdateSmallBalls(input, g);
 
 			accel = bar.Accel; 
 			
 			// 得点、レベル、残機枠の表示
-			DrawUtil.DrawBox(dc, 0, 0, 800, 30, Color.FromRgb(230, 230, 230), 3, null);
-			DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", Score), Color.FromRgb(255, 120, 0));
-			DrawUtil.DrawString(dc, 220, 10, string.Format("LEVEL: {0}", ball.Level), Color.FromRgb(255, 120, 0));
-            //デバック用
-            // コンボ表示　邪魔にならないよう透明化処理する  
-            if (combocount > 1)
-            {
-                DrawUtil.DrawString(dc, 20, 400, string.Format("{0} COMBO!", combocount), Color.FromRgb(255, 120, 0));
-                combooncount = 0;
-                comboon = true;
-                alphacombo = combocount;
-            }
-            if(combocount == 0 && comboon)
-            {
-                if (combooncount < 20)
-                {
-                    dc.PushOpacity((255d / 40) * (20 - combooncount) / byte.MaxValue);
-                    DrawUtil.DrawString(dc, 20, 400, string.Format("{0} COMBO!", alphacombo), Color.FromRgb(255, 120, 0));
-                    dc.Pop();
-                    ++combooncount;
-                }
-                else
-                {
-                    comboon = false;
-                    alphacombo = 0;
-                }
-            }
-            //DrawUtil.DrawString(dc, 20, 400, string.Format("ACCEL: {0}", accel), Color.FromRgb(255, 120, 0));
+			//DrawUtil.DrawBox(dc, 0, 0, 800, 30, Color.FromRgb(230, 230, 230), 3, null);
+			g.DrawRectangle(new System.Drawing.Pen(RGB(230, 230, 230), 3), 0, 0, 800, 30);
+			//DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", Score), Color.FromRgb(255, 120, 0));
+			g.DrawString(string.Format("SCORE: {0}", Score), font, RGB(255, 120, 0), 20, 10);
+			//DrawUtil.DrawString(dc, 220, 10, string.Format("LEVEL: {0}", ball.Level), Color.FromRgb(255, 120, 0));
+			g.DrawString(string.Format("LEVEL: {0}", ball.Level), font, RGB(255, 120, 0), 220, 10);
+			//デバック用
+			// コンボ表示　邪魔にならないよう透明化処理する  
+			if (combocount > 1)
+			{
+				//DrawUtil.DrawString(dc, 20, 400, string.Format("{0} COMBO!", combocount), Color.FromRgb(255, 120, 0));
+				g.DrawString(string.Format("{0} COMBO!", combocount), font, RGB(255, 120, 0), 20, 400);
+				combooncount = 0;
+				comboon = true;
+				alphacombo = combocount;
+			}
+			if(combocount == 0 && comboon)
+			{
+				if (combooncount < 20)
+				{
+					//dc.PushOpacity((255d / 40) * (20 - combooncount) / byte.MaxValue);
+					//DrawUtil.DrawString(dc, 20, 400, string.Format("{0} COMBO!", alphacombo), Color.FromRgb(255, 120, 0));
+					g.DrawString(string.Format("{0} COMBO!", alphacombo), font, ARGB((int)((255f / 40) * (20 - combooncount)), 255, 120, 0), 20, 400);
+					//dc.Pop();
+					++combooncount;
+				}
+				else
+				{
+					comboon = false;
+					alphacombo = 0;
+				}
+			}
+			//DrawUtil.DrawString(dc, 20, 400, string.Format("ACCEL: {0}", accel), Color.FromRgb(255, 120, 0));
 
-            for (int i = 0; i < Stock; ++i)
-            {
-                dc.DrawImage(gh, new Rect(540 + 18 * i, 7, gh.Width, gh.Height));
-            }
-            ball.BarAccel(accel);
-            // 小玉があれば表示
-            foreach (Ball smallBall in SmallBalls)
-            {
-                smallBall.BarAccel(accel);
-            }
+			for (int i = 0; i < Stock; ++i)
+			{
+				//dc.DrawImage(gh, new Rect(540 + 18 * i, 7, gh.Width, gh.Height));
+				g.DrawImage(gh, 540 + 18 * i, 7, (float)gh.Width, (float)gh.Height);
+			}
+			ball.BarAccel(accel);
+			// 小玉があれば表示
+			foreach (Ball smallBall in SmallBalls)
+			{
+				smallBall.BarAccel(accel);
+			}
 
 			///音再生
 			SoundPlay();
 
 			if (BallIsDead)
 			{
-                for(int i = 0; i < sumblock; ++i)
-                    block[i].scrollStop = true;
+				for(int i = 0; i < sumblock; ++i)
+					block[i].scrollStop = true;
 				bar.IsDead = true;
 				ball.DX = 0;
 			}
@@ -451,8 +460,8 @@ namespace WPFBlockCrash
 				ball.DX = 0;
 				ball.DY = 0;
 
-                for (int i = 0; i < sumblock; ++i)
-                    block[i].scrollStop = true;
+				for (int i = 0; i < sumblock; ++i)
+					block[i].scrollStop = true;
 
 				// 小玉があれば表示
 				foreach (Ball smallBall in SmallBalls)
@@ -462,17 +471,27 @@ namespace WPFBlockCrash
 				}
 
 				vspeed = 0;
-                Score += ball.Level * Stock; 
+				Score += ball.Level * Stock; 
 				bar.IsDead = true;
 			}
 
 			return BallIsDead;
 		}
 
-		private bool UpdateBall(Input input, DrawingContext dc)
+		private System.Drawing.Brush ARGB(int alpha, byte r, byte g, byte b)
+		{
+			return new SolidBrush(System.Drawing.Color.FromArgb(alpha, r, g, b));
+		}
+
+		private System.Drawing.Brush RGB(byte r, byte g, byte b)
+		{
+			return new SolidBrush(System.Drawing.Color.FromArgb(r, g, b));
+		}
+
+		private bool UpdateBall(Input input, Graphics g)
 		{
 			bool BallIsDead;
-			BallIsDead = ball.Process(input, dc);
+			BallIsDead = ball.Process(input, g);
 
 			// ボールとバーの当たり判定
 			HitCheckBallAndBar(ball);
@@ -480,26 +499,26 @@ namespace WPFBlockCrash
 			// ボールとブロックの当たり判定
 			HitCheckBallAndBlock(ball);
 
-            // ボールとボールの衝突判定
-            HitCheckBallAndBall(ball);
+			// ボールとボールの衝突判定
+			HitCheckBallAndBall(ball);
 
 			return BallIsDead;
 		}
 
-		private void UpdateSmallBalls(Input input, DrawingContext dc)
+		private void UpdateSmallBalls(Input input, Graphics g)
 		{
 			List<Ball> willBeRemovedSmallBalls = new List<Ball>();
 
 			foreach (Ball smallBall in SmallBalls)
 			{
-				bool SmallBallDroped = smallBall.Process(input, dc);
+				bool SmallBallDroped = smallBall.Process(input, g);
 
 				HitCheckBallAndBar(smallBall);
 
 				HitCheckBallAndBlock(smallBall);
 
-                // ボールとボールの衝突判定
-                HitCheckBallAndBall(smallBall);
+				// ボールとボールの衝突判定
+				HitCheckBallAndBall(smallBall);
 
 				if (SmallBallDroped)
 				{
@@ -538,158 +557,158 @@ namespace WPFBlockCrash
 			int ballX = ball.X;
 			int ballY = ball.Y;
 
-            for (int i = 0; i < sumblock; ++i)
-            {
-                if (!block[i].IsDead)
-                {
-                    int blockendX = 0;
-                    int blockX = block[i].X;
-                    int blockY = block[i].Y;
+			for (int i = 0; i < sumblock; ++i)
+			{
+				if (!block[i].IsDead)
+				{
+					int blockendX = 0;
+					int blockX = block[i].X;
+					int blockY = block[i].Y;
 
-                    if (blockX - bkwidth / 2 < 0)
-                        blockendX = blockX - bkwidth / 2 + 800;
-                    if (blockX + bkwidth / 2 >= 800)
-                        blockendX = blockX + bkwidth / 2 - 800;
+					if (blockX - bkwidth / 2 < 0)
+						blockendX = blockX - bkwidth / 2 + 800;
+					if (blockX + bkwidth / 2 >= 800)
+						blockendX = blockX + bkwidth / 2 - 800;
 
-                    for (int j = 0; j < 2; ++j)
-                    {
-                        if (ballX < blockX + bkwidth / 2
-                            && ballX > blockX - bkwidth / 2
-                            && ballY + blheight / 2 > blockY - bkheight / 2
-                            && ballY + blheight / 2 < blockY + bkheight / 2)
-                        {
-                            vspeed = 0;
+					for (int j = 0; j < 2; ++j)
+					{
+						if (ballX < blockX + bkwidth / 2
+							&& ballX > blockX - bkwidth / 2
+							&& ballY + blheight / 2 > blockY - bkheight / 2
+							&& ballY + blheight / 2 < blockY + bkheight / 2)
+						{
+							vspeed = 0;
 
-                            block[i].IsDead = true;
-                            demolishFlag = true;
+							block[i].IsDead = true;
+							demolishFlag = true;
 
-                            if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-                                ball.DY = -ball.DY;
-                        }
-                        else if (ballX < blockX + bkwidth / 2
-                            && ballX > blockX - bkwidth / 2
-                            && ballY - blheight / 2 > blockY - bkheight / 2
-                            && ballY - blheight / 2 < blockY + bkheight / 2)
-                        {
-                            vspeed = 0;
+							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+								ball.DY = -ball.DY;
+						}
+						else if (ballX < blockX + bkwidth / 2
+							&& ballX > blockX - bkwidth / 2
+							&& ballY - blheight / 2 > blockY - bkheight / 2
+							&& ballY - blheight / 2 < blockY + bkheight / 2)
+						{
+							vspeed = 0;
 
-                            block[i].IsDead = true;
-                            demolishFlag = true;
-                            if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-                                ball.DY = -ball.DY;
-                        }
-                        else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
-                            && ballX + blwidth / 2 > blockX - bkwidth / 2
-                            && ballY > blockY - bkheight / 2
-                            && ballY < blockY + bkheight / 2)
-                        {
-                            vspeed = 0;
+							block[i].IsDead = true;
+							demolishFlag = true;
+							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+								ball.DY = -ball.DY;
+						}
+						else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
+							&& ballX + blwidth / 2 > blockX - bkwidth / 2
+							&& ballY > blockY - bkheight / 2
+							&& ballY < blockY + bkheight / 2)
+						{
+							vspeed = 0;
 
-                            block[i].IsDead = true;
-                            demolishFlag = true;
-                            if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-                                ball.DX = -ball.DX;
-                        }
-                        else if (ballX - blwidth / 2 < blockX + bkwidth / 2
-                            && ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
-                            && ballY > blockY - bkheight / 2
-                            && ballY < blockY + bkheight / 2)
-                        {
-                            vspeed = 0;
+							block[i].IsDead = true;
+							demolishFlag = true;
+							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+								ball.DX = -ball.DX;
+						}
+						else if (ballX - blwidth / 2 < blockX + bkwidth / 2
+							&& ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
+							&& ballY > blockY - bkheight / 2
+							&& ballY < blockY + bkheight / 2)
+						{
+							vspeed = 0;
 
-                            block[i].IsDead = true;
-                            demolishFlag = true;
-                            if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-                                ball.DX = -ball.DX;
-                        }
-                        if (blockendX != 0)
-                            blockX = blockendX;
-                        else
-                            break;
-                    }
+							block[i].IsDead = true;
+							demolishFlag = true;
+							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+								ball.DX = -ball.DX;
+						}
+						if (blockendX != 0)
+							blockX = blockendX;
+						else
+							break;
+					}
 
 					if (block[i].IsDead)
 					{
-                        int nonmovebonus = 0;
-                        if (!bar.IsMove)
-                            nonmovebonus = 500;
-                        ++combocount; 
+						int nonmovebonus = 0;
+						if (!bar.IsMove)
+							nonmovebonus = 500;
+						++combocount; 
 						Score += 100 + 50 * ball.Level + combocount * 100 + nonmovebonus;
 						ball.Radius = 0;
 					}
 				}
 				else if (block[i].ItemFlag)
 				{
-                    if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-                        continue;
-                    int blockendX = 0;
+					if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+						continue;
+					int blockendX = 0;
 					int blockX = block[i].X;
 					int blockY = block[i].Y;
 
-                    if (blockX - bkwidth / 2 < 0)
-                        blockendX = blockX - bkwidth / 2 + 800;
-                    if (blockX + bkwidth / 2 >= 800)
-                        blockendX = blockX + bkwidth / 2 - 800;
+					if (blockX - bkwidth / 2 < 0)
+						blockendX = blockX - bkwidth / 2 + 800;
+					if (blockX + bkwidth / 2 >= 800)
+						blockendX = blockX + bkwidth / 2 - 800;
 
-                    for (int j = 0; j < 2; ++j)
-                    {
-                        if (ballX < blockX + bkwidth / 2
-                            && ballX > blockX - bkwidth / 2
-                            && ballY + blheight / 2 > blockY - bkheight / 2
-                            && ballY + blheight / 2 < blockY + bkheight / 2)
-                        {
-                            vspeed = 0;
+					for (int j = 0; j < 2; ++j)
+					{
+						if (ballX < blockX + bkwidth / 2
+							&& ballX > blockX - bkwidth / 2
+							&& ballY + blheight / 2 > blockY - bkheight / 2
+							&& ballY + blheight / 2 < blockY + bkheight / 2)
+						{
+							vspeed = 0;
 
-                            block[i].ItemFlag = false;
+							block[i].ItemFlag = false;
 
-                            ItemEffect(block[i].ItemType, ballX, ballY);
+							ItemEffect(block[i].ItemType, ballX, ballY);
 
-                            demolishFlag = true;
-                        }
-                        else if (ballX < blockX + bkwidth / 2
-                            && ballX > blockX - bkwidth / 2
-                            && ballY - blheight / 2 > blockY - bkheight / 2
-                            && ballY - blheight / 2 < blockY + bkheight / 2)
-                        {
-                            vspeed = 0;
+							demolishFlag = true;
+						}
+						else if (ballX < blockX + bkwidth / 2
+							&& ballX > blockX - bkwidth / 2
+							&& ballY - blheight / 2 > blockY - bkheight / 2
+							&& ballY - blheight / 2 < blockY + bkheight / 2)
+						{
+							vspeed = 0;
 
-                            block[i].ItemFlag = false;
+							block[i].ItemFlag = false;
 
-                            ItemEffect(block[i].ItemType, ballX, ballY);
+							ItemEffect(block[i].ItemType, ballX, ballY);
 
-                            demolishFlag = true;
-                        }
-                        else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
-                            && ballX + blwidth / 2 > blockX - bkwidth / 2
-                            && ballY > blockY - bkheight / 2
-                            && ballY < blockY + bkheight / 2)
-                        {
-                            vspeed = 0;
+							demolishFlag = true;
+						}
+						else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
+							&& ballX + blwidth / 2 > blockX - bkwidth / 2
+							&& ballY > blockY - bkheight / 2
+							&& ballY < blockY + bkheight / 2)
+						{
+							vspeed = 0;
 
-                            block[i].ItemFlag = false;
+							block[i].ItemFlag = false;
 
-                            ItemEffect(block[i].ItemType, ballX, ballY);
+							ItemEffect(block[i].ItemType, ballX, ballY);
 
-                            demolishFlag = true;
-                        }
-                        else if (ballX - blwidth / 2 < blockX + bkwidth / 2
-                            && ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
-                            && ballY > blockY - bkheight / 2
-                            && ballY < blockY + bkheight / 2)
-                        {
-                            vspeed = 0;
+							demolishFlag = true;
+						}
+						else if (ballX - blwidth / 2 < blockX + bkwidth / 2
+							&& ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
+							&& ballY > blockY - bkheight / 2
+							&& ballY < blockY + bkheight / 2)
+						{
+							vspeed = 0;
 
-                            block[i].ItemFlag = false;
+							block[i].ItemFlag = false;
 
-                            ItemEffect(block[i].ItemType, ballX, ballY);
+							ItemEffect(block[i].ItemType, ballX, ballY);
 
-                            demolishFlag = true;
-                        }
-                        if (blockendX != 0)
-                            blockX = blockendX;
-                        else
-                            break;
-                    }
+							demolishFlag = true;
+						}
+						if (blockendX != 0)
+							blockX = blockendX;
+						else
+							break;
+					}
 
 					if (!block[i].ItemFlag)
 						Score += 300;
@@ -719,7 +738,7 @@ namespace WPFBlockCrash
 							break;
 
 						Ball newSmallBall = new Ball(dInfo);
-                        newSmallBall.ballstop = false;
+						newSmallBall.ballstop = false;
 						newSmallBall.Increse(ballX, ballY);
 						willBeAddedSmallBalls.Add(newSmallBall);
 						++sballcount;
@@ -733,10 +752,10 @@ namespace WPFBlockCrash
 				case EItemType.ITEMTYPE_SCOREUP:
 					Score += 5000;
 					break;
-                case EItemType.ITEMTYPE_BALLCATCHER:
-                    bar.BallCatch( true );
-                    ballcatch = true;
-                    break;
+				case EItemType.ITEMTYPE_BALLCATCHER:
+					bar.BallCatch( true );
+					ballcatch = true;
+					break;
 			}
 		}
 
@@ -759,21 +778,21 @@ namespace WPFBlockCrash
 				{
 					ball.Radius = 20;
 
-                    if (ballcatch)
-                    { // ボールがバーにくっつく状態
-                        ball.DX = ball.DY = 0;
-                        ball.ballstop = true;
-                        if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
-                            ball.xoffset = ball.X - bar.MX;
-                        combocount = 0;
-                        bar.IsMove = false;
-                    }
+					if (ballcatch)
+					{ // ボールがバーにくっつく状態
+						ball.DX = ball.DY = 0;
+						ball.ballstop = true;
+						if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
+							ball.xoffset = ball.X - bar.MX;
+						combocount = 0;
+						bar.IsMove = false;
+					}
 					else if (ballX < barX - bdwidth / 2 * 2 / 3)
 					{
-                        combocount = 0;
-                        bar.IsMove = false;
-                        if (Bar == 3)
-                            ball.LvUp(1);
+						combocount = 0;
+						bar.IsMove = false;
+						if (Bar == 3)
+							ball.LvUp(1);
 
 						ball.DX = -ball.DX;
 						ball.DY = -ball.DY;
@@ -783,10 +802,10 @@ namespace WPFBlockCrash
 					}
 					else if (ballX > barX + bdwidth / 2 * 2 / 3)
 					{
-                        combocount = 0;
-                        bar.IsMove = false;
-                        if (Bar == 3)
-                            ball.LvUp(1);
+						combocount = 0;
+						bar.IsMove = false;
+						if (Bar == 3)
+							ball.LvUp(1);
 						ball.DX = -ball.DX;
 						ball.DY = -ball.DY;
 						ball.Y = ball.Y - 5;
@@ -795,14 +814,14 @@ namespace WPFBlockCrash
 					}
 					else
 					{
-                        if (ballX < barX + 10 && ballX > barX - 10) {
-                            ball.Penetration();
-                            ball.LvUp(1); // 速度が上がって短時間貫通化
-                        }
-                        combocount = 0;
-                        bar.IsMove = false;
-                        if (Bar == 3)
-                            ball.LvUp(1);
+						if (ballX < barX + 10 && ballX > barX - 10) {
+							ball.Penetration();
+							ball.LvUp(1); // 速度が上がって短時間貫通化
+						}
+						combocount = 0;
+						bar.IsMove = false;
+						if (Bar == 3)
+							ball.LvUp(1);
 						ball.DY = -ball.DY;
 						ball.Y = ball.Y - 5;
 						boundFlag = true;
@@ -811,35 +830,35 @@ namespace WPFBlockCrash
 			}
 		}
 
-        private void HitCheckBallAndBall(Ball ball) // ボールとボールの衝突判定
-        {
-            boundFlag = false;
+		private void HitCheckBallAndBall(Ball ball) // ボールとボールの衝突判定
+		{
+			boundFlag = false;
 
-            boundFlag = ball.PlaySound;
+			boundFlag = ball.PlaySound;
 
-            int ballX = ball.X;
-            int ballY = ball.Y;
+			int ballX = ball.X;
+			int ballY = ball.Y;
 
-            foreach (Ball smallBall in SmallBalls)
-            {
-                if (smallBall == ball) // 捜査対象が同じならコンティニュー
-                    continue;
-                if (smallBall.IsNewCount > 0) // 増えたばかりならコンティニュー
-                    continue;
+			foreach (Ball smallBall in SmallBalls)
+			{
+				if (smallBall == ball) // 捜査対象が同じならコンティニュー
+					continue;
+				if (smallBall.IsNewCount > 0) // 増えたばかりならコンティニュー
+					continue;
 
-                if ((ballX - smallBall.X) * (ballX - smallBall.X) + (ballY - smallBall.Y) * (ballY - smallBall.Y) <= 20 * 20)
-                {// 衝突判定
+				if ((ballX - smallBall.X) * (ballX - smallBall.X) + (ballY - smallBall.Y) * (ballY - smallBall.Y) <= 20 * 20)
+				{// 衝突判定
 
-                    ball.DX = -ball.DX;
-                    ball.DY = ball.DY;
-                    smallBall.DX = -smallBall.DX;
-                    smallBall.DY = smallBall.DY;
+					ball.DX = -ball.DX;
+					ball.DY = ball.DY;
+					smallBall.DX = -smallBall.DX;
+					smallBall.DY = smallBall.DY;
 
-                    boundFlag = true;
-                }
-            }
-        }
-        
+					boundFlag = true;
+				}
+			}
+		}
+		
 
 		internal void Reset()
 		{
@@ -847,18 +866,18 @@ namespace WPFBlockCrash
 			//    SmallBalls[i] = null;
 
 			SmallBalls = new LinkedList<Ball>();
-            ballcatch = false;
-            bar.BallCatch(false);
+			ballcatch = false;
+			bar.BallCatch(false);
 			sballcount = 0;
 			--Stock;
-            vspeed = 0;
+			vspeed = 0;
 			bdwidth = bar.Width;
-            combocount = 0;
-            bar.Reset();
+			combocount = 0;
+			bar.Reset();
 			ball.Reset();
-            for (int i = 0; i < sumblock; ++i)
-                block[i].scrollStop = false;
-            bar.IsDead = false;
+			for (int i = 0; i < sumblock; ++i)
+				block[i].scrollStop = false;
+			bar.IsDead = false;
 		}
 	}
 }

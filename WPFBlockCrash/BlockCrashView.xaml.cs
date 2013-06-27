@@ -47,12 +47,16 @@ namespace WPFBlockCrash
 
             render(g);
 
+            g.Dispose();
+            bmp.Dispose();
+
+            bitmap.AddDirtyRect(new Int32Rect(0, 0, 800, 600));
             bitmap.Unlock();
 
             return bitmap;
         }
 
-        private void SetBitmapToImage(System.Windows.Controls.Image Image, RenderTargetBitmap bitmap)
+        private void SetBitmapToImage(System.Windows.Controls.Image Image, WriteableBitmap bitmap)
         {
             if (!Image.CheckAccess())
                 Dispatcher.Invoke(new Action(() => SetBitmapToImage(Image, bitmap)));
@@ -71,7 +75,7 @@ namespace WPFBlockCrash
         private void timerToRun_Tick(object sender, EventArgs e)
         {
             main.ATMode(input);
-            SetBitmapToImage(image, CreateBitmap(800, 600, 96, dc => main.ProcessLoop(input, dc)));
+            SetBitmapToImage(image, CreateBitmap(800, 600, 96, g => main.ProcessLoop(input, g)));
         }
 
 

@@ -27,7 +27,7 @@ namespace WPFBlockCrash
         private int enterCount;
         private int autocount;
 
-        private readonly Font
+        private readonly Font font = new Font("Consolas", 16);
 
         public int Score { get; set; }
         public int Stock { get; set; }
@@ -114,49 +114,60 @@ namespace WPFBlockCrash
                     DrawStageTitle(g, "オナジミサン");
                     break;
                 case 2:
-                    DrawStageTitle(dc, "4つの塔");
+                    //DrawStageTitle(dc, "4つの塔");
+                    DrawStageTitle(g, "4つの塔");
                     break;
                 case 3:
-                    DrawStageTitle(dc, "クロスクロス");
+                    //DrawStageTitle(dc, "クロスクロス");
+                    DrawStageTitle(g, "クロスクロス");
                     break;
                 case 4:
-                    DrawStageTitle(dc, "円環の理");
+                    //DrawStageTitle(dc, "円環の理");
+                    DrawStageTitle(g, "円環の理");
                     break;
                 case 5:
-                    DrawStageTitle(dc, "製作は私達です。");
+                    //DrawStageTitle(dc, "製作は私達です。");
+                    DrawStageTitle(g, "製作者は私達です。");
                     break;
             }
 
             for (int i = 0; i < 5; ++i)
             {
-                DrawUtil.DrawGraph(dc, 60 + i * 120, 200, stagegh[i]);
+                //DrawUtil.DrawGraph(dc, 60 + i * 120, 200, stagegh[i]);
+                g.DrawImage(stagegh[i], 60 + i * 120, 200);
             }
 
             if (clear[Stage - 1])
             {
-                DrawUtil.DrawGraph(dc, 700, 320, cleargh);
+                //DrawUtil.DrawGraph(dc, 700, 320, cleargh);
+                g.DrawImage(cleargh, 700, 320);
             }
 
-            DrawUtil.DrawBox(dc, 60 + (Stage - 1) * 120, 200, 160 + (Stage - 1) * 120, 270, RGB(255, 20, 30));
-            DrawUtil.DrawBox(dc, 400, 320, 750, 578, RGB(255, 20, 30));
-            DrawUtil.DrawGraph(dc, 40, 460, bargh[Bar - 1]);
-            DrawUtil.DrawString(dc, 40, 500, string.Format("SCORE：{0}", Score),RGB(255, 120, 0));
-            DrawUtil.DrawString(dc, 40, 540, string.Format("STOCK：{0}", Stock), RGB(255, 120, 0));
+            //DrawUtil.DrawBox(dc, 60 + (Stage - 1) * 120, 200, 160 + (Stage - 1) * 120, 270, RGB(255, 20, 30));
+            g.DrawRectangle(new System.Drawing.Pen(RGB(255, 20, 30)), 60 + (Stage - 1) * 120, 200, 100, 80);
+            //DrawUtil.DrawBox(dc, 400, 320, 750, 578, RGB(255, 20, 30));
+            g.DrawRectangle(new System.Drawing.Pen(RGB(255, 20, 30)), 400, 320, 350, 270);
+            //DrawUtil.DrawGraph(dc, 40, 460, bargh[Bar - 1]);
+            g.DrawImage(bargh[Bar - 1], 40, 460);
+            //DrawUtil.DrawString(dc, 40, 500, string.Format("SCORE：{0}", Score),RGB(255, 120, 0));
+            g.DrawString(string.Format("SCORE：{0}", Score), font, RGB(255, 120, 0), 40, 500);
+            //DrawUtil.DrawString(dc, 40, 540, string.Format("STOCK：{0}", Stock), RGB(255, 120, 0));
+            g.DrawString(string.Format("STOCK：{0}", Stock), font, RGB(255, 120, 0), 40, 540);
         }
 
-        private void DrawStageTitle(Graphics g, string p)
+        private void DrawStageTitle(Graphics g, string stageTitle)
         {
-            g.DrawString(p, font, )
+            g.DrawString(stageTitle, font, RGB(255, 120, 0), 40, 340);
         }
 
-        private void DrawStageTitle(DrawingContext dc, string stageTitle)
-        {
-            DrawUtil.DrawString(dc, 40, 340, stageTitle, RGB(255, 120, 0));
-        }
+        //private void DrawStageTitle(DrawingContext dc, string stageTitle)
+        //{
+        //    DrawUtil.DrawString(dc, 40, 340, stageTitle, RGB(255, 120, 0));
+        //}
 
-        private Color RGB(byte r, byte g, byte b)
+        private System.Drawing.Brush RGB(byte r, byte g, byte b)
         {
-            return Color.FromRgb(r, g, b);
+            return new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(r, g, b));
         }
 
         private void KeyGet(Input input)

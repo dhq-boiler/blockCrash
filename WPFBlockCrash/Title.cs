@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Media;
 using System.Text;
@@ -16,7 +17,7 @@ namespace WPFBlockCrash
         {
             try
             {
-                titleGh = new BitmapImage(new Uri(Main.ResourceDirectory, "title.png"));
+                titleGh = new Bitmap(Main.ResourceDirectory + "title.png");
             }
             catch (Exception e)
             {
@@ -32,13 +33,13 @@ namespace WPFBlockCrash
             dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
         }
 
-        public bool Process(Input input, DrawingContext dc)
+        public bool Process(Input input, Graphics g)
         {
             //キー処理
             KeyGet(input);
 
             //描画処理
-            Draw(dc);
+            Draw(g);
 
             return IsDead;
         }
@@ -64,14 +65,15 @@ namespace WPFBlockCrash
             }
         }
 
-        private void Draw(DrawingContext dc)
+        private void Draw(Graphics g)
         {
             //タイトル表示
             //dc.DrawImage(titleGh, new Rect(0, 0, titleGh.Width, titleGh.Height));
-            DrawUtil.DrawGraph(dc, 0, 0, titleGh);
+            //DrawUtil.DrawGraph(dc, 0, 0, titleGh);
+            g.DrawImage(titleGh, 0, 0);
         }
 
-        private ImageSource titleGh;
+        private Image titleGh;
         public bool IsDead { get; set; }
         public bool selectSoundFlag { get; private set; }
         public bool decisionSoundFlag { get; private set; }

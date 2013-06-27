@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Media;
 using System.Text;
@@ -14,9 +15,11 @@ namespace WPFBlockCrash
     class Ranking
     {
         private DisplayInfo dInfo;
-        private ImageSource[] gh;
-        private ImageSource newgh;
+        private Image[] gh;
+        private Image newgh;
         public SaveGameData[] saved = new SaveGameData[20];
+
+        private readonly Font font = new Font("Consolas", 32);
 
         public Ranking(int score, int barnum, DisplayInfo dInfo)
         {
@@ -24,12 +27,12 @@ namespace WPFBlockCrash
 
             try
             {
-                rankGh = new BitmapImage(new Uri(Main.ResourceDirectory, "ranking.png"));
-                gh = new ImageSource[3];
-                gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "bar.bmp"));
-                gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "barsecond.bmp"));
-                gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "barthird.bmp"));
-                newgh = new BitmapImage(new Uri(Main.ResourceDirectory, "new.bmp"));
+                rankGh = new Bitmap(Main.ResourceDirectory + "ranking.png");
+                gh = new Image[3];
+                gh[0] = new Bitmap(Main.ResourceDirectory + "bar.bmp");
+                gh[1] = new Bitmap(Main.ResourceDirectory + "barsecond.bmp");
+                gh[2] = new Bitmap(Main.ResourceDirectory + "barthird.bmp");
+                newgh = new Bitmap(Main.ResourceDirectory + "new.bmp");
             }
             catch (Exception e)
             {
@@ -128,13 +131,13 @@ namespace WPFBlockCrash
             fs1.Close();
         }
 
-        public bool Process(Input input, DrawingContext dc)
+        public bool Process(Input input, Graphics g)
         {
             //キー処理
             KeyGet(input);
 
             //描画処理
-            Draw(dc);
+            Draw(g);
 
             return IsDead;
         }
@@ -174,36 +177,52 @@ namespace WPFBlockCrash
             }
         }
 
-        private void Draw(DrawingContext dc)
+        private void Draw(Graphics g)
         {
             // ランキング表示
             // 時間経過でスクロール
             for (int i = 0; i < 20; ++i)
             {
                 if (i == index) { // 今回の記録
-                    DrawUtil.DrawLine(dc, 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey, Color.FromRgb(255, 0, 0));
+                    //DrawUtil.DrawLine(dc, 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey, Color.FromRgb(255, 0, 0));
+                    g.DrawLine(new System.Drawing.Pen(RGB(255, 0, 0)), 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey);
 
-                    DrawUtil.DrawString(dc, 40, -670 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 255, 100), 32);
-                    DrawUtil.DrawString(dc, 150, -670 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 255, 100), 32);
-                    DrawUtil.DrawGraph(dc, 300, -665 + i * 40 + scorey, gh[saved[i].BarNum]);
-                    DrawUtil.DrawString(dc, 450, -670 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 255, 100), 32);
-                    DrawUtil.DrawGraph(dc, 650, -680 + i * 40 + scorey, newgh);
+                    //DrawUtil.DrawString(dc, 40, -670 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 255, 100), 32);
+                    g.DrawString(string.Format("{0}：", i + 1), font, RGB(255, 255, 100), 40, -670 + i * 40 + scorey);
+                    //DrawUtil.DrawString(dc, 150, -670 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 255, 100), 32);
+                    g.DrawString(string.Format("{0}", saved[i].Score), font, RGB(255, 255, 100), 150, -670 + i * 40 + scorey);
+                    //DrawUtil.DrawGraph(dc, 300, -665 + i * 40 + scorey, gh[saved[i].BarNum]);
+                    g.DrawImage(gh[saved[i].BarNum], 300, -665 + i * 40 + scorey);
+                    //DrawUtil.DrawString(dc, 450, -670 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 255, 100), 32);
+                    g.DrawString(string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), font, RGB(255, 255, 100), 450, -670 + i * 40 + scorey);
+                    //DrawUtil.DrawGraph(dc, 650, -680 + i * 40 + scorey, newgh);
+                    g.DrawImage(newgh, 650, -680 + i * 40 + scorey);
                 }
                 else {
-                    DrawUtil.DrawLine(dc, 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey, Color.FromRgb(230, 230, 230));
+                    //DrawUtil.DrawLine(dc, 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey, Color.FromRgb(230, 230, 230));
+                    g.DrawLine(new System.Drawing.Pen(RGB(230, 230, 230)), 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey);
 
-                    DrawUtil.DrawString(dc, 40, -670 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 120, 0), 32);
-                    DrawUtil.DrawString(dc, 150, -670 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 120, 0), 32);
-                    DrawUtil.DrawGraph(dc, 300, -665 + i * 40 + scorey, gh[saved[i].BarNum]);
-                    DrawUtil.DrawString(dc, 450, -670 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 120, 0), 32);
+                    //DrawUtil.DrawString(dc, 40, -670 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 120, 0), 32);
+                    g.DrawString(string.Format("{0} :", i + 1), font, RGB(255, 120, 0), 40, -670 + i * 40 + scorey);
+                    //DrawUtil.DrawString(dc, 150, -670 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 120, 0), 32);
+                    g.DrawString(string.Format("{0}", saved[i].Score), font, RGB(255, 120, 0), 150, -670 + i * 40 + scorey);
+                    //DrawUtil.DrawGraph(dc, 300, -665 + i * 40 + scorey, gh[saved[i].BarNum]);
+                    g.DrawImage(gh[saved[i].BarNum], 300, -665 + i * 40 + scorey);
+                    //DrawUtil.DrawString(dc, 450, -670 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 120, 0), 32);
+                    g.DrawString(string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), font, RGB(255, 120, 0), 450, -670 + i * 40 + scorey);
                 }
                 
             }
-            DrawUtil.DrawGraph(dc, 0, 0, rankGh);
-            DrawUtil.DrawString(dc, 40, 180, string.Format("RANK"), Color.FromRgb(255, 255, 255), 32);
-            DrawUtil.DrawString(dc, 150, 180, string.Format("SCORE"), Color.FromRgb(255, 255, 255), 32);
-            DrawUtil.DrawString(dc, 300, 180, string.Format("BARTYPE"), Color.FromRgb(255, 255, 255), 32);
-            DrawUtil.DrawString(dc, 480, 180, string.Format("DATE"), Color.FromRgb(255, 255, 255), 32);
+            //DrawUtil.DrawGraph(dc, 0, 0, rankGh);
+            g.DrawImage(rankGh, 0, 0);
+            //DrawUtil.DrawString(dc, 40, 180, string.Format("RANK"), Color.FromRgb(255, 255, 255), 32);
+            g.DrawString("RANK", font, RGB(255, 255, 255), 40, 180);
+            //DrawUtil.DrawString(dc, 150, 180, string.Format("SCORE"), Color.FromRgb(255, 255, 255), 32);
+            g.DrawString("SCORE", font, RGB(255, 255, 255), 150, 180);
+            //DrawUtil.DrawString(dc, 300, 180, string.Format("BARTYPE"), Color.FromRgb(255, 255, 255), 32);
+            g.DrawString("BARTYPE", font, RGB(255, 255, 255), 300, 180);
+            //DrawUtil.DrawString(dc, 480, 180, string.Format("DATE"), Color.FromRgb(255, 255, 255), 32);
+            g.DrawString("DATE", font, RGB(255, 255, 255), 480, 180);
 
             if (scorey < 900 && scroll)
                 scorey += 4 * scrollspeed;
@@ -211,7 +230,12 @@ namespace WPFBlockCrash
                 end = true;
         }
 
-        private ImageSource rankGh;
+        private System.Drawing.Brush RGB(byte r, byte g, byte b)
+        {
+            return new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(r, g, b));
+        }
+
+        private Image rankGh;
         public bool IsDead { get; set; }
         public bool selectSoundFlag { get; private set; }
         public bool decisionSoundFlag { get; private set; }

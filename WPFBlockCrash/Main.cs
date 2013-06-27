@@ -36,7 +36,7 @@ namespace WPFBlockCrash
         private bool keycheck;
         private bool automode;
         private DisplayInfo dInfo;
-        public static readonly Uri ResourceDirectory = new Uri(Directory.GetCurrentDirectory() + "\\res\\");
+        public static readonly string ResourceDirectory = Directory.GetCurrentDirectory() + "\\res\\";
         public static readonly Random rand = new Random(Environment.TickCount);
         
         public Main(DisplayInfo dInfo)
@@ -61,7 +61,8 @@ namespace WPFBlockCrash
             //{
 
             //DrawUtil.DrawBox(dc, 0, 0, 800, 600, Color.FromRgb(0, 0, 0), 1, Color.FromRgb(0, 0, 0));
-            g.DrawRectangle(new System.Drawing.Pen(Brushes.Black), 0, 0, 800, 600);
+            //g.DrawRectangle(new System.Drawing.Pen(Brushes.Black), 0, 0, 800, 600);
+            g.FillRectangle(Brushes.Black, 0, 0, 800, 600);
 
             if (input.IsPushedKeys)
             {
@@ -130,7 +131,7 @@ namespace WPFBlockCrash
                 //case 3:
                 case EActType.CONTROL:
                     {
-                        if (control.Process(input, dc))
+                        if (control.Process(input, g))
                         {
                             stock = control.Stock;
                             if (stock > 1)
@@ -181,7 +182,7 @@ namespace WPFBlockCrash
                     }
                     break;
                 case EActType.RANKING: {
-                    if(ranking.Process(input,g))
+                    if(ranking.Process(input, g))
                     {
                         //if (input.AT) // 疲れるからタイトルへ
                         // {
