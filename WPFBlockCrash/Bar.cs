@@ -10,7 +10,7 @@ namespace WPFBlockCrash
 {
     class Bar
     {
-        private const int SPEED = 8;
+        public int SPEED = 8;
 
         private int EnlargementFactor;
         private ImageSource[] gh;
@@ -23,7 +23,6 @@ namespace WPFBlockCrash
         {
             this.dInfo = dInfo;
             mBar = moldBar = barnum - 1;
-
             gh = new ImageSource[4];
             gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "bar.bmp"));
             gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "barsecond.bmp"));
@@ -32,8 +31,11 @@ namespace WPFBlockCrash
 
             BitmapImage bi = gh[0] as BitmapImage;
 
-            if (mBar == 2) // 2ならバーは小さくする
-                Width = (int)bi.PixelWidth/2;
+            if (mBar == 2)
+            {// 2ならバーは小さくする
+                Width = (int)bi.PixelWidth / 2;
+                SPEED = 16;
+            }
             else
                 Width = (int)bi.PixelWidth;
             Height = (int)bi.PixelHeight;
