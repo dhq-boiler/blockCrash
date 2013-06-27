@@ -69,6 +69,7 @@ Global
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Release|Win32.ActiveCfg = Release|Any CPU
+		{1AD63B96-723B-436E-95DE-064F055C3EE2}.Release|Win32.Build.0 = Release|Any CPU
 		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -80,6 +81,7 @@ Global
 		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Win32.ActiveCfg = Release|Any CPU
+		{AA90C0EB-F95E-4319-A46C-7E2EC3924C49}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
