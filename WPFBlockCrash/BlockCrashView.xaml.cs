@@ -24,24 +24,21 @@ namespace WPFBlockCrash
     public partial class BlockCrashView : UserControl
     {
         private DispatcherTimer timerToRun;
-        private DispatcherTimer timerToRender;
-        private WriteableBitmap bitmap;
-        private RenderTargetBitmap bs;
+        private RenderTargetBitmap bitmap;
 
         public BlockCrashView()
         {
             InitializeComponent();
 
             input = new Input();
-            //input.AT = true;
             main = new Main(new DisplayInfo() { Width = 800, Height = 600 });
-
         }
 
         private RenderTargetBitmap CreateBitmap(int width, int height, double dpi, Action<DrawingContext> render)
         {
-            GC.Collect();
-            RenderTargetBitmap bitmap = null;
+            //ガベージコレクションが必要か要検証
+            //GC.Collect();
+
             DrawingVisual drawingVisual = new DrawingVisual();
             using (DrawingContext drawingContext = drawingVisual.RenderOpen())
             {
@@ -55,7 +52,7 @@ namespace WPFBlockCrash
             return bitmap;
         }
 
-        private void SetBitmapToImage(System.Windows.Controls.Image Image, WriteableBitmap bitmap)
+        private void SetBitmapToImage(System.Windows.Controls.Image Image, RenderTargetBitmap bitmap)
         {
             if (!Image.CheckAccess())
                 Dispatcher.Invoke(new Action(() => SetBitmapToImage(Image, bitmap)));
@@ -65,44 +62,16 @@ namespace WPFBlockCrash
 
         public void RunGame()
         {
-            timerToRender = new DispatcherTimer();
-            timerToRender.Tick += timerToRender_Tick;
-            timerToRender.Interval = TimeSpan.FromMilliseconds(1);
-            timerToRender.Start();
-
             timerToRun = new DispatcherTimer();
             timerToRun.Tick += timerToRun_Tick;
             timerToRun.Interval = TimeSpan.FromMilliseconds(1);
             timerToRun.Start();
         }
 
-        private object render_object = new object();
-
-        private void timerToRender_Tick(object sender, EventArgs e)
-        {
-            if (bs == null)
-                return;
-
-            WriteableBitmap wb = null;
-
-            lock (render_object)
-            {
-                wb = new WriteableBitmap(bs);
-            }
-
-            SetBitmapToImage(image, wb);
-        }
-
         private void timerToRun_Tick(object sender, EventArgs e)
         {
             main.ATMode(input);
-            RenderTargetBitmap rtb = null;
-            rtb = CreateBitmap(800, 600, 96, dc => main.ProcessLoop(input, dc));
-
-            lock (render_object)
-            {
-                bs = rtb;
-            }
+            SetBitmapToImage(image, CreateBitmap(800, 600, 96, dc => main.ProcessLoop(input, dc)));
         }
 
 
@@ -151,7 +120,6 @@ namespace WPFBlockCrash
 
         public void ExitGame()
         {
-            timerToRender.Stop();
             timerToRun.Stop();
         }
 
