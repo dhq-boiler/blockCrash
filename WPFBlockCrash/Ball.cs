@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//using System.Windows.Media;
-//using System.Windows.Media.Imaging;
 using System.Drawing;
 
 namespace WPFBlockCrash
@@ -14,6 +12,26 @@ namespace WPFBlockCrash
         public int xoffset { get; set; }
         public int baccel { get; set; } 
         public int acbectl { get; set; } // 加速の向き
+        private Image[] gh;
+        private DisplayInfo dInfo;
+        public int ActCount { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int DX { get; set; }
+        public int DY { get; set; }
+        public int Level { get; set; }
+        public int Radius { get; set; }
+        public int OldY { get; set; }
+        public bool IsDead { get; set; }
+        public bool PlaySound { get; set; }
+        public EPenetrability Penetrability { get; set; }
+
+        public int PenetratingCount { get; set; }
+
+        public bool IsSmall { get; set; }
+        public int IsNewCount { get; set; }
 
         public enum EPenetrability
         {
@@ -24,16 +42,11 @@ namespace WPFBlockCrash
         public Ball(DisplayInfo dInfo)
         {
             this.dInfo = dInfo;
-            //gh = new ImageSource[4];
             gh = new Image[4];
             gh[0] = new Bitmap(Main.ResourceDirectory + "ball.png");
             gh[1] = new Bitmap(Main.ResourceDirectory + "ball_pene.png");
             gh[2] = new Bitmap(Main.ResourceDirectory + "ball2.png");
             gh[3] = new Bitmap(Main.ResourceDirectory + "ball2_pene.png");
-            //gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball.png"));
-            //gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_pene.png"));
-            //gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.png"));
-            //gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2_pene.png"));
 
             Width = (int)gh[0].Width;
             Height = (int)gh[0].Height;
@@ -60,7 +73,6 @@ namespace WPFBlockCrash
 
         public void Draw(Graphics g)
         {
-            //System.Windows.Media.ImageSource src = null;
             Image src = null;
 
             if (Penetrability == EPenetrability.PENETRATING)
@@ -75,7 +87,6 @@ namespace WPFBlockCrash
             else
                 src = gh[0];
 
-            //DrawUtil.DrawGraph(dc, X - Width / 2, Y - Height / 2, src);
             g.DrawImage(src, X - Width / 2, Y - Height / 2);
         }
 
@@ -99,9 +110,8 @@ namespace WPFBlockCrash
 
         internal void spchange()
         {
-            if (IsSmall)
-                return;
-            //Random rand = new Random(Environment.TickCount);
+            if (IsSmall) return;
+
             int r = Main.rand.Next() % 5;
             DX += r - 6;
             DY += (10 - r) - 6;
@@ -224,28 +234,6 @@ namespace WPFBlockCrash
             if (Y > dInfo.Height)
                 IsDead = true;
         }
-
-
-        private Image[] gh;
-        private DisplayInfo dInfo;
-        public int ActCount { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int DX { get; set; }
-        public int DY { get; set; }
-        public int Level { get; set; }
-        public int Radius { get; set; }
-        public int OldY { get; set; }
-        public bool IsDead { get; set; }
-        public bool PlaySound { get; set; }
-        public EPenetrability Penetrability { get; set; }
-
-        public int PenetratingCount { get; set; }
-
-        public bool IsSmall { get; set; }
-        public int IsNewCount { get; set; }
 
         internal void Reset()
         {

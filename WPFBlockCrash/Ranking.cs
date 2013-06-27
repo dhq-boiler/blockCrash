@@ -6,8 +6,6 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 
 namespace WPFBlockCrash
@@ -18,6 +16,17 @@ namespace WPFBlockCrash
         private Image[] gh;
         private Image newgh;
         public SaveGameData[] saved = new SaveGameData[20];
+        private Image rankGh;
+        public bool IsDead { get; set; }
+        public bool selectSoundFlag { get; private set; }
+        public bool decisionSoundFlag { get; private set; }
+        public bool end { get; private set; }
+        public bool scroll { get; private set; }
+        private int scrollspeed { get; set; }
+        private int scorey { get; set; }
+        private int index { get; set; } // 新しい記録の場所を示すインデックス
+        private SoundPlayer sh;
+        private SoundPlayer dh;
 
         private readonly Font font = new Font("Consolas", 20);
 
@@ -184,44 +193,28 @@ namespace WPFBlockCrash
             for (int i = 0; i < 20; ++i)
             {
                 if (i == index) { // 今回の記録
-                    //DrawUtil.DrawLine(dc, 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey, Color.FromRgb(255, 0, 0));
                     g.DrawLine(new System.Drawing.Pen(RGB(255, 0, 0)), 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey);
 
-                    //DrawUtil.DrawString(dc, 40, -670 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 255, 100), 32);
                     g.DrawString(string.Format("{0}：", i + 1), font, RGB(255, 255, 100), 40, -670 + i * 40 + scorey);
-                    //DrawUtil.DrawString(dc, 150, -670 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 255, 100), 32);
                     g.DrawString(string.Format("{0}", saved[i].Score), font, RGB(255, 255, 100), 150, -670 + i * 40 + scorey);
-                    //DrawUtil.DrawGraph(dc, 300, -665 + i * 40 + scorey, gh[saved[i].BarNum]);
                     g.DrawImage(gh[saved[i].BarNum], 300, -665 + i * 40 + scorey);
-                    //DrawUtil.DrawString(dc, 450, -670 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 255, 100), 32);
                     g.DrawString(string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), font, RGB(255, 255, 100), 450, -670 + i * 40 + scorey);
-                    //DrawUtil.DrawGraph(dc, 650, -680 + i * 40 + scorey, newgh);
                     g.DrawImage(newgh, 650, -680 + i * 40 + scorey);
                 }
                 else {
-                    //DrawUtil.DrawLine(dc, 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey, Color.FromRgb(230, 230, 230));
                     g.DrawLine(new System.Drawing.Pen(RGB(230, 230, 230)), 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey);
-
-                    //DrawUtil.DrawString(dc, 40, -670 + i * 40 + scorey, string.Format("{0} :", i + 1), Color.FromRgb(255, 120, 0), 32);
                     g.DrawString(string.Format("{0} :", i + 1), font, RGB(255, 120, 0), 40, -670 + i * 40 + scorey);
-                    //DrawUtil.DrawString(dc, 150, -670 + i * 40 + scorey, string.Format("{0}", saved[i].Score), Color.FromRgb(255, 120, 0), 32);
                     g.DrawString(string.Format("{0}", saved[i].Score), font, RGB(255, 120, 0), 150, -670 + i * 40 + scorey);
-                    //DrawUtil.DrawGraph(dc, 300, -665 + i * 40 + scorey, gh[saved[i].BarNum]);
                     g.DrawImage(gh[saved[i].BarNum], 300, -665 + i * 40 + scorey);
-                    //DrawUtil.DrawString(dc, 450, -670 + i * 40 + scorey, string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), Color.FromRgb(255, 120, 0), 32);
                     g.DrawString(string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), font, RGB(255, 120, 0), 450, -670 + i * 40 + scorey);
                 }
                 
             }
-            //DrawUtil.DrawGraph(dc, 0, 0, rankGh);
+
             g.DrawImage(rankGh, 0, 0);
-            //DrawUtil.DrawString(dc, 40, 180, string.Format("RANK"), Color.FromRgb(255, 255, 255), 32);
             g.DrawString("RANK", font, RGB(255, 255, 255), 40, 180);
-            //DrawUtil.DrawString(dc, 150, 180, string.Format("SCORE"), Color.FromRgb(255, 255, 255), 32);
             g.DrawString("SCORE", font, RGB(255, 255, 255), 150, 180);
-            //DrawUtil.DrawString(dc, 300, 180, string.Format("BARTYPE"), Color.FromRgb(255, 255, 255), 32);
             g.DrawString("BARTYPE", font, RGB(255, 255, 255), 300, 180);
-            //DrawUtil.DrawString(dc, 480, 180, string.Format("DATE"), Color.FromRgb(255, 255, 255), 32);
             g.DrawString("DATE", font, RGB(255, 255, 255), 480, 180);
 
             if (scorey < 900 && scroll)
@@ -230,24 +223,12 @@ namespace WPFBlockCrash
                 end = true;
         }
 
-        private System.Drawing.Brush RGB(byte r, byte g, byte b)
+        private Brush RGB(byte r, byte g, byte b)
         {
-            return new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(r, g, b));
+            return new SolidBrush(Color.FromArgb(r, g, b));
         }
-
-        private Image rankGh;
-        public bool IsDead { get; set; }
-        public bool selectSoundFlag { get; private set; }
-        public bool decisionSoundFlag { get; private set; }
-        public bool end { get; private set; }
-        public bool scroll { get; private set; }
-        private int scrollspeed { get; set; }
-        private int scorey { get; set; }
-        private int index { get; set; } // 新しい記録の場所を示すインデックス
-        private SoundPlayer sh;
-        private SoundPlayer dh;
-
     }
+
     public class SaveGameData
     {
         //    public string PlayerName; // 名前入力用

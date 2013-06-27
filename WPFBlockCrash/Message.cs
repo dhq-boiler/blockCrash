@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace WPFBlockCrash
 {
@@ -59,15 +58,9 @@ namespace WPFBlockCrash
         {
             if (count > 0)
             {
-                //float opacity = 128f / byte.MaxValue;
-                //dc.PushOpacity(128d / byte.MaxValue);
-                //DrawUtil.DrawBox(dc, 0, 0, dInfo.Width, dInfo.Height, RGB(30, 30, 30));
                 g.DrawRectangle(new System.Drawing.Pen(ARGB(128, 30, 30, 30)), 0, 0, dInfo.Width, dInfo.Height);
-                //dc.Pop();
-                //DrawUtil.DrawString(dc, 300, 300, message, RGB(255, 255, 255), 32);
                 g.DrawString(message, font, RGB(255, 255, 255), 300, 300);
                 if (pattern == 2) // クリアなら
-                    //DrawUtil.DrawString(dc, 150, 350, message2, RGB(255, 255, 255), 32);
                     g.DrawString(message2, font, RGB(255, 255, 255), 150, 350);
                 --count;
             }
@@ -75,19 +68,18 @@ namespace WPFBlockCrash
                 IsDead = true;
         }
 
-        private System.Drawing.Color ARGB(byte a, byte r, byte g, byte b)
+        private Color ARGB(byte a, byte r, byte g, byte b)
         {
-            return System.Drawing.Color.FromArgb(a, r, g, b);
+            return Color.FromArgb(a, r, g, b);
         }
 
-        private System.Drawing.Brush RGB(byte r, byte g, byte b)
+        private Brush RGB(byte r, byte g, byte b)
         {
-            return new SolidBrush(System.Drawing.Color.FromArgb(r, g, b));
+            return new SolidBrush(Color.FromArgb(r, g, b));
         }
 
         private void KeyGet(Input input)
         {
-            //if (input.key256[Input.KEY_INPUT_SPACE] == 1)
             if (BeginDisplayTime == null)
                 BeginDisplayTime = DateTime.Now;
             else if ((DateTime.Now - BeginDisplayTime.Value).TotalSeconds >= 1)

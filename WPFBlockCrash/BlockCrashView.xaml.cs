@@ -28,18 +28,20 @@ namespace WPFBlockCrash
         public Input input;
         private DispatcherTimer timerToRun;
         private WriteableBitmap bitmap;
+        private const int DisplayWidth = 800;
+        private const int DisplayHeight = 600;
 
         public BlockCrashView()
         {
             InitializeComponent();
 
-            bitmap = new WriteableBitmap(800, 600, 92, 92, PixelFormats.Bgr24, null);
+            bitmap = new WriteableBitmap(DisplayWidth, DisplayHeight, 92, 92, PixelFormats.Bgr24, null);
 
             input = new Input();
-            main = new Main(new DisplayInfo() { Width = 800, Height = 600 });
+            main = new Main(new DisplayInfo() { Width = DisplayWidth, Height = DisplayHeight });
         }
 
-        private WriteableBitmap RenderBitmap(int width, int height, double dpi, Action<Graphics> Run_Main_ProcessLoop)
+        private WriteableBitmap RenderBitmap(Action<Graphics> Run_Main_ProcessLoop)
         {
             try
             {
@@ -51,7 +53,7 @@ namespace WPFBlockCrash
                         Run_Main_ProcessLoop(g);
                     }
                 }
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, 800, 600));
+                bitmap.AddDirtyRect(new Int32Rect(0, 0, DisplayWidth, DisplayHeight));
             }
             finally
             {
@@ -79,7 +81,7 @@ namespace WPFBlockCrash
         private void timerToRun_Tick(object sender, EventArgs e)
         {
             main.ATMode(input);
-            SetBitmapToImage(image, RenderBitmap(800, 600, 96, g => main.ProcessLoop(input, g)));
+            SetBitmapToImage(image, RenderBitmap(g => main.ProcessLoop(input, g)));
         }
 
 

@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace WPFBlockCrash
 {
@@ -137,7 +135,6 @@ namespace WPFBlockCrash
             barextend = extendon;
             IsDead = false;
 
-            //Random rand = new Random(Environment.TickCount);
 #if true
             int r = Main.rand.Next() % 5;
             //int r = 1; デバック用
@@ -212,26 +209,23 @@ namespace WPFBlockCrash
             if (!IsDead)
             {
                 if (scrollcount > 0)
-                    //DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, gh[blockhandle]);
                     g.DrawImage(gh[blockhandle], scrollcount - Width, Y - Height / 2, Width, Height);
-                //DrawUtil.DrawExtendGraph(dc, X - Width / 2 , Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
+
                 g.DrawImage(gh[blockhandle], X - Width / 2, Y - Height / 2, Width, Height);
             }
             else if (ItemFlag)
                 if (half)
                 {
                     if (scrollcount > 0)
-                        //DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, itemgh[(int)ItemType]);
                         g.DrawImage(itemgh[(int)ItemType], scrollcount - Width, Y - Height / 2, Width, Height);
-                    //DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+
                     g.DrawImage(itemgh[(int)ItemType], X - Width / 2, Y - Height / 2, Width, Height);
                 }
                 else
                 {
                     if (scrollcount > 0)
-                        //DrawUtil.DrawExtendGraph(dc, scrollcount - ItemWidth, Y - Height / 2, scrollcount, Y + Height / 2, itemgh[(int)ItemType]);
                         g.DrawImage(itemgh[(int)ItemType], scrollcount - ItemWidth, Y - Height / 2, ItemWidth, ItemHeight);
-                    //DrawUtil.DrawExtendGraph(dc, X - ItemWidth / 2, Y - ItemHeight / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+
                     g.DrawImage(itemgh[(int)ItemType], X - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
                 }
             else
@@ -239,25 +233,20 @@ namespace WPFBlockCrash
                 if (count < 20)
                 {
                     float opacity = (255f / 40) * (20 - count) / byte.MaxValue;
-                    //dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
+
                     if (scrollcount > 0)
                     {
-                        //DrawUtil.DrawExtendGraph(dc, scrollcount - Width, Y - Height / 2, scrollcount, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
                         if (WasItem)
                             g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollcount - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
                         else
                             g.DrawImage(DrawUtil.SetOpacity(gh[blockhandle], opacity), scrollcount - Width, Y - Height / 2, Width, Height);
-                            //g.DrawImage(WasItem ? DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity) : DrawUtil.SetOpacity(gh[blockhandle], opacity),
-                            //    scrollcount - Width, Y - Height / 2, Width, Height);
                     }
-                    //DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
+                    
                     if (WasItem)
                         g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), X - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
                     else
                         g.DrawImage(DrawUtil.SetOpacity(gh[blockhandle], opacity), X - Width / 2, Y - Height / 2, Width, Height);
-                    //g.DrawImage(WasItem ? DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity) : DrawUtil.SetOpacity(gh[blockhandle], opacity),
-                    //    X - Width / 2, Y - Height / 2, Width, Height);
-                    //dc.Pop();
+
                     ++count;
                 }
             }

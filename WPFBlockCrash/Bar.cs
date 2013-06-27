@@ -4,8 +4,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace WPFBlockCrash
 {
@@ -19,6 +17,18 @@ namespace WPFBlockCrash
         private int mBar;
         private int moldBar;
         private int accelcount;
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int MX { get; set; }
+        public bool IsDead { get; set; }
+        public bool IsMove { get; set; } // 動いたかどうか
+
+        /// <summary>
+        /// 加速 -なら左，+なら右
+        /// </summary>
+        public int Accel { get; set; }
 
         public Bar(int barnum, DisplayInfo dInfo)
         {
@@ -136,19 +146,6 @@ namespace WPFBlockCrash
             MX = X;
             return IsPushedAnyKey;
         }
-
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int MX { get; set; }
-        public bool IsDead { get; set; }
-        public bool IsMove { get; set; } // 動いたかどうか
-
-        /// <summary>
-        /// 加速 -なら左，+なら右
-        /// </summary>
-        public int Accel { get; set; }
 
         public void BallCatch( bool on ){ // ボールがバーにくっつく状態
             if (on && mBar != 3)

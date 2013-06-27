@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace WPFBlockCrash
 {
@@ -104,7 +102,6 @@ namespace WPFBlockCrash
 
 			// 残機表示の読み込み
 			gh = new Bitmap(Main.ResourceDirectory + "ball_b.png");
-
 	
 			switch( Stage ){
 			case 1: sumblock = 28;
@@ -325,7 +322,6 @@ namespace WPFBlockCrash
 						else
 							block[i].Process(g, 3 + itemhandle);
 						break;
-
 				}
 			}
 
@@ -352,7 +348,6 @@ namespace WPFBlockCrash
 				if (smallBall.ballstop){ // ボールが止まっていれば
 					smallBall.X = bar.MX + smallBall.xoffset;
 					smallBall.Y = 527;
-
 				}
 			}
 
@@ -399,17 +394,15 @@ namespace WPFBlockCrash
 			accel = bar.Accel; 
 			
 			// 得点、レベル、残機枠の表示
-			//DrawUtil.DrawBox(dc, 0, 0, 800, 30, Color.FromRgb(230, 230, 230), 3, null);
 			g.DrawRectangle(new System.Drawing.Pen(RGB(230, 230, 230), 3), 0, 0, 800, 30);
-			//DrawUtil.DrawString(dc, 20, 10, string.Format("SCORE: {0}", Score), Color.FromRgb(255, 120, 0));
 			g.DrawString(string.Format("SCORE: {0}", Score), font, RGB(255, 120, 0), 20, 5);
-			//DrawUtil.DrawString(dc, 220, 10, string.Format("LEVEL: {0}", ball.Level), Color.FromRgb(255, 120, 0));
 			g.DrawString(string.Format("LEVEL: {0}", ball.Level), font, RGB(255, 120, 0), 220, 5);
+
 			//デバック用
+
 			// コンボ表示　邪魔にならないよう透明化処理する  
 			if (combocount > 1)
 			{
-				//DrawUtil.DrawString(dc, 20, 400, string.Format("{0} COMBO!", combocount), Color.FromRgb(255, 120, 0));
 				g.DrawString(string.Format("{0} COMBO!", combocount), font, RGB(255, 120, 0), 20, 400);
 				combooncount = 0;
 				comboon = true;
@@ -419,10 +412,7 @@ namespace WPFBlockCrash
 			{
 				if (combooncount < 20)
 				{
-					//dc.PushOpacity((255d / 40) * (20 - combooncount) / byte.MaxValue);
-					//DrawUtil.DrawString(dc, 20, 400, string.Format("{0} COMBO!", alphacombo), Color.FromRgb(255, 120, 0));
 					g.DrawString(string.Format("{0} COMBO!", alphacombo), font, ARGB((int)((255f / 40) * (20 - combooncount)), 255, 120, 0), 20, 400);
-					//dc.Pop();
 					++combooncount;
 				}
 				else
@@ -431,14 +421,14 @@ namespace WPFBlockCrash
 					alphacombo = 0;
 				}
 			}
-			//DrawUtil.DrawString(dc, 20, 400, string.Format("ACCEL: {0}", accel), Color.FromRgb(255, 120, 0));
 
 			for (int i = 0; i < Stock; ++i)
 			{
-				//dc.DrawImage(gh, new Rect(540 + 18 * i, 7, gh.Width, gh.Height));
 				g.DrawImage(gh, 540 + 18 * i, 7, (float)gh.Width, (float)gh.Height);
 			}
+
 			ball.BarAccel(accel);
+
 			// 小玉があれば表示
 			foreach (Ball smallBall in SmallBalls)
 			{
@@ -478,14 +468,14 @@ namespace WPFBlockCrash
 			return BallIsDead;
 		}
 
-		private System.Drawing.Brush ARGB(int alpha, byte r, byte g, byte b)
+		private Brush ARGB(int alpha, byte r, byte g, byte b)
 		{
-			return new SolidBrush(System.Drawing.Color.FromArgb(alpha, r, g, b));
+			return new SolidBrush(Color.FromArgb(alpha, r, g, b));
 		}
 
-		private System.Drawing.Brush RGB(byte r, byte g, byte b)
+		private Brush RGB(byte r, byte g, byte b)
 		{
-			return new SolidBrush(System.Drawing.Color.FromArgb(r, g, b));
+			return new SolidBrush(Color.FromArgb(r, g, b));
 		}
 
 		private bool UpdateBall(Input input, Graphics g)
