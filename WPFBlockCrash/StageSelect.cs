@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
-    class StageSelect
+    class StageSelect : IInputable
     {
         private Image[] bargh;
         private Image ballgh;

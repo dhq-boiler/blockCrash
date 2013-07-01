@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
-    class Bar
+    class Bar : IInputable
     {
         public int SPEED = 8;
 
@@ -58,7 +58,7 @@ namespace WPFBlockCrash
             IsMove = false;
         }
 
-        internal bool Process(Input input, Graphics g)
+        public bool Process(Input input, Graphics g)
         {
             if (!IsDead)
             {

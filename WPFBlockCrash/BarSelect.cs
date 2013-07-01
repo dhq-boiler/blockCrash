@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
-    class BarSelect
+    class BarSelect : IInputable
     {
         private Image[] barGh;
         private Image bSelectGh;

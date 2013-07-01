@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace WPFBlockCrash
 {
-    class Ball
+    class Ball : IInputable
     {
         public bool ballstop { get; set; }
         public int xoffset { get; set; }
@@ -71,7 +71,7 @@ namespace WPFBlockCrash
             acbectl = 0;
         }
 
-        public void Draw(Graphics g)
+        private void Draw(Graphics g)
         {
             Image src = null;
 
@@ -117,7 +117,7 @@ namespace WPFBlockCrash
             DY += (10 - r) - 6;
         }
 
-        internal bool Process(Input input, Graphics g)
+        public bool Process(Input input, Graphics g)
         {
             if (ActCount != 0 || IsSmall)
                 Move();

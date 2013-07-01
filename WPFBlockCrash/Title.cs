@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace WPFBlockCrash
 {
-    class Title
+    class Title : IInputable
     {
         private Image titleGh;
         public bool IsDead { get; set; }

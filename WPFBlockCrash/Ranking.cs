@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 
 namespace WPFBlockCrash
 {
-    class Ranking
+    class Ranking : IInputable
     {
         private DisplayInfo dInfo;
         private Image[] gh;
@@ -60,8 +60,8 @@ namespace WPFBlockCrash
 
             sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
             dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
-
         }
+
         // セーブデータ作成
         public void Save(int xscore, int xbarnum)
         {

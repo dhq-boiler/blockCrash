@@ -15,7 +15,7 @@ namespace WPFBlockCrash
         GAMEOVER
     }
 
-    class Message
+    class Message : IInputable
     {
         private EMessageType MessageType { get; set; }
         private int count;
@@ -51,7 +51,7 @@ namespace WPFBlockCrash
             }
         }
 
-        internal bool Process(Input input, Graphics g)
+        public bool Process(Input input, Graphics g)
         {
             //キー処理
             KeyGet(input);

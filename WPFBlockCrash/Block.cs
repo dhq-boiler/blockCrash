@@ -16,10 +16,17 @@ namespace WPFBlockCrash
         ITEMTYPE_SCOREUP,
         ITEMTYPE_BALLCATCHER,
         ITEMTYPE_NO,
-        
     }
 
-    class Block
+    enum EBlockColor
+    {
+        RED,
+        BLUE,
+        PURPLE,
+        CYAN
+    }
+
+    class Block : IInputable
     {
         private static bool IsFirstInstance = true;
         private static Image[] gh = new Image[8];
@@ -27,6 +34,9 @@ namespace WPFBlockCrash
 
         private bool half;
         private int count;
+
+        //public int BlockNumber { get; private set; }
+        public int ImageHandle { get; set; }
 
         // スクロールブロック用変数,0=スクロールなし,1=右スクロール,-1=左スクロール
         private int scroll = 0;
@@ -37,6 +47,7 @@ namespace WPFBlockCrash
         public int matchlesscount = 0;
 
         public EItemType ItemType { get; private set; }
+        public EBlockColor BlockColor { get; private set; }
 
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -98,7 +109,7 @@ namespace WPFBlockCrash
             }
         }
 
-        public Block(int x, int y,bool extendon)
+        public Block(int x, int y, bool extendon, EBlockColor blockColor)
         {
             if (IsFirstInstance)
             {
@@ -132,9 +143,10 @@ namespace WPFBlockCrash
             ItemWidth = (int)bsitem.Width;
             ItemHeight = (int)bsitem.Height;
 
+            BlockColor = blockColor;
             barextend = extendon;
             IsDead = false;
-
+            
 #if true
             int r = Main.rand.Next() % 5;
             //int r = 1; デバック用
@@ -166,14 +178,16 @@ namespace WPFBlockCrash
             half = false;
         }
 
-        internal void Process(Graphics g, int blockhandle)
+        public bool Process(Input input, Graphics g)
         {
-            Draw(g, blockhandle);
+            Draw(g);
             if (matchlesscount > 0)
                 --matchlesscount;
+
+            return IsDead;
         }
 
-        private void Draw(Graphics g, int blockhandle)
+        private void Draw(Graphics g)
         {
             if (!scrollStop) // スクロールストップフラグが立ってたらストップ
             {
@@ -209,9 +223,9 @@ namespace WPFBlockCrash
             if (!IsDead)
             {
                 if (scrollcount > 0)
-                    g.DrawImage(gh[blockhandle], scrollcount - Width, Y - Height / 2, Width, Height);
+                    g.DrawImage(gh[(int)BlockColor], scrollcount - Width, Y - Height / 2, Width, Height);
 
-                g.DrawImage(gh[blockhandle], X - Width / 2, Y - Height / 2, Width, Height);
+                g.DrawImage(gh[(int)BlockColor], X - Width / 2, Y - Height / 2, Width, Height);
             }
             else if (ItemFlag)
                 if (half)
@@ -239,13 +253,13 @@ namespace WPFBlockCrash
                         if (WasItem)
                             g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollcount - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
                         else
-                            g.DrawImage(DrawUtil.SetOpacity(gh[blockhandle], opacity), scrollcount - Width, Y - Height / 2, Width, Height);
+                            g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollcount - Width, Y - Height / 2, Width, Height);
                     }
                     
                     if (WasItem)
                         g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), X - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
                     else
-                        g.DrawImage(DrawUtil.SetOpacity(gh[blockhandle], opacity), X - Width / 2, Y - Height / 2, Width, Height);
+                        g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), X - Width / 2, Y - Height / 2, Width, Height);
 
                     ++count;
                 }

@@ -25,7 +25,7 @@ namespace WPFBlockCrash
         private Message message;
         private BarSelect barSelect;
         private Title title;
-        public Ranking ranking;
+        private Ranking ranking;
 
         private EActType ActType;
 
@@ -94,7 +94,7 @@ namespace WPFBlockCrash
                         {
                             ActType = EActType.CONTROL;
                             stock = stageSelect.Stock;
-                            control = new Control(stageSelect.Bar, stageSelect.Stage, stageSelect.Score, stock, dInfo);
+                            control = new Control(stageSelect.Bar, stageSelect.Stage, stageSelect.Score, stock, dInfo, input);
                         }
                     }
                     break;
