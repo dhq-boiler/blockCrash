@@ -74,7 +74,7 @@ namespace WPFBlockCrash
         {
             timerToRun = new DispatcherTimer();
             timerToRun.Tick += timerToRun_Tick;
-            timerToRun.Interval = TimeSpan.FromMilliseconds(1);
+            timerToRun.Interval = TimeSpan.FromMilliseconds(1000d / 60);
             timerToRun.Start();
         }
 
