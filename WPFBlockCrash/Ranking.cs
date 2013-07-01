@@ -30,7 +30,7 @@ namespace WPFBlockCrash
 
         private readonly Font font = new Font("Consolas", 20);
 
-        public Ranking(int score, int barnum, DisplayInfo dInfo)
+        public Ranking(int score, EBarType barnum, DisplayInfo dInfo)
         {
             this.dInfo = dInfo;
 
@@ -63,7 +63,7 @@ namespace WPFBlockCrash
         }
 
         // セーブデータ作成
-        public void Save(int xscore, int xbarnum)
+        public void Save(int xscore, EBarType xbarnum)
         {
 
             // 日付取得
@@ -101,7 +101,8 @@ namespace WPFBlockCrash
                     else // 数値は最上位が30000,
                         saved[i].Score = 30000 - (i + 1)*1500;
                     // BarNumはランダムで
-                    saved[i].BarNum = Main.rand.Next() % 3;
+                    EBarType bt = (EBarType)(Main.rand.Next() % 3 + 1);
+                    saved[i].BarNum = bt;
                     saved[i].Year = iYear;
                     saved[i].Month = iMonth;
                     saved[i].Date = iDay;
@@ -112,35 +113,45 @@ namespace WPFBlockCrash
             SaveGameData newsave = new SaveGameData();
             // 新しいデータを登録 //コンストラクタ作るのめんどかった
             newsave.Score = xscore;
-            newsave.BarNum = xbarnum -1;
+            //newsave.BarNum = xbarnum -1;
+            newsave.BarNum = xbarnum;
             newsave.Year = iYear;
             newsave.Month = iMonth;
             newsave.Date = iDay;
 
-            for (int i = 0; i < 20; ++i){ // index0から検索して,xScoreより小さいところまで来たらその番号を保存
-                if (saved[i].Score < xscore) {
-                    for (int j = i; j < 20; ++j) {
-                        if (j == i) { // 番号のところに今回の記録を記入
-                            index = j;
-                            oldscore = saved[j];
-                            saved[j] = newsave;
-                        }
-                        else { // それ以降のindexは一つずつずらす
-                            newsave = oldscore;
-                            oldscore = saved[j];
-                            saved[j] = newsave;
-                            
-                        }
-                    }
-                    break; // 代入したら終了
-                }            
-            }
+            List<SaveGameData> saveGames = new List<SaveGameData>(saved);
+            saveGames.Add(newsave);
+            var DescendingOrder = saveGames.OrderByDescending(a => a.Score).Take(20);
+
+            //for (int i = 0; i < 20; ++i)// index0から検索して,xScoreより小さいところまで来たらその番号を保存
+            //{ 
+            //    if (saved[i].Score < xscore) 
+            //    {
+            //        for (int j = i; j < 20; ++j)
+            //        {
+            //            if (j == i)// 番号のところに今回の記録を記入
+            //            { 
+            //                index = j;
+            //                oldscore = saved[j];
+            //                saved[j] = newsave;
+            //            }
+            //            else // それ以降のindexは一つずつずらす
+            //            { 
+            //                newsave = oldscore;
+            //                oldscore = saved[j];
+            //                saved[j] = newsave;
+            //            }
+            //        }
+            //        break; // 代入したら終了
+            //    }            
+            //}
             //XMLファイルに保存する
-            serializer.Serialize(fs1, saved);
+            //serializer.Serialize(fs1, saved);
+            serializer.Serialize(fs1, saveGames.ToArray());
             fs1.Close();
         }
 
-        public bool Process(Input input, Graphics g)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             //キー処理
             KeyGet(input);
@@ -148,7 +159,7 @@ namespace WPFBlockCrash
             //描画処理
             Draw(g);
 
-            return IsDead;
+            return new ProcessResult() { IsDead = IsDead, NextState = new Title(dInfo) };
         }
 
         private void KeyGet(Input input)
@@ -192,12 +203,13 @@ namespace WPFBlockCrash
             // 時間経過でスクロール
             for (int i = 0; i < 20; ++i)
             {
-                if (i == index) { // 今回の記録
+                if (i == index)
+                { // 今回の記録
                     g.DrawLine(new System.Drawing.Pen(DrawUtil.BrushRGB(255, 0, 0)), 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey);
 
                     g.DrawString(string.Format("{0}：", i + 1), font, DrawUtil.BrushRGB(255, 255, 100), 40, -670 + i * 40 + scorey);
                     g.DrawString(string.Format("{0}", saved[i].Score), font, DrawUtil.BrushRGB(255, 255, 100), 150, -670 + i * 40 + scorey);
-                    g.DrawImage(gh[saved[i].BarNum], 300, -665 + i * 40 + scorey);
+                    g.DrawImage(gh[(int)saved[i].BarNum - 1], 300, -665 + i * 40 + scorey);
                     g.DrawString(string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), font, DrawUtil.BrushRGB(255, 255, 100), 450, -670 + i * 40 + scorey);
                     g.DrawImage(newgh, 650, -680 + i * 40 + scorey);
                 }
@@ -205,7 +217,7 @@ namespace WPFBlockCrash
                     g.DrawLine(new System.Drawing.Pen(DrawUtil.BrushRGB(230, 230, 230)), 25, -635 + i * 40 + scorey, 650, -635 + i * 40 + scorey);
                     g.DrawString(string.Format("{0} :", i + 1), font, DrawUtil.BrushRGB(255, 120, 0), 40, -670 + i * 40 + scorey);
                     g.DrawString(string.Format("{0}", saved[i].Score), font, DrawUtil.BrushRGB(255, 120, 0), 150, -670 + i * 40 + scorey);
-                    g.DrawImage(gh[saved[i].BarNum], 300, -665 + i * 40 + scorey);
+                    g.DrawImage(gh[(int)saved[i].BarNum - 1], 300, -665 + i * 40 + scorey);
                     g.DrawString(string.Format("{0}/{1}/{2}", saved[i].Year, saved[i].Month, saved[i].Date), font, DrawUtil.BrushRGB(255, 120, 0), 450, -670 + i * 40 + scorey);
                 }
                 
@@ -228,7 +240,7 @@ namespace WPFBlockCrash
     {
         //    public string PlayerName; // 名前入力用
         public int Score;
-        public int BarNum;
+        public EBarType BarNum;
         public int Year;
         public int Month; // 日付用
         public int Date;

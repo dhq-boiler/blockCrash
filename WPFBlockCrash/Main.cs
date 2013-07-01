@@ -27,12 +27,17 @@ namespace WPFBlockCrash
         private Title title;
         private Ranking ranking;
 
+        private IInputable CurrentState;
+        private UserChoice userChoise;
+
         private EActType ActType;
 
         private int act;
         private int stock;
         private int c;
         private DisplayInfo dInfo;
+        private UserChoice userChoice;
+        private TakeOver takeOver;
         public static readonly string ResourceDirectory = Directory.GetCurrentDirectory() + "\\res\\";
         public static readonly Random rand = new Random(Environment.TickCount);
         
@@ -40,10 +45,18 @@ namespace WPFBlockCrash
         {
             this.dInfo = dInfo;
 
-            title = new Title();
-            barSelect = new BarSelect();
-            stageSelect = new StageSelect();
-            ActType = EActType.TITLE;
+            CurrentState = new Title(dInfo);
+            userChoice = new UserChoice();
+            takeOver = new TakeOver()
+            {
+                DisplayInfo = dInfo,
+                Score = 0,
+                Stock = 2
+            };
+            //title = new Title();
+            //barSelect = new BarSelect();
+            //stageSelect = new StageSelect();
+            //ActType = EActType.TITLE;
             act = 0;
             stock = 0;
             c = 0;
@@ -71,101 +84,104 @@ namespace WPFBlockCrash
                 }
             }
 
-            switch (ActType)
-            {
-                case EActType.TITLE:
-                    {
-                        if (title.Process(input, g))
-                            ActType = EActType.BAR_SELECT;
-                    }
-                    break;
-                case EActType.BAR_SELECT:
-                    {
-                        if (barSelect.Process(input, g))
-                        {
-                            stageSelect.SetValue(barSelect.mBar, 0, 0, 2);
-                            ActType = EActType.STAGE_SELECT;
-                        }
-                    }
-                    break;
-                case EActType.STAGE_SELECT:
-                    {
-                        if (stageSelect.Process(input, g))
-                        {
-                            ActType = EActType.CONTROL;
-                            stock = stageSelect.Stock;
-                            control = new Control(stageSelect.Bar, stageSelect.Stage, stageSelect.Score, stock, dInfo, input);
-                        }
-                    }
-                    break;
-                case EActType.CONTROL:
-                    {
-                        if (control.Process(input, g))
-                        {
-                            stock = control.Stock;
-                            if (stock > 1)
-                            {
-                                if (act == 0)
-                                {
-                                    message = new Message(EMessageType.FAILED, 50, dInfo);
-                                    ++act;
-                                }
+            ProcessResult r = CurrentState.Process(input, g, userChoice, takeOver);
+            CurrentState = r.NextState;
 
-                                if (message.Process(input, g))
-                                {
-                                    control.Reset(); // 残機を減らしゲームを続行
-                                    --stock;
-                                    act = 0;
-                                    message = null;
-                                }
-                            }
-                            else
-                            {
-                                if (act == 0)
-                                {
-                                    message = new Message(EMessageType.GAMEOVER, 120, dInfo);
-                                    ++act;
-                                }
+            //switch (ActType)
+            //{
+            //    case EActType.TITLE:
+            //        {
+            //            if (title.Process(input, g))
+            //                ActType = EActType.BAR_SELECT;
+            //        }
+            //        break;
+            //    case EActType.BAR_SELECT:
+            //        {
+            //            if (barSelect.Process(input, g))
+            //            {
+            //                stageSelect.SetValue(barSelect.mBar, 0, 0, 2);
+            //                ActType = EActType.STAGE_SELECT;
+            //            }
+            //        }
+            //        break;
+            //    case EActType.STAGE_SELECT:
+            //        {
+            //            if (stageSelect.Process(input, g))
+            //            {
+            //                ActType = EActType.CONTROL;
+            //                stock = stageSelect.Stock;
+            //                control = new Control(stageSelect.Bar, stageSelect.Stage, stageSelect.Score, stock, dInfo, input);
+            //            }
+            //        }
+            //        break;
+            //    case EActType.CONTROL:
+            //        {
+            //            if (control.Process(input, g))
+            //            {
+            //                stock = control.Stock;
+            //                if (stock > 1)
+            //                {
+            //                    if (act == 0)
+            //                    {
+            //                        message = new Message(EMessageType.FAILED, 50, dInfo);
+            //                        ++act;
+            //                    }
 
-                                if (message.Process(input, g))
-                                {
-                                    ActType = EActType.RANKING;
-                                    ranking = new Ranking(control.Score,control.Bar, dInfo);
-                                }
-                            }
-                        }
-                        else if (control.clear)
-                        {
-                            if (act == 0)
-                            {
-                                message = new Message(EMessageType.CLEAR, 200, dInfo);
-                                ++act;
-                            }
+            //                    if (message.Process(input, g))
+            //                    {
+            //                        control.Reset(); // 残機を減らしゲームを続行
+            //                        --stock;
+            //                        act = 0;
+            //                        message = null;
+            //                    }
+            //                }
+            //                else
+            //                {
+            //                    if (act == 0)
+            //                    {
+            //                        message = new Message(EMessageType.GAMEOVER, 120, dInfo);
+            //                        ++act;
+            //                    }
 
-                            if (message.Process(input, g))
-                            {
-                                ActType = EActType.RANKING;
-                                ranking = new Ranking(control.Score, control.Bar, dInfo);
-                            }
-                        }
-                    }
-                    break;
-                case EActType.RANKING: {
-                    if(ranking.Process(input, g))
-                    {
-                        ActType = EActType.TITLE;
-                        title.IsDead = false;
-                        barSelect.IsDead = false;
-                        act = 0;
-                        stageSelect.Reset();
-                        stageSelect.IsDead = false;
-                        message = null;
-                        control = null;
-                        ranking = null;
-                    }
-                }
-                    break;
-            }
+            //                    if (message.Process(input, g))
+            //                    {
+            //                        ActType = EActType.RANKING;
+            //                        ranking = new Ranking(control.Score,control.Bar, dInfo);
+            //                    }
+            //                }
+            //            }
+            //            else if (control.clear)
+            //            {
+            //                if (act == 0)
+            //                {
+            //                    message = new Message(EMessageType.CLEAR, 200, dInfo);
+            //                    ++act;
+            //                }
+
+            //                if (message.Process(input, g))
+            //                {
+            //                    ActType = EActType.RANKING;
+            //                    ranking = new Ranking(control.Score, control.Bar, dInfo);
+            //                }
+            //            }
+            //        }
+            //        break;
+            //    case EActType.RANKING: {
+            //        if(ranking.Process(input, g))
+            //        {
+            //            ActType = EActType.TITLE;
+            //            title.IsDead = false;
+            //            barSelect.IsDead = false;
+            //            act = 0;
+            //            stageSelect.Reset();
+            //            stageSelect.IsDead = false;
+            //            message = null;
+            //            control = null;
+            //            ranking = null;
+            //        }
+            //    }
+            //        break;
+            //}
             input.ClearSmaller();
         }
 
@@ -176,9 +192,9 @@ namespace WPFBlockCrash
             barSelect = null;
             stageSelect = null;
 
-            title = new Title();
-            barSelect = new BarSelect();
-            stageSelect = new StageSelect();
+            title = new Title(dInfo);
+            //barSelect = new BarSelect();
+            //stageSelect = new StageSelect();
 
             act = 0;
             stock = 0;

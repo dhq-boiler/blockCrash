@@ -11,7 +11,7 @@ using System.Windows.Controls;
 
 namespace WPFBlockCrash
 {
-	class Control
+	class Control : IInputable
 	{
 		private const int MAX_SBALLCOUNT = 20;
 		private const int MAX_BLOCKCOUNT = 100;
@@ -41,8 +41,8 @@ namespace WPFBlockCrash
 
 		private readonly Font font = new Font("Consolas", 16);
 
-		public int Bar { get; set; }
-		public int Stage { get; set; }
+		public EBarType Bar { get; set; }
+		public EStageType Stage { get; set; }
 		public int Score { get; set; }
 		public int Stock { get; set; }
 		public int sballcount { get; set; }
@@ -53,14 +53,20 @@ namespace WPFBlockCrash
 		private bool comboon { get; set; }
 		private int combooncount { get; set; }
 
-		public Control(int mbar, int stage, int score, int stock, DisplayInfo dInfo, Input input)
+		public bool IsDead { get; set; }
+		public bool IsPlaying { get; set; }
+
+		private IInputable message { get; set; }
+
+
+		public Control(UserChoice userChoice, TakeOver takeOver, DisplayInfo dInfo, Input input)
 		{
 			this.dInfo = dInfo;
-			Bar = mbar;
+			Bar = userChoice.BarType;
 
 
 			bool extendon = true;
-			if (mbar == 3)
+			if (Bar == EBarType.SHORT)
 				extendon = false;
 	
 			//バーとボールのインスタンスを生成
@@ -75,9 +81,9 @@ namespace WPFBlockCrash
 			boundFlag=false;
 			demolishFlag=false;
 			clear = false;
-			Score = score;
-			Stock = stock;
-			Stage = stage;
+			Score = takeOver.Score;
+			Stock = takeOver.Stock;
+			Stage = userChoice.StageType;
 			vspeed = 0;
 			ballcatch = false;
 			combocount = 0;
@@ -104,7 +110,8 @@ namespace WPFBlockCrash
 			gh = new Bitmap(Main.ResourceDirectory + "ball_b.png");
 	
 			switch( Stage ){
-			case 1: sumblock = 28;
+			case EStageType.ONAJIMISAN:
+				sumblock = 28;
 					//ブロックの間を5ピクセルあけて、横7列、縦4行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<7)
@@ -117,7 +124,8 @@ namespace WPFBlockCrash
 							block[i] = new Block(80 + (5 + 100) * (i - 21), 50 * 4 + 10, extendon, EBlockColor.CYAN);
 					}
 					break;
-			case 2: sumblock = 48;
+			case EStageType.FOURTOWER:
+				sumblock = 48;
 					//ブロックの上下間を30ピクセルあけて、横4列、縦12行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<4)
@@ -146,7 +154,8 @@ namespace WPFBlockCrash
 							block[i] = new Block(50 + (8 + 225) * (i - 44), 30 * 12 + 15, extendon, EBlockColor.CYAN);
 					}
 					break;
-			case 3: sumblock = 48;
+			case EStageType.CROSSCROSS:
+				sumblock = 48;
 					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<4)
@@ -179,7 +188,8 @@ namespace WPFBlockCrash
 							block[i].ScrollFlag = -1;
 					}
 					break;
-			case 4: sumblock = 44;
+			case EStageType.LAWOFCYCLES:
+				sumblock = 44;
 					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
 					for(int i=0;i<sumblock;++i){
 						if(i<1)
@@ -232,7 +242,8 @@ namespace WPFBlockCrash
 							block[i] = new Block(400, 28 * 12 + 15, extendon, EBlockColor.CYAN);
 					}
 					break;
-				case 5: sumblock = 64;
+				case EStageType.PRODUCTORISUS:
+					sumblock = 64;
 					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
 					for(int i=0;i<sumblock;++i){
 						if (i < 4)
@@ -287,41 +298,108 @@ namespace WPFBlockCrash
 			bkheight = block[0].Height;
 		}
 
-		internal bool Process(Input input, Graphics g)
+		public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
+		{
+			if (BallIsDroped(input, g, uc, takeOver))
+			{
+				if (Stock > 1)
+				{
+					if (IsPlaying)
+					{
+						message = new Message(EMessageType.FAILED, 50, dInfo);
+						IsPlaying = false;
+					}
+
+					if (message.Process(input, g, uc, takeOver).IsDead)
+					{
+						Reset();
+						--Stock;
+						IsPlaying = true;
+						message = null;
+					}
+				}
+				else
+				{
+					if (IsPlaying)
+					{
+						message = new Message(EMessageType.GAMEOVER, 120, dInfo);
+						IsPlaying = false;
+					}
+
+					if (message.Process(input, g, uc, takeOver).IsDead)
+					{
+						return new ProcessResult()
+						{
+							IsDead = true,
+							NextState = new Ranking(Score, Bar, dInfo),
+							TakeOver = takeOver
+						};
+					}
+				}
+			}
+			else if (clear)
+			{
+				if (IsPlaying)
+				{
+					message = new Message(EMessageType.CLEAR, 200, dInfo);
+					IsPlaying = false;
+				}
+
+				if (message.Process(input, g, uc, takeOver).IsDead)
+				{
+					return new ProcessResult()
+					{
+						IsDead = true,
+						NextState = new Ranking(Score, Bar, dInfo),
+						TakeOver = takeOver
+					};
+				}
+			}
+
+			return new ProcessResult()
+			{
+				IsDead = false,
+				NextState = this,
+				TakeOver = takeOver,
+				UserChoice = uc
+			};
+		}
+
+		private bool BallIsDroped(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
 		{
 			bool BallIsDead;
-			int itemhandle;
+			//int itemhandle;
 			int count = 0;
 
 			for (int i = 0; i < sumblock; ++i)
 			{
 				if (block[i].IsDead)
 					++count;
-				if (block[i].ItemFlag)
-					itemhandle = 4;
-				else
-					itemhandle = 0;
+				//if (block[i].ItemFlag)
+				//    itemhandle = 4;
+				//else
+				//    itemhandle = 0;
 
 				switch (Stage)
 				{
-					case 1: if (i < 7)
-							block[i].Process(input, g);
+					case EStageType.ONAJIMISAN: if (i < 7)
+							block[i].Process(input, g, uc, takeOver);
 						else if (i > 6 && i < 14)
-							block[i].Process(input, g);
+							block[i].Process(input, g, uc, takeOver);
 						else if (i > 13 && i < 21)
-							block[i].Process(input, g);
+							block[i].Process(input, g, uc, takeOver);
 						else
-							block[i].Process(input, g);
+							block[i].Process(input, g, uc, takeOver);
 						break;
 					default:
 						if (i % 4 == 0)
-							block[i].Process(input, g);
+							block[i].Process(input, g, uc, takeOver);
 						else if (i % 4 == 1)
-							block[i].Process(input, g);
+							block[i].Process(input, g, uc, takeOver);
 						else if (i % 4 == 2)
-							block[i].Process(input, g);
+							block[i].Process(input, g, uc, takeOver);
 						else
-							block[i].Process(input, g);
+							block[i].Process(input, g, uc, takeOver);
 						break;
 				}
 			}
@@ -335,7 +413,7 @@ namespace WPFBlockCrash
 				bar.X = ball.X;
 			}
 			//バーの処理
-			bar.Process(input, g);
+			bar.Process(input, g, uc, takeOver);
 
 			if (ball.ActCount == 0)
 			{
@@ -361,17 +439,20 @@ namespace WPFBlockCrash
 				switch (Bar)
 				{ // バーによりの速度上昇の早さが違う
 
-					case 1: if (ballspup % 1500 == 0)
+					case EBarType.LONG:
+						if (ballspup % 1500 == 0)
 						{ // やさしい
 							ball.LvUp(1);
 						}
 						break;
-					case 2: if (ballspup % 1000 == 0)
+					case EBarType.MEDIUM:
+						if (ballspup % 1000 == 0)
 						{ // ふつう
 							ball.LvUp(1);
 						}
 						break;
-					case 3: if (ballspup % 800 == 0)
+					case EBarType.SHORT:
+						if (ballspup % 800 == 0)
 						{ // 難しい
 							ball.LvUp(1);
 						}
@@ -390,7 +471,7 @@ namespace WPFBlockCrash
 			BallIsDead = UpdateBall(input, g);
 
 			// 小玉があれば表示
-			UpdateSmallBalls(input, g);
+			UpdateSmallBalls(input, g, uc, takeOver);
 
 			accel = bar.Accel; 
 			
@@ -471,8 +552,7 @@ namespace WPFBlockCrash
 
 		private bool UpdateBall(Input input, Graphics g)
 		{
-			bool BallIsDead;
-			BallIsDead = ball.Process(input, g);
+			bool BallIsDead = ball.Process(input, g, null, null).IsDead;
 
 			// ボールとバーの当たり判定
 			HitCheckBallAndBar(ball);
@@ -486,13 +566,13 @@ namespace WPFBlockCrash
 			return BallIsDead;
 		}
 
-		private void UpdateSmallBalls(Input input, Graphics g)
+		private void UpdateSmallBalls(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
 		{
 			List<Ball> willBeRemovedSmallBalls = new List<Ball>();
 
 			foreach (Ball smallBall in SmallBalls)
 			{
-				bool SmallBallDroped = smallBall.Process(input, g);
+				bool SmallBallDroped = smallBall.Process(input, g, uc, takeOver).IsDead;
 
 				HitCheckBallAndBar(smallBall);
 
@@ -530,6 +610,7 @@ namespace WPFBlockCrash
 			if (demolishFlag)
 				playerDH.Play(); //非同期
 		}
+
 
 		private void HitCheckBallAndBlock(Ball ball)
 		{
@@ -703,7 +784,7 @@ namespace WPFBlockCrash
 			switch (eItemType)
 			{
 				case EItemType.ITEMTYPE_LONG:
-					if (Bar != 3)
+					if (Bar != EBarType.SHORT)
 					{
 						bar.ExtendWidth();
 						bdwidth += exwidth;
@@ -772,7 +853,7 @@ namespace WPFBlockCrash
 					{
 						combocount = 0;
 						bar.IsMove = false;
-						if (Bar == 3)
+						if (Bar == EBarType.SHORT)
 							ball.LvUp(1);
 
 						ball.DX = -ball.DX;
@@ -785,7 +866,7 @@ namespace WPFBlockCrash
 					{
 						combocount = 0;
 						bar.IsMove = false;
-						if (Bar == 3)
+						if (Bar == EBarType.SHORT)
 							ball.LvUp(1);
 						ball.DX = -ball.DX;
 						ball.DY = -ball.DY;
@@ -801,7 +882,7 @@ namespace WPFBlockCrash
 						}
 						combocount = 0;
 						bar.IsMove = false;
-						if (Bar == 3)
+						if (Bar == EBarType.SHORT)
 							ball.LvUp(1);
 						ball.DY = -ball.DY;
 						ball.Y = ball.Y - 5;

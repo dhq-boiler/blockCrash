@@ -7,9 +7,30 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
+    class UserChoice
+    {
+        public EBarType BarType { get; set; }
+        public EStageType StageType { get; set; }
+    }
+
+    class TakeOver
+    {
+        public DisplayInfo DisplayInfo { get; set; }
+        public int Score { get; set; }
+        public int Stock { get; set; }
+    }
+
+    class ProcessResult
+    {
+        public bool IsDead { get; set; }
+        public IInputable NextState { get; set; }
+        public UserChoice UserChoice { get; set; }
+        public TakeOver TakeOver { get; set; }
+    }
+
     interface IInputable
     {
-        bool Process(Input input, Graphics g);
+        ProcessResult Process(Input input, Graphics g, UserChoice userChoice, TakeOver takeOver);
 
         bool IsDead { get; set; }
     }

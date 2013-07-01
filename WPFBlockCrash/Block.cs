@@ -178,13 +178,13 @@ namespace WPFBlockCrash
             half = false;
         }
 
-        public bool Process(Input input, Graphics g)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             Draw(g);
             if (matchlesscount > 0)
                 --matchlesscount;
 
-            return IsDead;
+            return new ProcessResult() { IsDead = IsDead };
         }
 
         private void Draw(Graphics g)

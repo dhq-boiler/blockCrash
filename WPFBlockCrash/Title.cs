@@ -18,10 +18,13 @@ namespace WPFBlockCrash
         public int atcount { get; private set; }
         private SoundPlayer sh;
         private SoundPlayer dh;
+
+        private DisplayInfo dInfo;
         
-        public Title()
+        public Title(DisplayInfo dInfo)
         {
             titleGh = new Bitmap(Main.ResourceDirectory + "title.png");
+            this.dInfo = dInfo;
 
             selectSoundFlag = false;
             decisionSoundFlag = false;
@@ -32,7 +35,7 @@ namespace WPFBlockCrash
             dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
         }
 
-        public bool Process(Input input, Graphics g)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             //キー処理
             KeyGet(input);
@@ -40,7 +43,10 @@ namespace WPFBlockCrash
             //描画処理
             Draw(g);
 
-            return IsDead;
+            if (IsDead)
+                return new ProcessResult() { IsDead = IsDead, NextState = new BarSelect(dInfo) };
+            else
+                return new ProcessResult() { IsDead = IsDead, NextState = this };
         }
 
         private void KeyGet(Input input)

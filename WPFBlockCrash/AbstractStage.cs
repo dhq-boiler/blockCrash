@@ -14,7 +14,7 @@ namespace WPFBlockCrash
         public int DeadBlockCount { get; private set; }
         public bool IsDead { get; set; }
 
-        public bool Process(Input input, System.Drawing.Graphics g)
+        public ProcessResult Process(Input input, System.Drawing.Graphics g, UserChoice uc, TakeOver takeOver)
         {
             int itemhandle = 0;
 
@@ -28,10 +28,9 @@ namespace WPFBlockCrash
                 DrawBlocks(g, block[i], itemhandle);
             }
 
-            return true;
+            return new ProcessResult();
         }
 
         public abstract void DrawBlocks(Graphics g, Block block, int ImageHandle);
-
     }
 }

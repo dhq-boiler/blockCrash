@@ -7,6 +7,15 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
+    public enum EBarType
+    {
+        UNKNOWN,
+        LONG,
+        MEDIUM,
+        SHORT,
+        MOLD
+    }
+
     class Bar : IInputable
     {
         public int SPEED = 8;
@@ -14,8 +23,8 @@ namespace WPFBlockCrash
         private int EnlargementFactor;
         private Image[] gh;
         private DisplayInfo dInfo;
-        private int mBar;
-        private int moldBar;
+        private EBarType mBar;
+        private EBarType moldBar; //for swap
         private int accelcount;
         public int X { get; set; }
         public int Y { get; set; }
@@ -30,10 +39,10 @@ namespace WPFBlockCrash
         /// </summary>
         public int Accel { get; set; }
 
-        public Bar(int barnum, DisplayInfo dInfo)
+        public Bar(EBarType BarType, DisplayInfo dInfo)
         {
             this.dInfo = dInfo;
-            mBar = moldBar = barnum - 1;
+            mBar = moldBar = BarType;
             gh = new Image[4];
             gh[0] = new Bitmap(Main.ResourceDirectory + "bar.bmp");
             gh[1] = new Bitmap(Main.ResourceDirectory + "barsecond.bmp");
@@ -42,7 +51,7 @@ namespace WPFBlockCrash
 
             Bitmap bi = gh[0] as Bitmap;
 
-            if (mBar == 2)
+            if (mBar == EBarType.SHORT)
             {// 2ならバーは小さくする
                 Width = (int)bi.Width / 2;
                 SPEED = 16;
@@ -58,7 +67,7 @@ namespace WPFBlockCrash
             IsMove = false;
         }
 
-        public bool Process(Input input, Graphics g)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             if (!IsDead)
             {
@@ -73,7 +82,7 @@ namespace WPFBlockCrash
             //描画処理
             Draw(g);
 
-            return IsDead;
+            return new ProcessResult() { IsDead = IsDead };
         }
 
         private void Draw(Graphics g)
@@ -86,7 +95,7 @@ namespace WPFBlockCrash
             //{
                 //DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 4, Y - Height / 2,
                 //X + Width * EnlargementFactor / 4, Y + Height / 2, gh[mBar]);
-            g.DrawImage(gh[mBar], X - Width * EnlargementFactor / 4, Y - Height / 2,
+            g.DrawImage(gh[(int)mBar], X - Width * EnlargementFactor / 4, Y - Height / 2,
                 Width * EnlargementFactor / 2, Height);
             //}
         }
@@ -148,11 +157,10 @@ namespace WPFBlockCrash
         }
 
         public void BallCatch( bool on ){ // ボールがバーにくっつく状態
-            if (on && mBar != 3)
+            if (on && mBar != EBarType.MOLD)
             {
                 moldBar = mBar;
-                mBar = 3;
-                   
+                mBar = EBarType.MOLD;
             }
             else if(!on)
                 mBar = moldBar;

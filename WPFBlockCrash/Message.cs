@@ -51,7 +51,7 @@ namespace WPFBlockCrash
             }
         }
 
-        public bool Process(Input input, Graphics g)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             //キー処理
             KeyGet(input);
@@ -59,7 +59,7 @@ namespace WPFBlockCrash
             //描画処理
             Draw(g);
 
-            return IsDead;
+            return new ProcessResult() { IsDead = IsDead };
         }
 
         private void Draw(Graphics g)

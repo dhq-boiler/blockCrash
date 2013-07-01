@@ -15,16 +15,19 @@ namespace WPFBlockCrash
         private SoundPlayer sh;
         private SoundPlayer dh;
         private int autoCount;
-        public int mBar { get; set; }
+        public int Bar { get; set; }
         public bool IsDead { get; set; }
+
+        private DisplayInfo dInfo;
 
         private readonly Font font = new Font("Consolas", 16);
 
-        public BarSelect()
+        public BarSelect(DisplayInfo dInfo)
         {
+            this.dInfo = dInfo;
             barGh = new Image[3];
 
-            mBar = 1;
+            Bar = 1;
 
             barGh[0] = new Bitmap(Main.ResourceDirectory + "bar.bmp");
             barGh[1] = new Bitmap(Main.ResourceDirectory + "barsecond.bmp");
@@ -37,7 +40,7 @@ namespace WPFBlockCrash
             autoCount = 0;
         }
 
-        public bool Process(Input input, Graphics g)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             //キー処理
             KeyGet(input);
@@ -45,7 +48,23 @@ namespace WPFBlockCrash
             //描画処理
             Draw(g);
 
-            return IsDead;
+            if (IsDead)
+            {
+                uc.BarType = (EBarType)Bar;
+                return new ProcessResult()
+                {
+                    IsDead = IsDead,
+                    NextState = new StageSelect(dInfo),
+                    UserChoice = uc,
+                    TakeOver = takeOver
+                };
+            }
+            else
+                return new ProcessResult()
+                {
+                    IsDead = IsDead,
+                    NextState = this
+                };
         }
 
         private void KeyGet(Input input)
@@ -55,10 +74,10 @@ namespace WPFBlockCrash
                 if (input.AT)
                     ++autoCount;
 
-                ++mBar;
+                ++Bar;
 
-                if (mBar > 3)
-                    mBar = 1;
+                if (Bar > 3)
+                    Bar = 1;
 
                 input.rB = false;
             }
@@ -68,25 +87,25 @@ namespace WPFBlockCrash
                 if (input.AT)
                     ++autoCount;
 
-                --mBar;
+                --Bar;
 
-                if (mBar < 1)
-                    mBar = 3;
+                if (Bar < 1)
+                    Bar = 3;
 
                 input.lB = false;
             }
 
             if (input.barx < 700d / 3d * 1d && input.barx >= 50)
             {
-                mBar = 1;
+                Bar = 1;
             }
             else if (input.barx >= 700d / 3d * 1d && input.barx < 700d / 3d * 2d)
             {
-                mBar = 2;
+                Bar = 2;
             }
             else if (input.barx >= 700d / 3d * 2d && input.barx < 700d)
             {
-                mBar = 3;
+                Bar = 3;
             }
 
             if (input.AT)
@@ -109,7 +128,7 @@ namespace WPFBlockCrash
         {
             g.DrawImage(bSelectGh, 30, 0);
 
-            switch (mBar)
+            switch (Bar)
             {
                 case 1:
                     {
@@ -157,7 +176,7 @@ namespace WPFBlockCrash
                     g.DrawImage(barGh[i], 100, 200 + i * 120);
             }
 
-            g.DrawRectangle(new Pen(DrawUtil.BrushRGB(255, 20, 30)), 80, 190 + (mBar - 1) * 120, 170, 40);
+            g.DrawRectangle(new Pen(DrawUtil.BrushRGB(255, 20, 30)), 80, 190 + (Bar - 1) * 120, 170, 40);
             g.DrawRectangle(new Pen(DrawUtil.BrushRGB(255, 20, 30)), 400, 220, 370, 250);
         }
     }

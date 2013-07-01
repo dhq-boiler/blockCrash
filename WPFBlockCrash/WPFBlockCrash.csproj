@@ -56,7 +56,7 @@
     <Compile Include="Control.cs" />
     <Compile Include="DisplayInfo.cs" />
     <Compile Include="DrawUtil.cs" />
-    <Compile Include="GameObject.cs" />
+    <Compile Include="IInputable.cs" />
     <Compile Include="KeyInput.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Ranking.cs" />

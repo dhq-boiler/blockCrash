@@ -117,7 +117,7 @@ namespace WPFBlockCrash
             DY += (10 - r) - 6;
         }
 
-        public bool Process(Input input, Graphics g)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             if (ActCount != 0 || IsSmall)
                 Move();
@@ -138,7 +138,7 @@ namespace WPFBlockCrash
 
             Draw(g);
 
-            return IsDead;
+            return new ProcessResult() { IsDead = IsDead };
         }
 
         private void KeyGet(Input input)

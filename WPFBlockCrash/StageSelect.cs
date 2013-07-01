@@ -8,6 +8,15 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
+    enum EStageType
+    {
+        ONAJIMISAN,
+        FOURTOWER,
+        CROSSCROSS,
+        LAWOFCYCLES,
+        PRODUCTORISUS
+    }
+
     class StageSelect : IInputable
     {
         private Image[] bargh;
@@ -30,7 +39,9 @@ namespace WPFBlockCrash
 
         public bool IsDead { get; set; }
 
-        public StageSelect()
+        private DisplayInfo dInfo;
+
+        public StageSelect(DisplayInfo dInfo)
         {
             bargh = new Image[3];
             stagegh = new Image[6];
@@ -72,6 +83,7 @@ namespace WPFBlockCrash
                 clear[i] = false;
             }
 
+            this.dInfo = dInfo;
             Score = 0;
             Stock = 2;
             Bar = 1;
@@ -79,7 +91,7 @@ namespace WPFBlockCrash
             autocount = 0;
         }
 
-        public bool Process(Input input, Graphics g)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             //キー処理
             KeyGet(input);
@@ -87,7 +99,22 @@ namespace WPFBlockCrash
             //描画処理
             Draw(g);
 
-            return IsDead;
+            if (IsDead)
+            {
+                uc.StageType = (EStageType)Stage;
+                return new ProcessResult()
+                {
+                    IsDead = IsDead,
+                    NextState = new Control(uc, takeOver, dInfo, input)
+                    {
+                        IsPlaying = true,
+                    },
+                    UserChoice = uc,
+                    TakeOver = takeOver
+                };
+            }
+            else
+                return new ProcessResult() { IsDead = IsDead, NextState = this };
         }
 
         private void Draw(Graphics g)
@@ -124,21 +151,16 @@ namespace WPFBlockCrash
                 g.DrawImage(cleargh, 700, 320);
             }
 
-            g.DrawRectangle(new System.Drawing.Pen(RGB(255, 20, 30)), 60 + (Stage - 1) * 120, 200, 100, 80);
-            g.DrawRectangle(new System.Drawing.Pen(RGB(255, 20, 30)), 400, 320, 350, 270);
+            g.DrawRectangle(new System.Drawing.Pen(DrawUtil.BrushRGB(255, 20, 30)), 60 + (Stage - 1) * 120, 200, 100, 80);
+            g.DrawRectangle(new System.Drawing.Pen(DrawUtil.BrushRGB(255, 20, 30)), 400, 320, 350, 270);
             g.DrawImage(bargh[Bar - 1], 40, 460);
-            g.DrawString(string.Format("SCORE：{0}", Score), font, RGB(255, 120, 0), 40, 500);
-            g.DrawString(string.Format("STOCK：{0}", Stock), font, RGB(255, 120, 0), 40, 540);
+            g.DrawString(string.Format("SCORE：{0}", Score), font, DrawUtil.BrushRGB(255, 120, 0), 40, 500);
+            g.DrawString(string.Format("STOCK：{0}", Stock), font, DrawUtil.BrushRGB(255, 120, 0), 40, 540);
         }
 
         private void DrawStageTitle(Graphics g, string stageTitle)
         {
-            g.DrawString(stageTitle, font, RGB(255, 120, 0), 40, 340);
-        }
-
-        private Brush RGB(byte r, byte g, byte b)
-        {
-            return new SolidBrush(Color.FromArgb(r, g, b));
+            g.DrawString(stageTitle, font, DrawUtil.BrushRGB(255, 120, 0), 40, 340);
         }
 
         private void KeyGet(Input input)
