@@ -107,7 +107,7 @@ namespace WPFBlockCrash
                             {
                                 if (act == 0)
                                 {
-                                    message = new Message(1, 50, dInfo);
+                                    message = new Message(EMessageType.FAILED, 50, dInfo);
                                     ++act;
                                 }
 
@@ -123,7 +123,7 @@ namespace WPFBlockCrash
                             {
                                 if (act == 0)
                                 {
-                                    message = new Message(3, 120, dInfo);
+                                    message = new Message(EMessageType.GAMEOVER, 120, dInfo);
                                     ++act;
                                 }
 
@@ -138,7 +138,7 @@ namespace WPFBlockCrash
                         {
                             if (act == 0)
                             {
-                                message = new Message(2, 200, dInfo);
+                                message = new Message(EMessageType.CLEAR, 200, dInfo);
                                 ++act;
                             }
 

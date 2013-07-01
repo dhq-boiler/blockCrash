@@ -394,16 +394,16 @@ namespace WPFBlockCrash
 			accel = bar.Accel; 
 			
 			// 得点、レベル、残機枠の表示
-			g.DrawRectangle(new System.Drawing.Pen(RGB(230, 230, 230), 3), 0, 0, 800, 30);
-			g.DrawString(string.Format("SCORE: {0}", Score), font, RGB(255, 120, 0), 20, 5);
-			g.DrawString(string.Format("LEVEL: {0}", ball.Level), font, RGB(255, 120, 0), 220, 5);
+			g.DrawRectangle(new System.Drawing.Pen(DrawUtil.BrushRGB(230, 230, 230), 3), 0, 0, 800, 30);
+			g.DrawString(string.Format("SCORE: {0}", Score), font, DrawUtil.BrushRGB(255, 120, 0), 20, 5);
+			g.DrawString(string.Format("LEVEL: {0}", ball.Level), font, DrawUtil.BrushRGB(255, 120, 0), 220, 5);
 
 			//デバック用
 
 			// コンボ表示　邪魔にならないよう透明化処理する  
 			if (combocount > 1)
 			{
-				g.DrawString(string.Format("{0} COMBO!", combocount), font, RGB(255, 120, 0), 20, 400);
+				g.DrawString(string.Format("{0} COMBO!", combocount), font, DrawUtil.BrushRGB(255, 120, 0), 20, 400);
 				combooncount = 0;
 				comboon = true;
 				alphacombo = combocount;
@@ -412,7 +412,7 @@ namespace WPFBlockCrash
 			{
 				if (combooncount < 20)
 				{
-					g.DrawString(string.Format("{0} COMBO!", alphacombo), font, ARGB((int)((255f / 40) * (20 - combooncount)), 255, 120, 0), 20, 400);
+					g.DrawString(string.Format("{0} COMBO!", alphacombo), font, DrawUtil.BrushRGB((int)((255f / 40) * (20 - combooncount)), 255, 120, 0), 20, 400);
 					++combooncount;
 				}
 				else
@@ -466,16 +466,6 @@ namespace WPFBlockCrash
 			}
 
 			return BallIsDead;
-		}
-
-		private Brush ARGB(int alpha, byte r, byte g, byte b)
-		{
-			return new SolidBrush(Color.FromArgb(alpha, r, g, b));
-		}
-
-		private Brush RGB(byte r, byte g, byte b)
-		{
-			return new SolidBrush(Color.FromArgb(r, g, b));
 		}
 
 		private bool UpdateBall(Input input, Graphics g)

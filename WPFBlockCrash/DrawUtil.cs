@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 
 namespace WPFBlockCrash
 {
@@ -38,6 +37,26 @@ namespace WPFBlockCrash
                     imageAttributes);
             }
             return output;
+        }
+
+        public static Color RGB(byte a, byte r, byte g, byte b)
+        {
+            return Color.FromArgb(a, r, g, b);
+        }
+
+        public static Color RGB(byte r, byte g, byte b)
+        {
+            return Color.FromArgb(r, g, b);
+        }
+
+        public static Brush BrushRGB(int alpha, byte r, byte g, byte b)
+        {
+            return new SolidBrush(Color.FromArgb(alpha, r, g, b));
+        }
+
+        public static Brush BrushRGB(byte r, byte g, byte b)
+        {
+            return new SolidBrush(Color.FromArgb(r, g, b));
         }
     }
 }

@@ -113,38 +113,38 @@ namespace WPFBlockCrash
             {
                 case 1:
                     {
-                        g.DrawString("BAR NAME：", font, RGB(255, 180, 0), new PointF(440, 240));
-                        g.DrawString("ノーマルバー", font, RGB(255, 255, 128), new PointF(560, 240));
-                        g.DrawString("BALL SPEED：", font, RGB(255, 180, 0), new PointF(440, 300));
-                        g.DrawString("★", font, RGB(255, 180, 128), new PointF(570, 300));
-                        g.DrawString("TECHNICAL：", font, RGB(255, 180, 0), new PointF(440, 360));
-                        g.DrawString("★", font, RGB(255, 180, 128), new PointF(570, 360));
-                        g.DrawString("DIFFICULTY：", font, RGB(255, 180, 0), new PointF(440, 420));
-                        g.DrawString("★", font, RGB(255, 180, 128), new PointF(570, 420));
+                        g.DrawString("BAR NAME：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 240));
+                        g.DrawString("ノーマルバー", font, DrawUtil.BrushRGB(255, 255, 128), new PointF(560, 240));
+                        g.DrawString("BALL SPEED：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 300));
+                        g.DrawString("★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 300));
+                        g.DrawString("TECHNICAL：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 360));
+                        g.DrawString("★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 360));
+                        g.DrawString("DIFFICULTY：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 420));
+                        g.DrawString("★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 420));
                     }
                     break;
                 case 2:
                     {
-                        g.DrawString("BAR NAME：", font, RGB(255, 180, 0), new PointF(440, 240));
-                        g.DrawString("2号機", font, RGB(255, 255, 128), new PointF(560, 240));
-                        g.DrawString("BALL SPEED：", font, RGB(255, 180, 0), new PointF(440, 300));
-                        g.DrawString("★　★　★", font, RGB(255, 180, 128), new PointF(570, 300));
-                        g.DrawString("TECHNICAL：", font, RGB(255, 180, 0), new PointF(440, 360));
-                        g.DrawString("★　★", font, RGB(255, 180, 128), new PointF(570, 360));
-                        g.DrawString("DIFFICULTY：", font, RGB(255, 180, 0), new PointF(440, 420));
-                        g.DrawString("★　★", font, RGB(255, 180, 128), new PointF(570, 420));
+                        g.DrawString("BAR NAME：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 240));
+                        g.DrawString("2号機", font, DrawUtil.BrushRGB(255, 255, 128), new PointF(560, 240));
+                        g.DrawString("BALL SPEED：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 300));
+                        g.DrawString("★　★　★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 300));
+                        g.DrawString("TECHNICAL：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 360));
+                        g.DrawString("★　★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 360));
+                        g.DrawString("DIFFICULTY：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 420));
+                        g.DrawString("★　★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 420));
                     }
                     break;
                 case 3:
                     {
-                        g.DrawString("BAR NAME：", font, RGB(255, 180, 0), new PointF(440, 240));
-                        g.DrawString("３つめ", font, RGB(255, 255, 128), new PointF(560, 240));
-                        g.DrawString("BALL SPEED：", font, RGB(255, 180, 0), new PointF(440, 300));
-                        g.DrawString("★　★　★　★　★", font, RGB(255, 0, 128), new PointF(570, 300));
-                        g.DrawString("TECHNICAL：", font, RGB(255, 180, 0), new PointF(440, 360));
-                        g.DrawString("★　★　★", font, RGB(255, 0, 128), new PointF(570, 360));
-                        g.DrawString("DIFFICULTY：", font, RGB(255, 180, 0), new PointF(440, 420));
-                        g.DrawString("★　★　★　★　★", font, RGB(255, 0, 128), new PointF(570, 420));
+                        g.DrawString("BAR NAME：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 240));
+                        g.DrawString("３つめ", font, DrawUtil.BrushRGB(255, 255, 128), new PointF(560, 240));
+                        g.DrawString("BALL SPEED：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 300));
+                        g.DrawString("★　★　★　★　★", font, DrawUtil.BrushRGB(255, 0, 128), new PointF(570, 300));
+                        g.DrawString("TECHNICAL：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 360));
+                        g.DrawString("★　★　★", font, DrawUtil.BrushRGB(255, 0, 128), new PointF(570, 360));
+                        g.DrawString("DIFFICULTY：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 420));
+                        g.DrawString("★　★　★　★　★", font, DrawUtil.BrushRGB(255, 0, 128), new PointF(570, 420));
                     }
                     break;
             }
@@ -157,13 +157,8 @@ namespace WPFBlockCrash
                     g.DrawImage(barGh[i], 100, 200 + i * 120);
             }
 
-            g.DrawRectangle(new Pen(Color.FromArgb(255, 20, 30)), 80, 190 + (mBar - 1) * 120, 170, 40);
-            g.DrawRectangle(new Pen(Color.FromArgb(255, 20, 30)), 400, 220, 370, 250);
-        }
-
-        private Brush RGB(byte r, byte g, byte b)
-        {
-            return new SolidBrush(Color.FromArgb(r, g, b));
+            g.DrawRectangle(new Pen(DrawUtil.BrushRGB(255, 20, 30)), 80, 190 + (mBar - 1) * 120, 170, 40);
+            g.DrawRectangle(new Pen(DrawUtil.BrushRGB(255, 20, 30)), 400, 220, 370, 250);
         }
     }
 }
