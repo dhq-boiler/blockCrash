@@ -180,7 +180,10 @@ namespace WPFBlockCrash
 
         public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
+            CalculatePosition();
+
             Draw(g);
+
             if (matchlesscount > 0)
                 --matchlesscount;
 
@@ -189,37 +192,6 @@ namespace WPFBlockCrash
 
         private void Draw(Graphics g)
         {
-            if (!scrollStop) // スクロールストップフラグが立ってたらストップ
-            {
-                if (scroll == 1)
-                { // 右スクロール
-                    ++X;
-                    if (X + Width / 2 >= 800)
-                    { //画面外に出たら逆の画面へ
-                        scrollcount = X + Width / 2 - 800;
-                    }
-                    if (X - Width / 2 >= 800)
-                    {
-                        X -= 800;
-                        scrollcount = 0;
-                    }
-                }
-
-                if (scroll == -1)
-                { // 左スクロール
-                    --X;
-                    if (X - Width / 2 < 0)
-                    { //画面外に出たら逆の画面へ
-                        scrollcount = X + Width / 2 + 800;
-                    }
-                    if (X + Width / 2 < 0)
-                    {
-                        X += 800;
-                        scrollcount = 0;
-                    }
-                }
-            }
-
             if (!IsDead)
             {
                 if (scrollcount > 0)
@@ -228,6 +200,7 @@ namespace WPFBlockCrash
                 g.DrawImage(gh[(int)BlockColor], X - Width / 2, Y - Height / 2, Width, Height);
             }
             else if (ItemFlag)
+            {
                 if (half)
                 {
                     if (scrollcount > 0)
@@ -242,7 +215,8 @@ namespace WPFBlockCrash
 
                     g.DrawImage(itemgh[(int)ItemType], X - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
                 }
-            else
+            }
+            else 
             {
                 if (count < 20)
                 {
@@ -255,13 +229,51 @@ namespace WPFBlockCrash
                         else
                             g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollcount - Width, Y - Height / 2, Width, Height);
                     }
-                    
+
                     if (WasItem)
                         g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), X - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
                     else
                         g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), X - Width / 2, Y - Height / 2, Width, Height);
 
                     ++count;
+                }
+            }
+        }
+
+        private void CalculatePosition()
+        {
+            if (!scrollStop) // スクロールストップフラグが立ってたらストップ
+            {
+                if (scroll == 1)// 右スクロール
+                {
+                    X += (int)Main.RunningSpeedFactor;
+                    
+                    if (X + Width / 2 >= 800)//画面外に出たら逆の画面へ
+                    {
+                        scrollcount = X + Width / 2 - 800;
+                    }
+
+                    if (X - Width / 2 >= 800)
+                    {
+                        X -= 800;
+                        scrollcount = 0;
+                    }
+                }
+
+                if (scroll == -1)// 左スクロール
+                {
+                    X -= (int)Main.RunningSpeedFactor;
+                    
+                    if (X - Width / 2 < 0)//画面外に出たら逆の画面へ
+                    {
+                        scrollcount = X + Width / 2 + 800;
+                    }
+                    
+                    if (X + Width / 2 < 0)
+                    {
+                        X += 800;
+                        scrollcount = 0;
+                    }
                 }
             }
         }

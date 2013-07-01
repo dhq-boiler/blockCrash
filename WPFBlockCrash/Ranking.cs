@@ -80,75 +80,96 @@ namespace WPFBlockCrash
             // Saveファイルを開く
             //保存した内容を復元する
             XmlSerializer serializer = new XmlSerializer(typeof(SaveGameData[]));
-            System.IO.FileStream fs1;
-            try { // あれば開く　場所はC:\Users\大輔\Desktop\TSBBC\blockcrash\BlockCrashGUI\bin\Debug
-                System.IO.FileStream fs2;
-                fs2 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Open); // 読み込み
-                saved = (SaveGameData[])serializer.Deserialize(fs2);
-                fs2.Close();
-                fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create); // 再作成
-            }
-            catch (Exception e)
-            { // 開けなかったらCreate
-                fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create); //作成
-                for (int i = 0; i < 20; ++i)
-                { // 配列20
-                    saved[i] = new SaveGameData();
-                    if (i == 19)
-                    { // デバック用に最下位は0を入力
-                        saved[i].Score = 0;
+            System.IO.FileStream fs1 = null;
+
+            try
+            {
+                try
+                {
+                    System.IO.FileStream fs2 = null;
+                    try
+                    {
+                        // あれば開く　場所はC:\Users\大輔\Desktop\TSBBC\blockcrash\BlockCrashGUI\bin\Debug
+                        fs2 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Open); // 読み込み
+                        saved = (SaveGameData[])serializer.Deserialize(fs2);
                     }
-                    else // 数値は最上位が30000,
-                        saved[i].Score = 30000 - (i + 1)*1500;
-                    // BarNumはランダムで
-                    EBarType bt = (EBarType)(Main.rand.Next() % 3 + 1);
-                    saved[i].BarNum = bt;
-                    saved[i].Year = iYear;
-                    saved[i].Month = iMonth;
-                    saved[i].Date = iDay;
+                    finally
+                    {
+                        if (fs2 != null)
+                            fs2.Close();
+                    }
+                    fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create); // 再作成
                 }
+                catch (Exception e)
+                {
+                    // 開けなかったらCreate
+                    fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create); //作成
+                    for (int i = 0; i < 20; ++i) // 配列20
+                    {
+                        saved[i] = new SaveGameData();
+                        if (i == 19) // デバック用に最下位は0を入力
+                        {
+                            saved[i].Score = 0;
+                        }
+                        else // 数値は最上位が30000,
+                            saved[i].Score = 30000 - (i + 1) * 1500;
+
+                        // BarNumはランダムで
+                        EBarType bt = (EBarType)(Main.rand.Next() % 3 + 1);
+                        saved[i].BarNum = bt;
+                        saved[i].Year = iYear;
+                        saved[i].Month = iMonth;
+                        saved[i].Date = iDay;
+                    }
+                }
+
+                SaveGameData oldscore = new SaveGameData();
+                SaveGameData newsave = new SaveGameData();
+                // 新しいデータを登録 //コンストラクタ作るのめんどかった
+                newsave.Score = xscore;
+                //newsave.BarNum = xbarnum -1;
+                newsave.BarNum = xbarnum;
+                newsave.Year = iYear;
+                newsave.Month = iMonth;
+                newsave.Date = iDay;
+
+                List<SaveGameData> saveGames = new List<SaveGameData>(saved);
+                saveGames.Add(newsave);
+                var DescendingOrder = saveGames.OrderByDescending(a => a.Score).Take(20);
+                index = new List<SaveGameData>(DescendingOrder).FindIndex(a => Object.ReferenceEquals(newsave, a));
+                saved = DescendingOrder.ToArray();
+
+                //for (int i = 0; i < 20; ++i)// index0から検索して,xScoreより小さいところまで来たらその番号を保存
+                //{ 
+                //    if (saved[i].Score < xscore) 
+                //    {
+                //        for (int j = i; j < 20; ++j)
+                //        {
+                //            if (j == i)// 番号のところに今回の記録を記入
+                //            { 
+                //                index = j;
+                //                oldscore = saved[j];
+                //                saved[j] = newsave;
+                //            }
+                //            else // それ以降のindexは一つずつずらす
+                //            { 
+                //                newsave = oldscore;
+                //                oldscore = saved[j];
+                //                saved[j] = newsave;
+                //            }
+                //        }
+                //        break; // 代入したら終了
+                //    }            
+                //}
+                //XMLファイルに保存する
+                //serializer.Serialize(fs1, saved);
+                serializer.Serialize(fs1, saved);
             }
-
-            SaveGameData oldscore = new SaveGameData();
-            SaveGameData newsave = new SaveGameData();
-            // 新しいデータを登録 //コンストラクタ作るのめんどかった
-            newsave.Score = xscore;
-            //newsave.BarNum = xbarnum -1;
-            newsave.BarNum = xbarnum;
-            newsave.Year = iYear;
-            newsave.Month = iMonth;
-            newsave.Date = iDay;
-
-            List<SaveGameData> saveGames = new List<SaveGameData>(saved);
-            saveGames.Add(newsave);
-            var DescendingOrder = saveGames.OrderByDescending(a => a.Score).Take(20);
-
-            //for (int i = 0; i < 20; ++i)// index0から検索して,xScoreより小さいところまで来たらその番号を保存
-            //{ 
-            //    if (saved[i].Score < xscore) 
-            //    {
-            //        for (int j = i; j < 20; ++j)
-            //        {
-            //            if (j == i)// 番号のところに今回の記録を記入
-            //            { 
-            //                index = j;
-            //                oldscore = saved[j];
-            //                saved[j] = newsave;
-            //            }
-            //            else // それ以降のindexは一つずつずらす
-            //            { 
-            //                newsave = oldscore;
-            //                oldscore = saved[j];
-            //                saved[j] = newsave;
-            //            }
-            //        }
-            //        break; // 代入したら終了
-            //    }            
-            //}
-            //XMLファイルに保存する
-            //serializer.Serialize(fs1, saved);
-            serializer.Serialize(fs1, saveGames.ToArray());
-            fs1.Close();
+            finally
+            {
+                if (fs1 != null)
+                    fs1.Close();
+            }
         }
 
         public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
@@ -159,7 +180,10 @@ namespace WPFBlockCrash
             //描画処理
             Draw(g);
 
-            return new ProcessResult() { IsDead = IsDead, NextState = new Title(dInfo) };
+            if (IsDead)
+                return new ProcessResult() { IsDead = IsDead, NextState = new Title(dInfo) };
+            else
+                return new ProcessResult() { IsDead = IsDead, NextState = this };
         }
 
         private void KeyGet(Input input)

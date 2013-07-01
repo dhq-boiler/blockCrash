@@ -20,21 +20,23 @@ namespace WPFBlockCrash
             RANKING
         }
 
-        private StageSelect stageSelect;
-        private Control control;
-        private Message message;
-        private BarSelect barSelect;
-        private Title title;
-        private Ranking ranking;
+        public static readonly double RunningSpeedFactor = 1.5;
+
+        //private StageSelect stageSelect;
+        //private Control control;
+        //private Message message;
+        //private BarSelect barSelect;
+        //private Title title;
+        //private Ranking ranking;
 
         private IInputable CurrentState;
-        private UserChoice userChoise;
+        //private UserChoice userChoise;
 
-        private EActType ActType;
+        //private EActType ActType;
 
-        private int act;
-        private int stock;
-        private int c;
+        //private int act;
+        //private int stock;
+        private int AutoModeControl;
         private DisplayInfo dInfo;
         private UserChoice userChoice;
         private TakeOver takeOver;
@@ -57,9 +59,9 @@ namespace WPFBlockCrash
             //barSelect = new BarSelect();
             //stageSelect = new StageSelect();
             //ActType = EActType.TITLE;
-            act = 0;
-            stock = 0;
-            c = 0;
+            //act = 0;
+            //stock = 0;
+            AutoModeControl = 0;
         }
 
         public void ProcessLoop(Input input, Graphics g)
@@ -188,45 +190,47 @@ namespace WPFBlockCrash
         private void Restart(Input input)
         {
             input.Clear();
-            title = null;
-            barSelect = null;
-            stageSelect = null;
+            //title = null;
+            //barSelect = null;
+            //stageSelect = null;
 
-            title = new Title(dInfo);
+            //title = new Title(dInfo);
             //barSelect = new BarSelect();
             //stageSelect = new StageSelect();
 
-            act = 0;
-            stock = 0;
+            //act = 0;
+            //stock = 0;
 
-            switch (ActType)
-            {
-                case EActType.TITLE:
-                    break;
-                case EActType.BAR_SELECT:
-                    barSelect.IsDead = false;
-                    break;
-                case EActType.STAGE_SELECT:
-                    barSelect.IsDead = false;
-                    stageSelect.IsDead = false;
-                    control = null;
-                    break;
-            }
+            //switch (ActType)
+            //{
+            //    case EActType.TITLE:
+            //        break;
+            //    case EActType.BAR_SELECT:
+            //        barSelect.IsDead = false;
+            //        break;
+            //    case EActType.STAGE_SELECT:
+            //        barSelect.IsDead = false;
+            //        stageSelect.IsDead = false;
+            //        control = null;
+            //        break;
+            //}
 
-            ActType = EActType.TITLE;
+            //ActType = EActType.TITLE;
+
+            CurrentState = new Title(dInfo);
         }
 
         public void ATMode(Input input)
         {
             if (input.AT)
             {
-                if (c < 15)
+                if (AutoModeControl < 15)
                 {
-                    ++c;
+                    ++AutoModeControl;
                 }
                 else
                 {
-                    c = 0;
+                    AutoModeControl = 0;
 
                     int r = rand.Next() % 3;
 

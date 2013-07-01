@@ -10,6 +10,7 @@ namespace WPFBlockCrash
 {
     enum EStageType
     {
+        UNKNOWN,
         ONAJIMISAN,
         FOURTOWER,
         CROSSCROSS,

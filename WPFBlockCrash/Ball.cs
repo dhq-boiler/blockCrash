@@ -147,11 +147,13 @@ namespace WPFBlockCrash
             {
                 if (ActCount == 0 && !IsSmall || ballstop)
                 {
-                    if (input.AT) {
+                    if (input.AT)
+                    {
                         Y = Y - 5;
                         int r = Main.rand.Next() % 1;
                         int rx = (Main.rand.Next() % 5) + 1;
                         int ry = (Main.rand.Next() % 5) + 1;
+
                         if (r == 0)
                         {
                             DX = rx;
@@ -165,19 +167,25 @@ namespace WPFBlockCrash
                     else
                     {
                         Y = Y - 5;
+
+                        //初速設定？
                         switch (baccel)
                         {
-                            case 0: DX = (2 + Level) * acbectl;
-                                DY = -(2 + Level);
+                            case 0:
+                                DX = (int)((2 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DY = (int)(-(2 + Level) * Main.RunningSpeedFactor);
                                 break;
-                            case 1: DX = (3 + Level) * acbectl;
-                                DY = -(3 + Level);
+                            case 1:
+                                DX = (int)((3 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
-                            case 2: DX = (4 + Level) * acbectl;
-                                DY = -(3 + Level);
+                            case 2:
+                                DX = (int)((4 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
-                            case 3: DX = (5 + Level) * acbectl;
-                                DY = -(3 + Level);
+                            case 3:
+                                DX = (int)((5 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
                         }
                     }
@@ -186,12 +194,13 @@ namespace WPFBlockCrash
                 }
             }
         }
+
         public void BarAccel(int bac)
         {
             baccel = bac;
             if (baccel == 0)
             {
-                acbectl = 1;
+                acbectl = 1; //初速？
             }
             else if (baccel > 0)
                 acbectl = 1;

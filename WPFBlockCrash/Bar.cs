@@ -18,14 +18,14 @@ namespace WPFBlockCrash
 
     class Bar : IInputable
     {
-        public int SPEED = 8;
+        public int SPEED = (int)(8 * Main.RunningSpeedFactor);
 
         private int EnlargementFactor;
         private Image[] gh;
         private DisplayInfo dInfo;
         private EBarType mBar;
         private EBarType moldBar; //for swap
-        private int accelcount;
+        private int AcceleratingCount;
         public int X { get; set; }
         public int Y { get; set; }
         public int Width { get; set; }
@@ -75,7 +75,7 @@ namespace WPFBlockCrash
                 if (!KeyGet(input))
                 {
                     Accel = 0;
-                    accelcount = 0;
+                    AcceleratingCount = 0;
                 }
             }
 
@@ -95,7 +95,7 @@ namespace WPFBlockCrash
             //{
                 //DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 4, Y - Height / 2,
                 //X + Width * EnlargementFactor / 4, Y + Height / 2, gh[mBar]);
-            g.DrawImage(gh[(int)mBar], X - Width * EnlargementFactor / 4, Y - Height / 2,
+            g.DrawImage(gh[(int)mBar - 1], X - Width * EnlargementFactor / 4, Y - Height / 2,
                 Width * EnlargementFactor / 2, Height);
             //}
         }
@@ -115,11 +115,11 @@ namespace WPFBlockCrash
             {
                 IsMove = true;
                 X -= SPEED;
-                ++accelcount;
+                ++AcceleratingCount;
 
-                if (accelcount < 25)
+                if (AcceleratingCount < 25)
                     Accel = -1;
-                else if (accelcount < 50)
+                else if (AcceleratingCount < 50)
                     Accel = -2;
                 else
                     Accel = -3;
@@ -130,11 +130,11 @@ namespace WPFBlockCrash
             {
                 IsMove = true;
                 X += SPEED;
-                ++accelcount;
+                ++AcceleratingCount;
 
-                if (accelcount < 25)
+                if (AcceleratingCount < 25)
                     Accel = 1;
-                else if (accelcount < 50)
+                else if (AcceleratingCount < 50)
                     Accel = 2;
                 else
                     Accel = 3;
@@ -156,7 +156,8 @@ namespace WPFBlockCrash
             return IsPushedAnyKey;
         }
 
-        public void BallCatch( bool on ){ // ボールがバーにくっつく状態
+        public void BallCatch( bool on )// ボールがバーにくっつく状態
+        { 
             if (on && mBar != EBarType.MOLD)
             {
                 moldBar = mBar;

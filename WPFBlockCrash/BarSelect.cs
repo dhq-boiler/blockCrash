@@ -95,6 +95,8 @@ namespace WPFBlockCrash
                 input.lB = false;
             }
 
+
+            //タッチスクロールバー用選択
             if (input.barx < 700d / 3d * 1d && input.barx >= 50)
             {
                 Bar = 1;

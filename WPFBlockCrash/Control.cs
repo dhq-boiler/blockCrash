@@ -300,7 +300,7 @@ namespace WPFBlockCrash
 
 		public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
 		{
-			if (BallIsDroped(input, g, uc, takeOver))
+			if (CalculateAndDraw(input, g, uc, takeOver))
 			{
 				if (Stock > 1)
 				{
@@ -318,7 +318,7 @@ namespace WPFBlockCrash
 						message = null;
 					}
 				}
-				else
+				else // Stock == 0
 				{
 					if (IsPlaying)
 					{
@@ -365,7 +365,7 @@ namespace WPFBlockCrash
 			};
 		}
 
-		private bool BallIsDroped(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
+		private bool CalculateAndDraw(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
 		{
 			bool BallIsDead;
 			//int itemhandle;
@@ -382,7 +382,8 @@ namespace WPFBlockCrash
 
 				switch (Stage)
 				{
-					case EStageType.ONAJIMISAN: if (i < 7)
+					case EStageType.ONAJIMISAN:
+						if (i < 7)
 							block[i].Process(input, g, uc, takeOver);
 						else if (i > 6 && i < 14)
 							block[i].Process(input, g, uc, takeOver);
@@ -412,6 +413,7 @@ namespace WPFBlockCrash
 				//ボールの座標取得
 				bar.X = ball.X;
 			}
+
 			//バーの処理
 			bar.Process(input, g, uc, takeOver);
 
@@ -419,12 +421,16 @@ namespace WPFBlockCrash
 			{
 				ball.X = bar.MX;
 			}
-			if (ball.ballstop) {
+
+			if (ball.ballstop)
+			{
 				ball.X = bar.MX + ball.xoffset;
 			}
+
 			foreach (Ball smallBall in SmallBalls)
 			{
-				if (smallBall.ballstop){ // ボールが止まっていれば
+				if (smallBall.ballstop)// ボールが止まっていれば
+				{ 
 					smallBall.X = bar.MX + smallBall.xoffset;
 					smallBall.Y = 527;
 				}
@@ -436,24 +442,24 @@ namespace WPFBlockCrash
 			{
 				++ballspup; // 速度上昇カウント
 
-				switch (Bar)
-				{ // バーによりの速度上昇の早さが違う
+				switch (Bar) // バーによりの速度上昇の早さが違う
+				{ 
 
 					case EBarType.LONG:
-						if (ballspup % 1500 == 0)
-						{ // やさしい
+						if (ballspup % 1500 == 0)// やさしい
+						{ 
 							ball.LvUp(1);
 						}
 						break;
 					case EBarType.MEDIUM:
-						if (ballspup % 1000 == 0)
-						{ // ふつう
+						if (ballspup % 1000 == 0)// ふつう
+						{ 
 							ball.LvUp(1);
 						}
 						break;
 					case EBarType.SHORT:
-						if (ballspup % 800 == 0)
-						{ // 難しい
+						if (ballspup % 800 == 0)// 難しい
+						{ 
 							ball.LvUp(1);
 						}
 						break;
@@ -490,6 +496,8 @@ namespace WPFBlockCrash
 				comboon = true;
 				alphacombo = combocount;
 			}
+
+
 			if(combocount == 0 && comboon)
 			{
 				if (combooncount < 20)
@@ -504,7 +512,8 @@ namespace WPFBlockCrash
 				}
 			}
 
-			for (int i = 0; i < Stock; ++i)
+			//ストック数の表示
+			for (int i = 0; i < (BallIsDead ? Stock - 2 : Stock - 1); ++i)
 			{
 				g.DrawImage(gh, 540 + 18 * i, 7, (float)gh.Width, (float)gh.Height);
 			}
@@ -527,6 +536,7 @@ namespace WPFBlockCrash
 				bar.IsDead = true;
 				ball.DX = 0;
 			}
+
 			if (clear)
 			{
 				ball.DX = 0;
@@ -840,8 +850,8 @@ namespace WPFBlockCrash
 				{
 					ball.Radius = 20;
 
-					if (ballcatch)
-					{ // ボールがバーにくっつく状態
+					if (ballcatch)// ボールがバーにくっつく状態
+					{ 
 						ball.DX = ball.DY = 0;
 						ball.ballstop = true;
 						if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
@@ -876,10 +886,12 @@ namespace WPFBlockCrash
 					}
 					else
 					{
-						if (ballX < barX + 10 && ballX > barX - 10) {
+						if (ballX < barX + 10 && ballX > barX - 10)
+						{
 							ball.Penetration();
 							ball.LvUp(1); // 速度が上がって短時間貫通化
 						}
+
 						combocount = 0;
 						bar.IsMove = false;
 						if (Bar == EBarType.SHORT)
@@ -892,7 +904,11 @@ namespace WPFBlockCrash
 			}
 		}
 
-		private void HitCheckBallAndBall(Ball ball) // ボールとボールの衝突判定
+		/// <summary>
+		/// ボールとボールの衝突判定
+		/// </summary>
+		/// <param name="ball"></param>
+		private void HitCheckBallAndBall(Ball ball)
 		{
 			boundFlag = false;
 
