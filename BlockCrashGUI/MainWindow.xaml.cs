@@ -24,6 +24,7 @@ namespace BlockCrashGUI
         {
             InitializeComponent();
 
+            view.IsAuto = true;
             view.RunGame();
         }
 

@@ -86,6 +86,14 @@ namespace WPFBlockCrash
             }
         }
 
+        private int ItemHandleOffset
+        {
+            get
+            {
+                return ItemFlag ? 4 : 0;
+            }
+        }
+
         private bool WasItem;
         public bool HalfFlag
         {
@@ -195,9 +203,9 @@ namespace WPFBlockCrash
             if (!IsDead)
             {
                 if (scrollcount > 0)
-                    g.DrawImage(gh[(int)BlockColor], scrollcount - Width, Y - Height / 2, Width, Height);
+                    g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], scrollcount - Width, Y - Height / 2, Width, Height);
 
-                g.DrawImage(gh[(int)BlockColor], X - Width / 2, Y - Height / 2, Width, Height);
+                g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], X - Width / 2, Y - Height / 2, Width, Height);
             }
             else if (ItemFlag)
             {

@@ -156,12 +156,12 @@ namespace WPFBlockCrash
 
                         if (r == 0)
                         {
-                            DX = rx;
-                            DY = -ry;
+                            DX = (int)(rx * Main.RunningSpeedFactor);
+                            DY = (int)(-ry * Main.RunningSpeedFactor);
                         }
                         else {
-                            DX = -rx;
-                            DY = -ry;
+                            DX = (int)(-rx * Main.RunningSpeedFactor);
+                            DY = (int)(-ry * Main.RunningSpeedFactor);
                         }
                     }
                     else
