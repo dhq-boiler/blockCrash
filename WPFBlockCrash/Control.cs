@@ -38,6 +38,7 @@ namespace WPFBlockCrash
 		private int ballspup;
 		private int vspeed;
 		private DisplayInfo dInfo;
+		private IOperator Operator;
 
 		private readonly Font font = new Font("Consolas", 16);
 
@@ -58,19 +59,19 @@ namespace WPFBlockCrash
 
 		private IInputable message { get; set; }
 
-
-		public Control(UserChoice userChoice, TakeOver takeOver, DisplayInfo dInfo, Input input)
+		public Control(UserChoice userChoice, TakeOver takeOver, DisplayInfo dInfo, Input input, IOperator Operator)
 		{
 			this.dInfo = dInfo;
-			Bar = userChoice.BarType;
+			this.Operator = Operator;
 
+			Bar = userChoice.BarType;
 
 			bool extendon = true;
 			if (Bar == EBarType.SHORT)
 				extendon = false;
 	
 			//バーとボールのインスタンスを生成
-			bar = new Bar(Bar, dInfo);
+			bar = new Bar(Bar, dInfo, Operator);
 			ball = new Ball(dInfo);
 			ballspup = 0;
 
@@ -331,7 +332,7 @@ namespace WPFBlockCrash
 						return new ProcessResult()
 						{
 							IsDead = true,
-							NextState = new Ranking(Score, Bar, dInfo),
+							NextState = new Ranking(Score, Bar, dInfo, Operator),
 							TakeOver = takeOver
 						};
 					}
@@ -350,7 +351,7 @@ namespace WPFBlockCrash
 					return new ProcessResult()
 					{
 						IsDead = true,
-						NextState = new Ranking(Score, Bar, dInfo),
+						NextState = new Ranking(Score, Bar, dInfo, Operator),
 						TakeOver = takeOver
 					};
 				}

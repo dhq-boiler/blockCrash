@@ -35,15 +35,19 @@ namespace WPFBlockCrash
 
         public int Score { get; set; }
         public int Stock { get; set; }
-        public int Stage { get; set; }
+        private int Stage;
         public int Bar { get; set; }
 
         public bool IsDead { get; set; }
 
         private DisplayInfo dInfo;
+        private IOperator Operator;
 
-        public StageSelect(DisplayInfo dInfo)
+        public StageSelect(DisplayInfo dInfo, IOperator Operator)
         {
+            this.dInfo = dInfo;
+            this.Operator = Operator;
+
             bargh = new Image[3];
             stagegh = new Image[6];
             sdetailgh = new Image[6];
@@ -84,7 +88,6 @@ namespace WPFBlockCrash
                 clear[i] = false;
             }
 
-            this.dInfo = dInfo;
             Score = 0;
             Stock = 2;
             Bar = 1;
@@ -106,7 +109,7 @@ namespace WPFBlockCrash
                 return new ProcessResult()
                 {
                     IsDead = IsDead,
-                    NextState = new Control(uc, takeOver, dInfo, input)
+                    NextState = new Control(uc, takeOver, dInfo, input, Operator)
                     {
                         IsPlaying = true,
                     },
@@ -166,52 +169,53 @@ namespace WPFBlockCrash
 
         private void KeyGet(Input input)
         {
-            if (input.rB)
-            {
-                if (input.AT)
-                    ++autocount;
+            Operator.SelectStage(ref Stage, input, ref autocount);
+            //if (input.rB)
+            //{
+            //    if (input.AT)
+            //        ++autocount;
 
-                ++Stage;
+            //    ++Stage;
 
-                if (Stage > 5)
-                    Stage = 1;
+            //    if (Stage > 5)
+            //        Stage = 1;
 
-                input.rB = false;
-            }
+            //    input.rB = false;
+            //}
 
-            if (input.lB)
-            {
-                if (input.AT)
-                    ++autocount;
+            //if (input.lB)
+            //{
+            //    if (input.AT)
+            //        ++autocount;
 
-                --Stage;
+            //    --Stage;
 
-                if (Stage < 1)
-                    Stage = 5;
+            //    if (Stage < 1)
+            //        Stage = 5;
 
-                input.lB = false;
-            }
+            //    input.lB = false;
+            //}
 
-            if (input.barx >= 50 && input.barx < 700d / 5d * 1d)
-            {
-                Stage = 1;
-            }
-            else if (input.barx >= 700d / 5d * 1d && input.barx < 700d / 5d * 2d)
-            {
-                Stage = 2;
-            }
-            else if (input.barx >= 700d / 5d * 2d && input.barx < 700d / 5d * 3d)
-            {
-                Stage = 3;
-            }
-            else if (input.barx >= 700d / 5d * 3d && input.barx < 700d / 5d * 4d)
-            {
-                Stage = 4;
-            }
-            else if (input.barx >= 700d / 5d * 4d && input.barx < 700d)
-            {
-                Stage = 5;
-            }
+            //if (input.barx >= 50 && input.barx < 700d / 5d * 1d)
+            //{
+            //    Stage = 1;
+            //}
+            //else if (input.barx >= 700d / 5d * 1d && input.barx < 700d / 5d * 2d)
+            //{
+            //    Stage = 2;
+            //}
+            //else if (input.barx >= 700d / 5d * 2d && input.barx < 700d / 5d * 3d)
+            //{
+            //    Stage = 3;
+            //}
+            //else if (input.barx >= 700d / 5d * 3d && input.barx < 700d / 5d * 4d)
+            //{
+            //    Stage = 4;
+            //}
+            //else if (input.barx >= 700d / 5d * 4d && input.barx < 700d)
+            //{
+            //    Stage = 5;
+            //}
 
             if (input.AT)
             {

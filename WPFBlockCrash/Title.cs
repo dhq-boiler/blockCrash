@@ -16,23 +16,26 @@ namespace WPFBlockCrash
         public bool selectSoundFlag { get; private set; }
         public bool decisionSoundFlag { get; private set; }
         public int atcount { get; private set; }
-        private SoundPlayer sh;
-        private SoundPlayer dh;
+        //private SoundPlayer sh;
+        //private SoundPlayer dh;
 
         private DisplayInfo dInfo;
+        private IOperator Operator;
         
-        public Title(DisplayInfo dInfo)
+        public Title(DisplayInfo dInfo, IOperator Operator)
         {
-            titleGh = new Bitmap(Main.ResourceDirectory + "title.png");
             this.dInfo = dInfo;
+            this.Operator = Operator;
+
+            titleGh = new Bitmap(Main.ResourceDirectory + "title.png");
 
             selectSoundFlag = false;
             decisionSoundFlag = false;
             IsDead = false;
             atcount = 0;
 
-            sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
-            dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
+            //sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
+            //dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
         }
 
         public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
@@ -44,7 +47,7 @@ namespace WPFBlockCrash
             Draw(g);
 
             if (IsDead)
-                return new ProcessResult() { IsDead = IsDead, NextState = new BarSelect(dInfo) };
+                return new ProcessResult() { IsDead = IsDead, NextState = new BarSelect(dInfo, Operator) };
             else
                 return new ProcessResult() { IsDead = IsDead, NextState = this };
         }

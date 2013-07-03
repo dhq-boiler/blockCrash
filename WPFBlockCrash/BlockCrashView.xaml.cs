@@ -24,12 +24,20 @@ namespace WPFBlockCrash
     /// </summary>
     public partial class BlockCrashView : UserControl
     {
+        public enum EOperatingType
+        {
+            DESKTOP_KEYBOARD,
+            VIRTOS_SLIDER
+        }
+
         private Main main;
         public Input input;
         private DispatcherTimer timerToRun;
         private WriteableBitmap bitmap;
         private const int DisplayWidth = 800;
         private const int DisplayHeight = 600;
+
+        public bool IsInitialized { get; set; }
 
         public BlockCrashView()
         {
@@ -38,7 +46,12 @@ namespace WPFBlockCrash
             bitmap = new WriteableBitmap(DisplayWidth, DisplayHeight, 92, 92, PixelFormats.Bgr24, null);
 
             input = new Input();
-            main = new Main(new DisplayInfo() { Width = DisplayWidth, Height = DisplayHeight });
+        }
+
+        public void Initialize(EOperatingType OperatingType)
+        {
+            main = new Main(new DisplayInfo() { Width = DisplayWidth, Height = DisplayHeight }, OperatingType);
+            IsInitialized = true;
         }
 
         private WriteableBitmap RenderBitmap(Action<Graphics> Run_Main_ProcessLoop)
@@ -72,6 +85,9 @@ namespace WPFBlockCrash
 
         public void RunGame()
         {
+            if (!IsInitialized)
+                throw new InvalidOperationException("Not Initialize yet.");
+
             timerToRun = new DispatcherTimer();
             timerToRun.Tick += timerToRun_Tick;
             timerToRun.Interval = TimeSpan.FromMilliseconds(1000d / 60);

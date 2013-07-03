@@ -21,18 +21,20 @@ namespace WPFBlockCrash
         public bool selectSoundFlag { get; private set; }
         public bool decisionSoundFlag { get; private set; }
         public bool end { get; private set; }
-        public bool scroll { get; private set; }
+        private bool scroll;
         private int scrollspeed { get; set; }
-        private int scorey { get; set; }
+        private int scorey;
         private int index { get; set; } // 新しい記録の場所を示すインデックス
         private SoundPlayer sh;
         private SoundPlayer dh;
 
+        private IOperator Operator;
         private readonly Font font = new Font("Consolas", 20);
 
-        public Ranking(int score, EBarType barnum, DisplayInfo dInfo)
+        public Ranking(int score, EBarType barnum, DisplayInfo dInfo, IOperator Operator)
         {
             this.dInfo = dInfo;
+            this.Operator = Operator;
 
             try
             {
@@ -181,43 +183,46 @@ namespace WPFBlockCrash
             Draw(g);
 
             if (IsDead)
-                return new ProcessResult() { IsDead = IsDead, NextState = new Title(dInfo) };
+                return new ProcessResult() { IsDead = IsDead, NextState = new Title(dInfo, Operator) };
             else
                 return new ProcessResult() { IsDead = IsDead, NextState = this };
         }
 
         private void KeyGet(Input input)
         {
-           
-                if (input.eB)
+            if (input.eB)
+            {
+                if (end || !scroll)
                 {
-                    if (end || !scroll)
-                    {
-                        IsDead = true;
-                    }
-                    else
-                        scrollspeed = 2;
+                    IsDead = true;
                 }
                 else
-                    scrollspeed = 1;
-                if (!input.AT)
-                {
-                if (input.lB)
-                {
-                    if (scorey > 0)
-                    {
-                        scorey -= 20;
-                        scroll = false;
-                    }
-                }
-                if (input.rB)
-                {
-                    if (scorey < 900)
-                    {
-                        scorey += 20;
-                        scroll = false;
-                    }
-                }
+                    scrollspeed = 2;
+            }
+            else
+                scrollspeed = 1;
+
+            if (!input.AT)
+            {
+                Operator.ScrollRanking(input, ref scorey, ref scroll);
+
+                //if (input.lB)
+                //{
+                //    if (scorey > 0)
+                //    {
+                //        scorey -= 20;
+                //        scroll = false;
+                //    }
+                //}
+
+                //if (input.rB)
+                //{
+                //    if (scorey < 900)
+                //    {
+                //        scorey += 20;
+                //        scroll = false;
+                //    }
+                //}
             }
         }
 

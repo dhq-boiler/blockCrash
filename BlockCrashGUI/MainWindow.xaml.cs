@@ -24,8 +24,35 @@ namespace BlockCrashGUI
         {
             InitializeComponent();
 
-            view.IsAuto = true;
+            try
+            {
+                string[] args = Environment.CommandLine.Split(' ');
+                WPFBlockCrash.BlockCrashView.EOperatingType selectOperationMode = (WPFBlockCrash.BlockCrashView.EOperatingType)int.Parse(args[0]);
+                view.Initialize(selectOperationMode);
+            }
+            catch (NullReferenceException)
+            {
+                SetKeyboardMode();
+            }
+            catch (ArgumentNullException)
+            {
+                SetKeyboardMode();
+            }
+            catch (FormatException)
+            {
+                SetKeyboardMode();
+            }
+            catch (InvalidCastException)
+            {
+                SetKeyboardMode();
+            }
+
             view.RunGame();
+        }
+
+        private void SetKeyboardMode()
+        {
+            view.Initialize(WPFBlockCrash.BlockCrashView.EOperatingType.DESKTOP_KEYBOARD);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

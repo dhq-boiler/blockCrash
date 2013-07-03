@@ -36,6 +36,7 @@ namespace WPFBlockCrash
 
         //private int act;
         //private int stock;
+        private WPFBlockCrash.BlockCrashView.EOperatingType OperatingType;
         private int AutoModeControl;
         private DisplayInfo dInfo;
         private UserChoice userChoice;
@@ -43,11 +44,20 @@ namespace WPFBlockCrash
         public static readonly string ResourceDirectory = Directory.GetCurrentDirectory() + "\\res\\";
         public static readonly Random rand = new Random(Environment.TickCount);
         
-        public Main(DisplayInfo dInfo)
+        public Main(DisplayInfo dInfo, WPFBlockCrash.BlockCrashView.EOperatingType OperatingType)
         {
             this.dInfo = dInfo;
+            this.OperatingType = OperatingType;
 
-            CurrentState = new Title(dInfo);
+            switch (OperatingType)
+            {
+                case BlockCrashView.EOperatingType.DESKTOP_KEYBOARD:
+                    CurrentState = new Title(dInfo, new DesktopKeyboard());
+                    break;
+                case BlockCrashView.EOperatingType.VIRTOS_SLIDER:
+                    CurrentState = new Title(dInfo, new VIRTOSSlider());
+                    break;
+            }
             userChoice = new UserChoice();
             takeOver = new TakeOver()
             {
@@ -89,135 +99,22 @@ namespace WPFBlockCrash
             ProcessResult r = CurrentState.Process(input, g, userChoice, takeOver);
             CurrentState = r.NextState;
 
-            //switch (ActType)
-            //{
-            //    case EActType.TITLE:
-            //        {
-            //            if (title.Process(input, g))
-            //                ActType = EActType.BAR_SELECT;
-            //        }
-            //        break;
-            //    case EActType.BAR_SELECT:
-            //        {
-            //            if (barSelect.Process(input, g))
-            //            {
-            //                stageSelect.SetValue(barSelect.mBar, 0, 0, 2);
-            //                ActType = EActType.STAGE_SELECT;
-            //            }
-            //        }
-            //        break;
-            //    case EActType.STAGE_SELECT:
-            //        {
-            //            if (stageSelect.Process(input, g))
-            //            {
-            //                ActType = EActType.CONTROL;
-            //                stock = stageSelect.Stock;
-            //                control = new Control(stageSelect.Bar, stageSelect.Stage, stageSelect.Score, stock, dInfo, input);
-            //            }
-            //        }
-            //        break;
-            //    case EActType.CONTROL:
-            //        {
-            //            if (control.Process(input, g))
-            //            {
-            //                stock = control.Stock;
-            //                if (stock > 1)
-            //                {
-            //                    if (act == 0)
-            //                    {
-            //                        message = new Message(EMessageType.FAILED, 50, dInfo);
-            //                        ++act;
-            //                    }
-
-            //                    if (message.Process(input, g))
-            //                    {
-            //                        control.Reset(); // 残機を減らしゲームを続行
-            //                        --stock;
-            //                        act = 0;
-            //                        message = null;
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    if (act == 0)
-            //                    {
-            //                        message = new Message(EMessageType.GAMEOVER, 120, dInfo);
-            //                        ++act;
-            //                    }
-
-            //                    if (message.Process(input, g))
-            //                    {
-            //                        ActType = EActType.RANKING;
-            //                        ranking = new Ranking(control.Score,control.Bar, dInfo);
-            //                    }
-            //                }
-            //            }
-            //            else if (control.clear)
-            //            {
-            //                if (act == 0)
-            //                {
-            //                    message = new Message(EMessageType.CLEAR, 200, dInfo);
-            //                    ++act;
-            //                }
-
-            //                if (message.Process(input, g))
-            //                {
-            //                    ActType = EActType.RANKING;
-            //                    ranking = new Ranking(control.Score, control.Bar, dInfo);
-            //                }
-            //            }
-            //        }
-            //        break;
-            //    case EActType.RANKING: {
-            //        if(ranking.Process(input, g))
-            //        {
-            //            ActType = EActType.TITLE;
-            //            title.IsDead = false;
-            //            barSelect.IsDead = false;
-            //            act = 0;
-            //            stageSelect.Reset();
-            //            stageSelect.IsDead = false;
-            //            message = null;
-            //            control = null;
-            //            ranking = null;
-            //        }
-            //    }
-            //        break;
-            //}
             input.ClearSmaller();
         }
 
         private void Restart(Input input)
         {
             input.Clear();
-            //title = null;
-            //barSelect = null;
-            //stageSelect = null;
 
-            //title = new Title(dInfo);
-            //barSelect = new BarSelect();
-            //stageSelect = new StageSelect();
-
-            //act = 0;
-            //stock = 0;
-
-            //switch (ActType)
-            //{
-            //    case EActType.TITLE:
-            //        break;
-            //    case EActType.BAR_SELECT:
-            //        barSelect.IsDead = false;
-            //        break;
-            //    case EActType.STAGE_SELECT:
-            //        barSelect.IsDead = false;
-            //        stageSelect.IsDead = false;
-            //        control = null;
-            //        break;
-            //}
-
-            //ActType = EActType.TITLE;
-
-            CurrentState = new Title(dInfo);
+            switch (OperatingType)
+            {
+                case BlockCrashView.EOperatingType.DESKTOP_KEYBOARD:
+                    CurrentState = new Title(dInfo, new DesktopKeyboard());
+                    break;
+                case BlockCrashView.EOperatingType.VIRTOS_SLIDER:
+                    CurrentState = new Title(dInfo, new VIRTOSSlider());
+                    break;
+            }
         }
 
         public void ATMode(Input input)

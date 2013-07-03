@@ -18,11 +18,12 @@ namespace WPFBlockCrash
 
     class Bar : IInputable
     {
-        public int SPEED = (int)(8 * Main.RunningSpeedFactor);
+        public readonly int SPEED = (int)(8 * Main.RunningSpeedFactor);
 
         private int EnlargementFactor;
         private Image[] gh;
         private DisplayInfo dInfo;
+        private IOperator Operator;
         private EBarType mBar;
         private EBarType moldBar; //for swap
         private int AcceleratingCount;
@@ -34,14 +35,17 @@ namespace WPFBlockCrash
         public bool IsDead { get; set; }
         public bool IsMove { get; set; } // 動いたかどうか
 
+
         /// <summary>
         /// 加速 -なら左，+なら右
         /// </summary>
         public int Accel { get; set; }
 
-        public Bar(EBarType BarType, DisplayInfo dInfo)
+        public Bar(EBarType BarType, DisplayInfo dInfo, IOperator Operator)
         {
             this.dInfo = dInfo;
+            this.Operator = Operator;
+
             mBar = moldBar = BarType;
             gh = new Image[4];
             gh[0] = new Bitmap(Main.ResourceDirectory + "bar.bmp");
@@ -102,49 +106,49 @@ namespace WPFBlockCrash
 
         private bool KeyGet(Input input)
         {
-            bool IsPushedAnyKey = false;
+            bool IsPushedAnyKey = Operator.MoveBar(this, ref AcceleratingCount, input);
 
-            if (!input.AT && input.barx != 0) 
+            if (!input.AT && input.barx != 0)
             {
                 IsMove = true;
                 X = input.barx;
                 IsPushedAnyKey = true;
             }
 
-            if (input.key256[Input.KEY_INPUT_LEFT] == 1)
-            {
-                IsMove = true;
-                X -= SPEED;
-                ++AcceleratingCount;
+            //if (input.key256[Input.KEY_INPUT_LEFT] == 1)
+            //{
+            //    IsMove = true;
+            //    X -= SPEED;
+            //    ++AcceleratingCount;
 
-                if (AcceleratingCount < 25)
-                    Accel = -1;
-                else if (AcceleratingCount < 50)
-                    Accel = -2;
-                else
-                    Accel = -3;
+            //    if (AcceleratingCount < 25)
+            //        Accel = -1;
+            //    else if (AcceleratingCount < 50)
+            //        Accel = -2;
+            //    else
+            //        Accel = -3;
 
-                IsPushedAnyKey = true;
-            }
-            else if (input.key256[Input.KEY_INPUT_RIGHT] == 1)
-            {
-                IsMove = true;
-                X += SPEED;
-                ++AcceleratingCount;
+            //    IsPushedAnyKey = true;
+            //}
+            //else if (input.key256[Input.KEY_INPUT_RIGHT] == 1)
+            //{
+            //    IsMove = true;
+            //    X += SPEED;
+            //    ++AcceleratingCount;
 
-                if (AcceleratingCount < 25)
-                    Accel = 1;
-                else if (AcceleratingCount < 50)
-                    Accel = 2;
-                else
-                    Accel = 3;
+            //    if (AcceleratingCount < 25)
+            //        Accel = 1;
+            //    else if (AcceleratingCount < 50)
+            //        Accel = 2;
+            //    else
+            //        Accel = 3;
                 
-                IsPushedAnyKey = true;
-            }
-            else if (input.key256[Input.KEY_INPUT_ESCAPE] == 1)
-            {
-                IsDead = true;
-            }
+            //    IsPushedAnyKey = true;
+            //}
+            //else if (input.key256[Input.KEY_INPUT_ESCAPE] == 1)
+            //{
+            //    IsDead = true;
+            //}
 
             if (X < Width * EnlargementFactor / 4)
                 X = Width * EnlargementFactor / 4;
@@ -153,6 +157,7 @@ namespace WPFBlockCrash
                 X = dInfo.Width - Width * EnlargementFactor / 4;
 
             MX = X;
+
             return IsPushedAnyKey;
         }
 

@@ -12,19 +12,21 @@ namespace WPFBlockCrash
     {
         private Image[] barGh;
         private Image bSelectGh;
-        private SoundPlayer sh;
-        private SoundPlayer dh;
+        //private SoundPlayer sh;
+        //private SoundPlayer dh;
         private int autoCount;
-        public int Bar { get; set; }
+        public int Bar;
         public bool IsDead { get; set; }
 
+        private IOperator Operator;
         private DisplayInfo dInfo;
 
         private readonly Font font = new Font("Consolas", 16);
 
-        public BarSelect(DisplayInfo dInfo)
+        public BarSelect(DisplayInfo dInfo, IOperator Operator)
         {
             this.dInfo = dInfo;
+            this.Operator = Operator;
             barGh = new Image[3];
 
             Bar = 1;
@@ -33,8 +35,8 @@ namespace WPFBlockCrash
             barGh[1] = new Bitmap(Main.ResourceDirectory + "barsecond.bmp");
             barGh[2] = new Bitmap(Main.ResourceDirectory + "barthird.bmp");
             bSelectGh = new Bitmap(Main.ResourceDirectory + "barselect.png");
-            sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
-            dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
+            //sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
+            //dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
 
             IsDead = false;
             autoCount = 0;
@@ -54,7 +56,7 @@ namespace WPFBlockCrash
                 return new ProcessResult()
                 {
                     IsDead = IsDead,
-                    NextState = new StageSelect(dInfo),
+                    NextState = new StageSelect(dInfo, Operator),
                     UserChoice = uc,
                     TakeOver = takeOver
                 };
@@ -69,46 +71,48 @@ namespace WPFBlockCrash
 
         private void KeyGet(Input input)
         {
-            if (input.rB)
-            {
-                if (input.AT)
-                    ++autoCount;
+            Operator.SelectBar(ref Bar, input, ref autoCount);
 
-                ++Bar;
+            //if (input.rB)
+            //{
+            //    if (input.AT)
+            //        ++autoCount;
 
-                if (Bar > 3)
-                    Bar = 1;
+            //    ++Bar;
 
-                input.rB = false;
-            }
+            //    if (Bar > 3)
+            //        Bar = 1;
 
-            if (input.lB)
-            {
-                if (input.AT)
-                    ++autoCount;
+            //    input.rB = false;
+            //}
 
-                --Bar;
+            //if (input.lB)
+            //{
+            //    if (input.AT)
+            //        ++autoCount;
 
-                if (Bar < 1)
-                    Bar = 3;
+            //    --Bar;
 
-                input.lB = false;
-            }
+            //    if (Bar < 1)
+            //        Bar = 3;
+
+            //    input.lB = false;
+            //}
 
 
-            //タッチスクロールバー用選択
-            if (input.barx < 700d / 3d * 1d && input.barx >= 50)
-            {
-                Bar = 1;
-            }
-            else if (input.barx >= 700d / 3d * 1d && input.barx < 700d / 3d * 2d)
-            {
-                Bar = 2;
-            }
-            else if (input.barx >= 700d / 3d * 2d && input.barx < 700d)
-            {
-                Bar = 3;
-            }
+            ////タッチスクロールバー用選択
+            //if (input.barx < 700d / 3d * 1d && input.barx >= 50)
+            //{
+            //    Bar = 1;
+            //}
+            //else if (input.barx >= 700d / 3d * 1d && input.barx < 700d / 3d * 2d)
+            //{
+            //    Bar = 2;
+            //}
+            //else if (input.barx >= 700d / 3d * 2d && input.barx < 700d)
+            //{
+            //    Bar = 3;
+            //}
 
             if (input.AT)
             {

@@ -54,14 +54,17 @@
     <Compile Include="BarSelect.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="Control.cs" />
+    <Compile Include="DesktopKeyboard.cs" />
     <Compile Include="DisplayInfo.cs" />
     <Compile Include="DrawUtil.cs" />
     <Compile Include="IInputable.cs" />
+    <Compile Include="IOperator.cs" />
     <Compile Include="KeyInput.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Ranking.cs" />
     <Compile Include="StageSelect.cs" />
     <Compile Include="Title.cs" />
+    <Compile Include="TouchScrollBar.cs" />
     <Page Include="BlockCrashView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
