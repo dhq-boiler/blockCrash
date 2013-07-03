@@ -15,18 +15,16 @@ namespace WPFBlockCrash
         private DisplayInfo dInfo;
         private Image[] gh;
         private Image newgh;
-        public SaveGameData[] saved = new SaveGameData[20];
         private Image rankGh;
-        public bool IsDead { get; set; }
-        public bool selectSoundFlag { get; private set; }
-        public bool decisionSoundFlag { get; private set; }
-        public bool end { get; private set; }
         private bool scroll;
         private int scrollspeed { get; set; }
         private int scorey;
         private int index { get; set; } // 新しい記録の場所を示すインデックス
-        private SoundPlayer sh;
-        private SoundPlayer dh;
+        public SaveGameData[] saved = new SaveGameData[20];
+        public bool IsDead { get; set; }
+        public bool selectSoundFlag { get; private set; }
+        public bool decisionSoundFlag { get; private set; }
+        public bool end { get; private set; }
 
         private IOperator Operator;
         private readonly Font font = new Font("Consolas", 20);
@@ -59,9 +57,6 @@ namespace WPFBlockCrash
             index = -1; // 配列の一番最初は添え字が0なため
 
             Save(score, barnum);
-
-            sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
-            dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
         }
 
         // セーブデータ作成
@@ -140,31 +135,6 @@ namespace WPFBlockCrash
                 var DescendingOrder = saveGames.OrderByDescending(a => a.Score).Take(20);
                 index = new List<SaveGameData>(DescendingOrder).FindIndex(a => Object.ReferenceEquals(newsave, a));
                 saved = DescendingOrder.ToArray();
-
-                //for (int i = 0; i < 20; ++i)// index0から検索して,xScoreより小さいところまで来たらその番号を保存
-                //{ 
-                //    if (saved[i].Score < xscore) 
-                //    {
-                //        for (int j = i; j < 20; ++j)
-                //        {
-                //            if (j == i)// 番号のところに今回の記録を記入
-                //            { 
-                //                index = j;
-                //                oldscore = saved[j];
-                //                saved[j] = newsave;
-                //            }
-                //            else // それ以降のindexは一つずつずらす
-                //            { 
-                //                newsave = oldscore;
-                //                oldscore = saved[j];
-                //                saved[j] = newsave;
-                //            }
-                //        }
-                //        break; // 代入したら終了
-                //    }            
-                //}
-                //XMLファイルに保存する
-                //serializer.Serialize(fs1, saved);
                 serializer.Serialize(fs1, saved);
             }
             finally
@@ -183,7 +153,7 @@ namespace WPFBlockCrash
             Draw(g);
 
             if (IsDead)
-                return new ProcessResult() { IsDead = IsDead, NextState = new Title(dInfo, Operator) };
+                return new ProcessResult() { IsDead = IsDead, NextState = new Title(Main.MainInstance, dInfo, Operator) };
             else
                 return new ProcessResult() { IsDead = IsDead, NextState = this };
         }
@@ -205,24 +175,6 @@ namespace WPFBlockCrash
             if (!input.AT)
             {
                 Operator.ScrollRanking(input, ref scorey, ref scroll);
-
-                //if (input.lB)
-                //{
-                //    if (scorey > 0)
-                //    {
-                //        scorey -= 20;
-                //        scroll = false;
-                //    }
-                //}
-
-                //if (input.rB)
-                //{
-                //    if (scorey < 900)
-                //    {
-                //        scorey += 20;
-                //        scroll = false;
-                //    }
-                //}
             }
         }
 

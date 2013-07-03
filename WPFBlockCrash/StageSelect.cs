@@ -17,8 +17,6 @@ namespace WPFBlockCrash
         private Image sselectgh;
         private Image cleargh;
         private bool[] clear;
-        private SoundPlayer sh;
-        private SoundPlayer dh;
         private int autocount;
         private DisplayInfo dInfo;
         private IOperator Operator;
@@ -69,9 +67,6 @@ namespace WPFBlockCrash
             cleargh = new Bitmap(Main.ResourceDirectory + "clearstar.png");
             
             IsDead = false;
-
-            sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
-            dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
 
             for (int i = 0; i < 6; ++i)
             {
@@ -160,63 +155,7 @@ namespace WPFBlockCrash
         private void KeyGet(Input input)
         {
             Operator.SelectStage(this, ref Stage, input, ref autocount);
-            //if (input.rB)
-            //{
-            //    if (input.AT)
-            //        ++autocount;
-
-            //    ++Stage;
-
-            //    if (Stage > 5)
-            //        Stage = 1;
-
-            //    input.rB = false;
-            //}
-
-            //if (input.lB)
-            //{
-            //    if (input.AT)
-            //        ++autocount;
-
-            //    --Stage;
-
-            //    if (Stage < 1)
-            //        Stage = 5;
-
-            //    input.lB = false;
-            //}
-
-            //if (input.barx >= 50 && input.barx < 700d / 5d * 1d)
-            //{
-            //    Stage = 1;
-            //}
-            //else if (input.barx >= 700d / 5d * 1d && input.barx < 700d / 5d * 2d)
-            //{
-            //    Stage = 2;
-            //}
-            //else if (input.barx >= 700d / 5d * 2d && input.barx < 700d / 5d * 3d)
-            //{
-            //    Stage = 3;
-            //}
-            //else if (input.barx >= 700d / 5d * 3d && input.barx < 700d / 5d * 4d)
-            //{
-            //    Stage = 4;
-            //}
-            //else if (input.barx >= 700d / 5d * 4d && input.barx < 700d)
-            //{
-            //    Stage = 5;
-            //}
-
-            //if (input.AT)
-            //{
-            //    if (input.eB && autocount > 10)
-            //    {
-            //        IsDead = true;
-            //        input.eB = false;
-            //        autocount = 0;
-            //    }
-            //}
-            //else 
+            
             if (!input.AT && input.eB)
             {
                 IsDead = true;

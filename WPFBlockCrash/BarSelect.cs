@@ -12,8 +12,6 @@ namespace WPFBlockCrash
     {
         private Image[] barGh;
         private Image bSelectGh;
-        //private SoundPlayer sh;
-        //private SoundPlayer dh;
         private int autoCount;
         public bool IsDead { get; set; }
 
@@ -35,8 +33,6 @@ namespace WPFBlockCrash
             barGh[1] = new Bitmap(Main.ResourceDirectory + "barsecond.bmp");
             barGh[2] = new Bitmap(Main.ResourceDirectory + "barthird.bmp");
             bSelectGh = new Bitmap(Main.ResourceDirectory + "barselect.png");
-            //sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
-            //dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
 
             IsDead = false;
             autoCount = 0;
@@ -73,57 +69,6 @@ namespace WPFBlockCrash
         {
             Operator.SelectBar(this, ref Bar, input, ref autoCount);
 
-            //if (input.rB)
-            //{
-            //    if (input.AT)
-            //        ++autoCount;
-
-            //    ++Bar;
-
-            //    if (Bar > 3)
-            //        Bar = 1;
-
-            //    input.rB = false;
-            //}
-
-            //if (input.lB)
-            //{
-            //    if (input.AT)
-            //        ++autoCount;
-
-            //    --Bar;
-
-            //    if (Bar < 1)
-            //        Bar = 3;
-
-            //    input.lB = false;
-            //}
-
-
-            ////タッチスクロールバー用選択
-            //if (input.barx < 700d / 3d * 1d && input.barx >= 50)
-            //{
-            //    Bar = 1;
-            //}
-            //else if (input.barx >= 700d / 3d * 1d && input.barx < 700d / 3d * 2d)
-            //{
-            //    Bar = 2;
-            //}
-            //else if (input.barx >= 700d / 3d * 2d && input.barx < 700d)
-            //{
-            //    Bar = 3;
-            //}
-
-            //if (input.AT)
-            //{
-            //    //if (input.eB && autoCount > 10)
-            //    //{
-            //    //    IsDead = true;
-            //    //    input.eB = false;
-            //    //    autoCount = 0;
-            //    //}
-            //}
-            //else 
             if (!input.AT && input.eB)
             {
                 IsDead = true;

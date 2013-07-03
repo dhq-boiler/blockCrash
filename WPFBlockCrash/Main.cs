@@ -21,43 +21,25 @@ namespace WPFBlockCrash
         }
 
         public static readonly double RunningSpeedFactor = 1.5;
-
-        //private StageSelect stageSelect;
-        //private Control control;
-        //private Message message;
-        //private BarSelect barSelect;
-        //private Title title;
-        //private Ranking ranking;
+        public static readonly string ResourceDirectory = Directory.GetCurrentDirectory() + "\\res\\";
+        public static readonly Random rand = new Random(Environment.TickCount);
+        public static Main MainInstance = null;
 
         private IInputable CurrentState;
-        //private UserChoice userChoise;
-
-        //private EActType ActType;
-
-        //private int act;
-        //private int stock;
         private WPFBlockCrash.BlockCrashView.EOperatingType OperatingType;
         private int AutoModeControl;
         private DisplayInfo dInfo;
         private UserChoice userChoice;
         private TakeOver takeOver;
-        public static readonly string ResourceDirectory = Directory.GetCurrentDirectory() + "\\res\\";
-        public static readonly Random rand = new Random(Environment.TickCount);
+        private WPFBlockCrash.BlockCrashView.EOperatingType OldOperatingType;
         
         public Main(DisplayInfo dInfo, WPFBlockCrash.BlockCrashView.EOperatingType OperatingType)
         {
+            MainInstance = this;
             this.dInfo = dInfo;
             this.OperatingType = OperatingType;
 
-            switch (OperatingType)
-            {
-                case BlockCrashView.EOperatingType.DESKTOP_KEYBOARD:
-                    CurrentState = new Title(dInfo, new DesktopKeyboard());
-                    break;
-                case BlockCrashView.EOperatingType.VIRTOS_SLIDER:
-                    CurrentState = new Title(dInfo, new VIRTOSSlider());
-                    break;
-            }
+            Reconstruct(dInfo, OperatingType);
             userChoice = new UserChoice();
             takeOver = new TakeOver()
             {
@@ -65,13 +47,23 @@ namespace WPFBlockCrash
                 Score = 0,
                 Stock = 2
             };
-            //title = new Title();
-            //barSelect = new BarSelect();
-            //stageSelect = new StageSelect();
-            //ActType = EActType.TITLE;
-            //act = 0;
-            //stock = 0;
             AutoModeControl = 0;
+        }
+
+        private void Reconstruct(DisplayInfo dInfo, WPFBlockCrash.BlockCrashView.EOperatingType OperatingType)
+        {
+            switch (OperatingType)
+            {
+                case BlockCrashView.EOperatingType.DESKTOP_KEYBOARD:
+                    CurrentState = new Title(this, dInfo, new DesktopKeyboard());
+                    break;
+                case BlockCrashView.EOperatingType.VIRTOS_SLIDER:
+                    CurrentState = new Title(this, dInfo, new VIRTOSSlider());
+                    break;
+                case BlockCrashView.EOperatingType.AUTO:
+                    CurrentState = new Title(this, dInfo, new AutomaticOperator());
+                    break;
+            }
         }
 
         public void ProcessLoop(Input input, Graphics g)
@@ -92,6 +84,7 @@ namespace WPFBlockCrash
                 if (input.barx == 50 || (input.eB && input.lB && input.rB))
                 {
                     input.AT = false;
+                    SwapOperatingMode();
                     Restart(input);
                 }
             }
@@ -106,15 +99,7 @@ namespace WPFBlockCrash
         {
             input.Clear();
 
-            switch (OperatingType)
-            {
-                case BlockCrashView.EOperatingType.DESKTOP_KEYBOARD:
-                    CurrentState = new Title(dInfo, new DesktopKeyboard());
-                    break;
-                case BlockCrashView.EOperatingType.VIRTOS_SLIDER:
-                    CurrentState = new Title(dInfo, new VIRTOSSlider());
-                    break;
-            }
+            Reconstruct(dInfo, OperatingType);
         }
 
         public void ATMode(Input input)
@@ -139,6 +124,13 @@ namespace WPFBlockCrash
                         input.eB = true;
                 }
             }
+        }
+
+        internal void SwapOperatingMode()
+        {
+            WPFBlockCrash.BlockCrashView.EOperatingType temp = OperatingType;
+            OperatingType = OldOperatingType;
+            OldOperatingType = temp;
         }
     }
 }

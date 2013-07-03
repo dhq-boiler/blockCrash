@@ -16,14 +16,14 @@ namespace WPFBlockCrash
         public bool selectSoundFlag { get; private set; }
         public bool decisionSoundFlag { get; private set; }
         public int atcount { get; private set; }
-        //private SoundPlayer sh;
-        //private SoundPlayer dh;
 
+        private Main main;
         private DisplayInfo dInfo;
         private IOperator Operator;
         
-        public Title(DisplayInfo dInfo, IOperator Operator)
+        public Title(Main main, DisplayInfo dInfo, IOperator Operator)
         {
+            this.main = main;
             this.dInfo = dInfo;
             this.Operator = Operator;
 
@@ -33,9 +33,6 @@ namespace WPFBlockCrash
             decisionSoundFlag = false;
             IsDead = false;
             atcount = 0;
-
-            //sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
-            //dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
         }
 
         public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
@@ -69,6 +66,7 @@ namespace WPFBlockCrash
                 if (atcount > 100)
                 {
                     input.AT = true;
+                    main.SwapOperatingMode();
                 }
             }
         }

@@ -90,64 +90,13 @@ namespace WPFBlockCrash
 
         private void Draw(Graphics g)
         {
-            //if (mBar == 2){ // 2ならバーは小さくする
-            //    DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 8, Y - Height / 2,
-            //    X + Width * EnlargementFactor / 8, Y + Height / 2, gh[mBar]);
-            //}
-            //else
-            //{
-                //DrawUtil.DrawExtendGraph(dc, X - Width * EnlargementFactor / 4, Y - Height / 2,
-                //X + Width * EnlargementFactor / 4, Y + Height / 2, gh[mBar]);
             g.DrawImage(gh[(int)mBar - 1], X - Width * EnlargementFactor / 4, Y - Height / 2,
                 Width * EnlargementFactor / 2, Height);
-            //}
         }
 
         private bool KeyGet(Input input)
         {
             bool IsPushedAnyKey = Operator.MoveBar(this, ref AcceleratingCount, input);
-
-            //if (!input.AT && input.barx != 0)
-            //{
-            //    IsMove = true;
-            //    X = input.barx;
-            //    IsPushedAnyKey = true;
-            //}
-
-            //if (input.key256[Input.KEY_INPUT_LEFT] == 1)
-            //{
-            //    IsMove = true;
-            //    X -= SPEED;
-            //    ++AcceleratingCount;
-
-            //    if (AcceleratingCount < 25)
-            //        Accel = -1;
-            //    else if (AcceleratingCount < 50)
-            //        Accel = -2;
-            //    else
-            //        Accel = -3;
-
-            //    IsPushedAnyKey = true;
-            //}
-            //else if (input.key256[Input.KEY_INPUT_RIGHT] == 1)
-            //{
-            //    IsMove = true;
-            //    X += SPEED;
-            //    ++AcceleratingCount;
-
-            //    if (AcceleratingCount < 25)
-            //        Accel = 1;
-            //    else if (AcceleratingCount < 50)
-            //        Accel = 2;
-            //    else
-            //        Accel = 3;
-                
-            //    IsPushedAnyKey = true;
-            //}
-            //else if (input.key256[Input.KEY_INPUT_ESCAPE] == 1)
-            //{
-            //    IsDead = true;
-            //}
 
             if (X < Width * EnlargementFactor / 4)
                 X = Width * EnlargementFactor / 4;

@@ -35,7 +35,6 @@ namespace WPFBlockCrash
         private bool half;
         private int count;
 
-        //public int BlockNumber { get; private set; }
         public int ImageHandle { get; set; }
 
         // スクロールブロック用変数,0=スクロールなし,1=右スクロール,-1=左スクロール
