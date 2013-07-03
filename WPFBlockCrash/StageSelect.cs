@@ -8,16 +8,6 @@ using System.Threading.Tasks;
 
 namespace WPFBlockCrash
 {
-    enum EStageType
-    {
-        UNKNOWN,
-        ONAJIMISAN,
-        FOURTOWER,
-        CROSSCROSS,
-        LAWOFCYCLES,
-        PRODUCTORISUS
-    }
-
     class StageSelect : IInputable
     {
         private Image[] bargh;
@@ -30,18 +20,18 @@ namespace WPFBlockCrash
         private SoundPlayer sh;
         private SoundPlayer dh;
         private int autocount;
+        private DisplayInfo dInfo;
+        private IOperator Operator;
+        private int Stage;
 
         private readonly Font font = new Font("Consolas", 16);
 
         public int Score { get; set; }
         public int Stock { get; set; }
-        private int Stage;
         public int Bar { get; set; }
 
         public bool IsDead { get; set; }
 
-        private DisplayInfo dInfo;
-        private IOperator Operator;
 
         public StageSelect(DisplayInfo dInfo, IOperator Operator)
         {
@@ -169,7 +159,7 @@ namespace WPFBlockCrash
 
         private void KeyGet(Input input)
         {
-            Operator.SelectStage(ref Stage, input, ref autocount);
+            Operator.SelectStage(this, ref Stage, input, ref autocount);
             //if (input.rB)
             //{
             //    if (input.AT)
@@ -217,16 +207,17 @@ namespace WPFBlockCrash
             //    Stage = 5;
             //}
 
-            if (input.AT)
-            {
-                if (input.eB && autocount > 10)
-                {
-                    IsDead = true;
-                    input.eB = false;
-                    autocount = 0;
-                }
-            }
-            else if (input.eB)
+            //if (input.AT)
+            //{
+            //    if (input.eB && autocount > 10)
+            //    {
+            //        IsDead = true;
+            //        input.eB = false;
+            //        autocount = 0;
+            //    }
+            //}
+            //else 
+            if (!input.AT && input.eB)
             {
                 IsDead = true;
                 input.eB = false;

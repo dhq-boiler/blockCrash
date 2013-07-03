@@ -8,7 +8,7 @@ namespace WPFBlockCrash
 {
     class VIRTOSSlider : IOperator
     {
-        public void SelectBar(ref int BarType, Input input, ref int autoCount)
+        public void SelectBar(BarSelect barSelect, ref int BarType, Input input, ref int autoCount)
         {
             if (input.barx < 700d / 3d * 1d && input.barx >= 50)
             {
@@ -25,7 +25,7 @@ namespace WPFBlockCrash
         }
 
 
-        public void SelectStage(ref int Stage, Input input, ref int autoCount)
+        public void SelectStage(StageSelect stageSelect, ref int Stage, Input input, ref int autoCount)
         {
             if (input.barx >= 50 && input.barx < 700d / 5d * 1d)
             {
@@ -66,8 +66,6 @@ namespace WPFBlockCrash
 
 
         public void ScrollRanking(Input input, ref int scoreY, ref bool scroll)
-        {
-            throw new NotImplementedException();
-        }
+        { }
     }
 }

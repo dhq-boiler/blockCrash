@@ -75,7 +75,7 @@ namespace WPFBlockCrash
 			ball = new Ball(dInfo);
 			ballspup = 0;
 
-			block = new Block[MAX_BLOCKCOUNT];
+			//block = new Block[MAX_BLOCKCOUNT];
 			SmallBalls = new LinkedList<Ball>();
 			willBeAddedSmallBalls = new List<Ball>();
 
@@ -109,191 +109,201 @@ namespace WPFBlockCrash
 
 			// 残機表示の読み込み
 			gh = new Bitmap(Main.ResourceDirectory + "ball_b.png");
+
+			StageBuilder builder = StageBuilder.CreateStageBuilder(Stage);
+
+			builder.CreateStage(out block, ref sumblock, extendon);
 	
-			switch( Stage ){
-			case EStageType.ONAJIMISAN:
-				sumblock = 28;
-					//ブロックの間を5ピクセルあけて、横7列、縦4行で配置
-					for(int i=0;i<sumblock;++i){
-						if(i<7)
-							block[i] = new Block(80 + (5 + 100) * i, 50 * 1 + 10, extendon, EBlockColor.RED);
-						else if(i>6 && i<14)
-							block[i] = new Block(80 + (5 + 100) * (i - 7), 50 * 2 + 10, extendon, EBlockColor.BLUE);
-						else if(i>13 && i<21)
-							block[i] = new Block(80 + (5 + 100) * (i - 14), 50 * 3 + 10, extendon, EBlockColor.PURPLE);
-						else
-							block[i] = new Block(80 + (5 + 100) * (i - 21), 50 * 4 + 10, extendon, EBlockColor.CYAN);
-					}
-					break;
-			case EStageType.FOURTOWER:
-				sumblock = 48;
-					//ブロックの上下間を30ピクセルあけて、横4列、縦12行で配置
-					for(int i=0;i<sumblock;++i){
-						if(i<4)
-							block[i] = new Block(50 + (8 + 225) * i, 30 * 1 + 15, extendon, EBlockColor.RED);
-						else if(i>3 && i<8)
-							block[i] = new Block(50 + (8 + 225) * (i - 4), 30 * 2 + 15, extendon, EBlockColor.BLUE);
-						else if(i>7 && i<12)
-							block[i] = new Block(50 + (8 + 225) * (i - 8), 30 * 3 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>11 && i<16)
-							block[i] = new Block(50 + (8 + 225) * (i - 12), 30 * 4 + 15, extendon, EBlockColor.CYAN);
-						else if(i>15 && i<20)
-							block[i] = new Block(50 + (8 + 225) * (i - 16), 30 * 5 + 15, extendon, EBlockColor.RED);
-						else if(i>19 && i<24)
-							block[i] = new Block(50 + (8 + 225) * (i - 20), 30 * 6 + 15, extendon, EBlockColor.BLUE);
-						else if(i>23 && i<28)
-							block[i] = new Block(50 + (8 + 225) * (i - 24), 30 * 7 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>27 && i<32)
-							block[i] = new Block(50 + (8 + 225) * (i - 28), 30 * 8 + 15, extendon, EBlockColor.CYAN);
-						else if(i>31 && i<36)
-							block[i] = new Block(50 + (8 + 225) * (i - 32), 30 * 9 + 15, extendon, EBlockColor.RED);
-						else if(i>35 && i<40)
-							block[i] = new Block(50 + (8 + 225) * (i - 36), 30 * 10 + 15, extendon, EBlockColor.BLUE);
-						else if(i>39 && i<44)
-							block[i] = new Block(50 + (8 + 225) * (i - 40), 30 * 11 + 15, extendon, EBlockColor.PURPLE);
-						else
-							block[i] = new Block(50 + (8 + 225) * (i - 44), 30 * 12 + 15, extendon, EBlockColor.CYAN);
-					}
-					break;
-			case EStageType.CROSSCROSS:
-				sumblock = 48;
-					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
-					for(int i=0;i<sumblock;++i){
-						if(i<4)
-							block[i] = new Block(55 + (8 + 180) * i, 30 * 1 + 15, extendon, EBlockColor.RED);
-						else if(i>3 && i<8)
-							block[i] = new Block(145 + (8 + 180) * (i - 4), 30 * 2 + 15, extendon, EBlockColor.BLUE);
-						else if(i>7 && i<12)
-							block[i] = new Block(55 + (8 + 180) * (i - 8), 30 * 3 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>11 && i<16)
-							block[i] = new Block(145 + (8 + 180) * (i - 12), 30 * 4 + 15, extendon, EBlockColor.CYAN);
-						else if(i>15 && i<20)
-							block[i] = new Block(55 + (8 + 180) * (i - 16), 30 * 5 + 15, extendon, EBlockColor.RED);
-						else if(i>19 && i<24)
-							block[i] = new Block(145 + (8 + 180) * (i - 20), 30 * 6 + 15, extendon, EBlockColor.BLUE);
-						else if(i>23 && i<28)
-							block[i] = new Block(55 + (8 + 180) * (i - 24), 30 * 7 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>27 && i<32)
-							block[i] = new Block(145 + (8 + 180) * (i - 28), 30 * 8 + 15, extendon, EBlockColor.CYAN);
-						else if(i>31 && i<36)
-							block[i] = new Block(55 + (8 + 180) * (i - 32), 30 * 9 + 15, extendon, EBlockColor.RED);
-						else if(i>35 && i<40)
-							block[i] = new Block(145 + (8 + 180) * (i - 36), 30 * 10 + 15, extendon, EBlockColor.BLUE);
-						else if(i>39 && i<44)
-							block[i] = new Block(55 + (8 + 180) * (i - 40), 30 * 11 + 15, extendon, EBlockColor.PURPLE);
-						else
-							block[i] = new Block(145 + (8 + 180) * (i - 44), 30 * 12 + 15, extendon, EBlockColor.CYAN);
-						if (i % 2 == 0)
-							block[i].ScrollFlag = 1;
-						else
-							block[i].ScrollFlag = -1;
-					}
-					break;
-			case EStageType.LAWOFCYCLES:
-				sumblock = 44;
-					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
-					for(int i=0;i<sumblock;++i){
-						if(i<1)
-							block[i] = new Block(400, 28 * 1 + 15, extendon, EBlockColor.RED);
-						else if(i>0 && i<3)
-							block[i] = new Block(350 + 100 * (i - 1), 28 * 2 + 15, extendon, EBlockColor.BLUE);
-						else if(i>2 && i<5)
-							block[i] = new Block(300 + 200 * (i - 3), 28 * 3 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>4 && i<7)
-							block[i] = new Block(250 + 300 * (i - 5), 28 * 4 + 15, extendon, EBlockColor.CYAN);
-						else if(i>6 && i<9)
-							block[i] = new Block(200 + 400 * (i - 7), 28 * 5 + 15, extendon, EBlockColor.RED);
-						else if(i>8 && i<11)
-							block[i] = new Block(150 + 500 * (i - 9), 28 * 6 + 15, extendon, EBlockColor.BLUE);
-						else if(i>10 && i<13)
-							block[i] = new Block(100 + 600 * (i - 11), 28 * 7 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>12 && i<15)
-							block[i] = new Block(50 + 700 * (i - 13), 28 * 8 + 15, extendon, EBlockColor.CYAN);
-						else if(i>14 && i<17)
-							block[i] = new Block(100 + 600 * (i - 15), 28 * 9 + 15, extendon, EBlockColor.RED);
-						else if(i>16 && i<19)
-							block[i] = new Block(150 + 500 * (i - 17), 28 * 10 + 15, extendon, EBlockColor.BLUE);
-						else if(i>18 && i<21)
-							block[i] = new Block(200 + 400 * (i - 19), 28 * 11 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>20 && i<23)
-							block[i] = new Block(250 + 300 * (i - 21), 28 * 12 + 15, extendon, EBlockColor.CYAN);
-						else if(i>22 && i<25)
-							block[i] = new Block(300 + 200 * (i - 23), 28 * 13 + 15, extendon, EBlockColor.RED);
-						else if(i>24 && i<27)
-							block[i] = new Block(350 + 100 * (i - 25), 28 * 14 + 15, extendon, EBlockColor.BLUE);
-						else if(i>26 && i<28)
-							block[i] = new Block(400, 28 * 15 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>27 && i<29)
-							block[i] = new Block(400, 28 * 4 + 15, extendon, EBlockColor.CYAN);
-						else if(i>28 && i<31)
-							block[i] = new Block(350 + 100 * (i - 29), 28 * 5 + 15, extendon, EBlockColor.RED);
-						else if(i>30 && i<33)
-							block[i] = new Block(300 + 200 * (i - 31), 28 * 6 + 15, extendon, EBlockColor.BLUE);
-						else if(i>32 && i<35)
-							block[i] = new Block(250 + 300 * (i - 33), 28 * 7 + 15, extendon, EBlockColor.PURPLE);
-						else if(i>34 && i<37)
-							block[i] = new Block(200 + 400 * (i - 35), 28 * 8 + 15, extendon, EBlockColor.CYAN);
-						else if(i>36 && i<39)
-							block[i] = new Block(250 + 300 * (i - 37), 28 * 9 + 15, extendon, EBlockColor.RED);
-						else if(i>38 && i<41)
-							block[i] = new Block(300 + 200 * (i - 39), 28 * 10 + 15, extendon, EBlockColor.BLUE);
-						else if(i>40 && i<43)
-							block[i] = new Block(350 + 100 * (i - 41), 28 * 11 + 15, extendon, EBlockColor.PURPLE);
-						else
-							block[i] = new Block(400, 28 * 12 + 15, extendon, EBlockColor.CYAN);
-					}
-					break;
-				case EStageType.PRODUCTORISUS:
-					sumblock = 64;
-					//ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
-					for(int i=0;i<sumblock;++i){
-						if (i < 4)
-							block[i] = new Block(50 + 50 * i, 50, extendon, EBlockColor.RED);
-						else if (i > 3 && i < 16)
-							block[i] = new Block(125, 50 + 28 * (i - 3), extendon, EBlockColor.BLUE);
-						else if (i > 15 && i < 20)
-							block[i] = new Block(50 + 50 * (i - 16), 50 + 28 * 13, extendon, EBlockColor.PURPLE);
+			//switch( Stage )
+			//{
+			//case EStageType.ONAJIMISAN:
+			//    //sumblock = 28;
+			//    //    //ブロックの間を5ピクセルあけて、横7列、縦4行で配置
+			//    //    for(int i=0;i<sumblock;++i)
+			//    //    {
+			//    //        if(i<7)
+			//    //            block[i] = new Block(80 + (5 + 100) * i, 50 * 1 + 10, extendon, EBlockColor.RED);
+			//    //        else if(i>6 && i<14)
+			//    //            block[i] = new Block(80 + (5 + 100) * (i - 7), 50 * 2 + 10, extendon, EBlockColor.BLUE);
+			//    //        else if(i>13 && i<21)
+			//    //            block[i] = new Block(80 + (5 + 100) * (i - 14), 50 * 3 + 10, extendon, EBlockColor.PURPLE);
+			//    //        else
+			//    //            block[i] = new Block(80 + (5 + 100) * (i - 21), 50 * 4 + 10, extendon, EBlockColor.CYAN);
+			//    //    }
+			//        break;
+			//case EStageType.FOURTOWER:
+			//    //sumblock = 48;
+			//    //    //ブロックの上下間を30ピクセルあけて、横4列、縦12行で配置
+			//    //    for(int i=0;i<sumblock;++i)
+			//    //    {
+			//    //        if(i<4)
+			//    //            block[i] = new Block(50 + (8 + 225) * i, 30 * 1 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>3 && i<8)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 4), 30 * 2 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>7 && i<12)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 8), 30 * 3 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>11 && i<16)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 12), 30 * 4 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>15 && i<20)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 16), 30 * 5 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>19 && i<24)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 20), 30 * 6 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>23 && i<28)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 24), 30 * 7 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>27 && i<32)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 28), 30 * 8 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>31 && i<36)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 32), 30 * 9 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>35 && i<40)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 36), 30 * 10 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>39 && i<44)
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 40), 30 * 11 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else
+			//    //            block[i] = new Block(50 + (8 + 225) * (i - 44), 30 * 12 + 15, extendon, EBlockColor.CYAN);
+			//    //    }
+			//        break;
+			//case EStageType.CROSSCROSS:
+			//    //sumblock = 48;
+			//    //    //ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
+			//    //    for(int i=0;i<sumblock;++i)
+			//    //    {
+			//    //        if(i<4)
+			//    //            block[i] = new Block(55 + (8 + 180) * i, 30 * 1 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>3 && i<8)
+			//    //            block[i] = new Block(145 + (8 + 180) * (i - 4), 30 * 2 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>7 && i<12)
+			//    //            block[i] = new Block(55 + (8 + 180) * (i - 8), 30 * 3 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>11 && i<16)
+			//    //            block[i] = new Block(145 + (8 + 180) * (i - 12), 30 * 4 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>15 && i<20)
+			//    //            block[i] = new Block(55 + (8 + 180) * (i - 16), 30 * 5 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>19 && i<24)
+			//    //            block[i] = new Block(145 + (8 + 180) * (i - 20), 30 * 6 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>23 && i<28)
+			//    //            block[i] = new Block(55 + (8 + 180) * (i - 24), 30 * 7 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>27 && i<32)
+			//    //            block[i] = new Block(145 + (8 + 180) * (i - 28), 30 * 8 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>31 && i<36)
+			//    //            block[i] = new Block(55 + (8 + 180) * (i - 32), 30 * 9 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>35 && i<40)
+			//    //            block[i] = new Block(145 + (8 + 180) * (i - 36), 30 * 10 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>39 && i<44)
+			//    //            block[i] = new Block(55 + (8 + 180) * (i - 40), 30 * 11 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else
+			//    //            block[i] = new Block(145 + (8 + 180) * (i - 44), 30 * 12 + 15, extendon, EBlockColor.CYAN);
+			//    //        if (i % 2 == 0)
+			//    //            block[i].ScrollFlag = 1;
+			//    //        else
+			//    //            block[i].ScrollFlag = -1;
+			//    //    }
+			//        break;
+			//case EStageType.LAWOFCYCLES:
+			//    //sumblock = 44;
+			//    //    //ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
+			//    //    for(int i=0;i<sumblock;++i)
+			//    //    {
+			//    //        if(i<1)
+			//    //            block[i] = new Block(400, 28 * 1 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>0 && i<3)
+			//    //            block[i] = new Block(350 + 100 * (i - 1), 28 * 2 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>2 && i<5)
+			//    //            block[i] = new Block(300 + 200 * (i - 3), 28 * 3 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>4 && i<7)
+			//    //            block[i] = new Block(250 + 300 * (i - 5), 28 * 4 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>6 && i<9)
+			//    //            block[i] = new Block(200 + 400 * (i - 7), 28 * 5 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>8 && i<11)
+			//    //            block[i] = new Block(150 + 500 * (i - 9), 28 * 6 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>10 && i<13)
+			//    //            block[i] = new Block(100 + 600 * (i - 11), 28 * 7 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>12 && i<15)
+			//    //            block[i] = new Block(50 + 700 * (i - 13), 28 * 8 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>14 && i<17)
+			//    //            block[i] = new Block(100 + 600 * (i - 15), 28 * 9 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>16 && i<19)
+			//    //            block[i] = new Block(150 + 500 * (i - 17), 28 * 10 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>18 && i<21)
+			//    //            block[i] = new Block(200 + 400 * (i - 19), 28 * 11 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>20 && i<23)
+			//    //            block[i] = new Block(250 + 300 * (i - 21), 28 * 12 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>22 && i<25)
+			//    //            block[i] = new Block(300 + 200 * (i - 23), 28 * 13 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>24 && i<27)
+			//    //            block[i] = new Block(350 + 100 * (i - 25), 28 * 14 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>26 && i<28)
+			//    //            block[i] = new Block(400, 28 * 15 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>27 && i<29)
+			//    //            block[i] = new Block(400, 28 * 4 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>28 && i<31)
+			//    //            block[i] = new Block(350 + 100 * (i - 29), 28 * 5 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>30 && i<33)
+			//    //            block[i] = new Block(300 + 200 * (i - 31), 28 * 6 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>32 && i<35)
+			//    //            block[i] = new Block(250 + 300 * (i - 33), 28 * 7 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else if(i>34 && i<37)
+			//    //            block[i] = new Block(200 + 400 * (i - 35), 28 * 8 + 15, extendon, EBlockColor.CYAN);
+			//    //        else if(i>36 && i<39)
+			//    //            block[i] = new Block(250 + 300 * (i - 37), 28 * 9 + 15, extendon, EBlockColor.RED);
+			//    //        else if(i>38 && i<41)
+			//    //            block[i] = new Block(300 + 200 * (i - 39), 28 * 10 + 15, extendon, EBlockColor.BLUE);
+			//    //        else if(i>40 && i<43)
+			//    //            block[i] = new Block(350 + 100 * (i - 41), 28 * 11 + 15, extendon, EBlockColor.PURPLE);
+			//    //        else
+			//    //            block[i] = new Block(400, 28 * 12 + 15, extendon, EBlockColor.CYAN);
+			//    //    }
+			//        break;
+			//    case EStageType.PRODUCTORISUS:
+			//        //sumblock = 64;
+			//        ////ブロックの上下間を5ピクセルあけて、横3列、縦8行で配置
+			//        //for(int i=0;i<sumblock;++i)
+			//        //{
+			//        //    if (i < 4)
+			//        //        block[i] = new Block(50 + 50 * i, 50, extendon, EBlockColor.RED);
+			//        //    else if (i > 3 && i < 16)
+			//        //        block[i] = new Block(125, 50 + 28 * (i - 3), extendon, EBlockColor.BLUE);
+			//        //    else if (i > 15 && i < 20)
+			//        //        block[i] = new Block(50 + 50 * (i - 16), 50 + 28 * 13, extendon, EBlockColor.PURPLE);
 
-						else if (i > 19 && i < 21)
-							block[i] = new Block(375, 50, extendon, EBlockColor.CYAN);
-						else if (i > 20 && i < 23)
-							block[i] = new Block(325 + 100 * (i - 21), 50 + 28 * 1, extendon, EBlockColor.RED);
-						else if (i > 22 && i < 25)
-							block[i] = new Block(275 + 200 * (i - 23), 50 + 28 * 2, extendon, EBlockColor.BLUE);
-						else if (i > 24 && i < 27)
-							block[i] = new Block(250 + 250 * (i - 25), 50 + 28 * 3, extendon, EBlockColor.PURPLE);
-						else if (i > 26 && i < 29)
-							block[i] = new Block(250 + 250 * (i - 27), 50 + 28 * 4, extendon, EBlockColor.CYAN);
-						else if (i > 28 && i < 33)
-							block[i] = new Block(250, 50 + 28 * (i - 24), extendon, EBlockColor.RED);
-						else if (i > 32 && i < 35)
-							block[i] = new Block(250 + 250 * (i - 33), 50 + 28 * 9, extendon, EBlockColor.BLUE);
-						else if (i > 34 && i < 37)
-							block[i] = new Block(250 + 250 * (i - 35), 50 + 28 * 10, extendon, EBlockColor.PURPLE);
-						else if (i > 36 && i < 39)
-							block[i] = new Block(275 + 200 * (i - 37), 50 + 28 * 11, extendon, EBlockColor.CYAN);
-						else if (i > 38 && i < 41)
-							block[i] = new Block(325 + 100 * (i - 39), 50 + 28 * 12, extendon, EBlockColor.RED);
-						else if (i > 40 && i < 42)
-							block[i] = new Block(375, 50 + 28 * 13, extendon, EBlockColor.BLUE);
+			//        //    else if (i > 19 && i < 21)
+			//        //        block[i] = new Block(375, 50, extendon, EBlockColor.CYAN);
+			//        //    else if (i > 20 && i < 23)
+			//        //        block[i] = new Block(325 + 100 * (i - 21), 50 + 28 * 1, extendon, EBlockColor.RED);
+			//        //    else if (i > 22 && i < 25)
+			//        //        block[i] = new Block(275 + 200 * (i - 23), 50 + 28 * 2, extendon, EBlockColor.BLUE);
+			//        //    else if (i > 24 && i < 27)
+			//        //        block[i] = new Block(250 + 250 * (i - 25), 50 + 28 * 3, extendon, EBlockColor.PURPLE);
+			//        //    else if (i > 26 && i < 29)
+			//        //        block[i] = new Block(250 + 250 * (i - 27), 50 + 28 * 4, extendon, EBlockColor.CYAN);
+			//        //    else if (i > 28 && i < 33)
+			//        //        block[i] = new Block(250, 50 + 28 * (i - 24), extendon, EBlockColor.RED);
+			//        //    else if (i > 32 && i < 35)
+			//        //        block[i] = new Block(250 + 250 * (i - 33), 50 + 28 * 9, extendon, EBlockColor.BLUE);
+			//        //    else if (i > 34 && i < 37)
+			//        //        block[i] = new Block(250 + 250 * (i - 35), 50 + 28 * 10, extendon, EBlockColor.PURPLE);
+			//        //    else if (i > 36 && i < 39)
+			//        //        block[i] = new Block(275 + 200 * (i - 37), 50 + 28 * 11, extendon, EBlockColor.CYAN);
+			//        //    else if (i > 38 && i < 41)
+			//        //        block[i] = new Block(325 + 100 * (i - 39), 50 + 28 * 12, extendon, EBlockColor.RED);
+			//        //    else if (i > 40 && i < 42)
+			//        //        block[i] = new Block(375, 50 + 28 * 13, extendon, EBlockColor.BLUE);
 
-						else if (i > 41 && i < 44)
-							block[i] = new Block(550 + 50 * (i - 42), 50, extendon, EBlockColor.PURPLE);
-						else if (i > 43 && i < 55)
-							block[i] = new Block(575, 50 + 28 * (i - 43), extendon, EBlockColor.CYAN);
-						else if (i > 54 && i < 57)
-							block[i] = new Block(575 + 175 * (i - 55), 50 + 28 * 11, extendon, EBlockColor.RED);
-						else if (i > 56 && i < 59)
-							block[i] = new Block(575 + 175 * (i - 57), 50 + 28 * 12, extendon, EBlockColor.BLUE);
-						else if (i > 58 && i < 64)
-							block[i] = new Block(550 + 50 * (i - 59), 50 + 28 * 13, extendon, EBlockColor.PURPLE);
+			//        //    else if (i > 41 && i < 44)
+			//        //        block[i] = new Block(550 + 50 * (i - 42), 50, extendon, EBlockColor.PURPLE);
+			//        //    else if (i > 43 && i < 55)
+			//        //        block[i] = new Block(575, 50 + 28 * (i - 43), extendon, EBlockColor.CYAN);
+			//        //    else if (i > 54 && i < 57)
+			//        //        block[i] = new Block(575 + 175 * (i - 55), 50 + 28 * 11, extendon, EBlockColor.RED);
+			//        //    else if (i > 56 && i < 59)
+			//        //        block[i] = new Block(575 + 175 * (i - 57), 50 + 28 * 12, extendon, EBlockColor.BLUE);
+			//        //    else if (i > 58 && i < 64)
+			//        //        block[i] = new Block(550 + 50 * (i - 59), 50 + 28 * 13, extendon, EBlockColor.PURPLE);
 
-						block[i].HalfFlag = true;
-						block[i].ScrollFlag = 1;
-					}
-					break;
+			//        //    block[i].HalfFlag = true;
+			//        //    block[i].ScrollFlag = 1;
+			//        //}
+			//        break;
 
-			}
+			//}
 
 			bkwidth = block[0].Width;
 			bkheight = block[0].Height;
@@ -409,11 +419,11 @@ namespace WPFBlockCrash
 			if (count == sumblock)
 				clear = true;
 
-			if (input.AT)
-			{
-				//ボールの座標取得
-				bar.X = ball.X;
-			}
+            if (input.AT)
+            {
+                //ボールの座標取得
+                bar.X = ball.X;
+            }
 
 			//バーの処理
 			bar.Process(input, g, uc, takeOver);
@@ -436,7 +446,6 @@ namespace WPFBlockCrash
 					smallBall.Y = 527;
 				}
 			}
-
 
 			// ボールの動き
 			if (!ball.ballstop)
@@ -497,7 +506,6 @@ namespace WPFBlockCrash
 				comboon = true;
 				alphacombo = combocount;
 			}
-
 
 			if(combocount == 0 && comboon)
 			{

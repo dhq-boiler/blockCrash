@@ -15,12 +15,12 @@ namespace WPFBlockCrash
         //private SoundPlayer sh;
         //private SoundPlayer dh;
         private int autoCount;
-        public int Bar;
         public bool IsDead { get; set; }
 
         private IOperator Operator;
         private DisplayInfo dInfo;
 
+        private int Bar;
         private readonly Font font = new Font("Consolas", 16);
 
         public BarSelect(DisplayInfo dInfo, IOperator Operator)
@@ -71,7 +71,7 @@ namespace WPFBlockCrash
 
         private void KeyGet(Input input)
         {
-            Operator.SelectBar(ref Bar, input, ref autoCount);
+            Operator.SelectBar(this, ref Bar, input, ref autoCount);
 
             //if (input.rB)
             //{
@@ -114,16 +114,17 @@ namespace WPFBlockCrash
             //    Bar = 3;
             //}
 
-            if (input.AT)
-            {
-                if (input.eB && autoCount > 10)
-                {
-                    IsDead = true;
-                    input.eB = false;
-                    autoCount = 0;
-                }
-            }
-            else if (input.eB)
+            //if (input.AT)
+            //{
+            //    //if (input.eB && autoCount > 10)
+            //    //{
+            //    //    IsDead = true;
+            //    //    input.eB = false;
+            //    //    autoCount = 0;
+            //    //}
+            //}
+            //else 
+            if (!input.AT && input.eB)
             {
                 IsDead = true;
                 input.eB = false;

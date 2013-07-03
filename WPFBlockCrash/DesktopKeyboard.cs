@@ -8,7 +8,7 @@ namespace WPFBlockCrash
 {
     class DesktopKeyboard : IOperator
     {
-        public void SelectBar(ref int BarType, Input input, ref int autoCount)
+        public void SelectBar(BarSelect barSelect, ref int BarType, Input input, ref int autoCount)
         {
             if (input.rB)
             {
@@ -38,7 +38,7 @@ namespace WPFBlockCrash
         }
 
 
-        public void SelectStage(ref int Stage, Input input, ref int autoCount)
+        public void SelectStage(StageSelect stageSelect, ref int Stage, Input input, ref int autoCount)
         {
             if (input.rB)
             {

@@ -66,9 +66,12 @@ namespace WPFBlockCrash
             {
                 bool old = isdead;
                 isdead = value;
-                if (value == true && ItemFlag) {
+
+                if (value == true && ItemFlag)
+                {
                     matchlesscount = 10; // 10フレーム無敵に                    
                 }
+
                 if (!old && isdead)
                     Debug.WriteLine("A Block is dead now. (" + X + ", " + Y + ")");
             }
@@ -107,6 +110,7 @@ namespace WPFBlockCrash
                 }
             }
         }
+
         // ブロックのスクロールを制御する関数
         public int ScrollFlag
         {

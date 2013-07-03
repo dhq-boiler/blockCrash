@@ -35,7 +35,6 @@ namespace WPFBlockCrash
         public bool IsDead { get; set; }
         public bool IsMove { get; set; } // 動いたかどうか
 
-
         /// <summary>
         /// 加速 -なら左，+なら右
         /// </summary>
@@ -108,12 +107,12 @@ namespace WPFBlockCrash
         {
             bool IsPushedAnyKey = Operator.MoveBar(this, ref AcceleratingCount, input);
 
-            if (!input.AT && input.barx != 0)
-            {
-                IsMove = true;
-                X = input.barx;
-                IsPushedAnyKey = true;
-            }
+            //if (!input.AT && input.barx != 0)
+            //{
+            //    IsMove = true;
+            //    X = input.barx;
+            //    IsPushedAnyKey = true;
+            //}
 
             //if (input.key256[Input.KEY_INPUT_LEFT] == 1)
             //{
