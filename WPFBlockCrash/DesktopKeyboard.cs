@@ -85,7 +85,7 @@ namespace WPFBlockCrash
             if (input.key256[Input.KEY_INPUT_LEFT] == 1)
             {
                 bar.IsMove = true;
-                bar.X -= bar.SPEED;
+                bar.CenterX -= bar.SPEED;
                 ++AcceleratingCount;
 
                 if (AcceleratingCount < 25)
@@ -100,7 +100,7 @@ namespace WPFBlockCrash
             else if (input.key256[Input.KEY_INPUT_RIGHT] == 1)
             {
                 bar.IsMove = true;
-                bar.X += bar.SPEED;
+                bar.CenterX += bar.SPEED;
                 ++AcceleratingCount;
 
                 if (AcceleratingCount < 25)

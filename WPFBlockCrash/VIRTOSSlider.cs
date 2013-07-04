@@ -57,7 +57,7 @@ namespace WPFBlockCrash
             if (!input.AT && input.barx != 0)
             {
                 bar.IsMove = true;
-                bar.X = input.barx;
+                bar.CenterX = input.barx;
                 IsPushedAnyKey = true;
             }
 

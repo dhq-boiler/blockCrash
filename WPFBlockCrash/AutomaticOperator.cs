@@ -36,14 +36,14 @@ namespace WPFBlockCrash
 
         public bool MoveBar(Bar bar, ref int AcceleratingCount, Input input)
         {
-            if (PreviousX != bar.X)
+            if (PreviousX != bar.CenterX)
             {
-                PreviousX = bar.X;
+                PreviousX = bar.CenterX;
                 return true;
             }
             else
             {
-                PreviousX = bar.X;
+                PreviousX = bar.CenterX;
                 return false;
             }
         }

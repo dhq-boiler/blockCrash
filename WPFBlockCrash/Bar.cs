@@ -27,10 +27,14 @@ namespace WPFBlockCrash
         private EBarType mBar;
         private EBarType moldBar; //for swap
         private int AcceleratingCount;
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int CenterX { get; set; }
+        public int CenterY { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public int Top { get { return CenterY - Height / 2; } }
+        public int Bottom { get { return CenterY + Height / 2; } }
+        public int Left { get { return CenterX - Width / 2; } }
+        public int Right { get { return CenterX + Width / 2; } }
         public int MX { get; set; }
         public bool IsDead { get; set; }
         public bool IsMove { get; set; } // 動いたかどうか
@@ -63,8 +67,8 @@ namespace WPFBlockCrash
                 Width = (int)bi.Width;
             Height = (int)bi.Height;
     
-            X = dInfo.Width / 2;
-            Y = 540;
+            CenterX = dInfo.Width / 2;
+            CenterY = 540;
             EnlargementFactor = 2;
             IsDead = false;
             IsMove = false;
@@ -90,7 +94,7 @@ namespace WPFBlockCrash
 
         private void Draw(Graphics g)
         {
-            g.DrawImage(gh[(int)mBar - 1], X - Width * EnlargementFactor / 4, Y - Height / 2,
+            g.DrawImage(gh[(int)mBar - 1], CenterX - Width * EnlargementFactor / 4, CenterY - Height / 2,
                 Width * EnlargementFactor / 2, Height);
         }
 
@@ -98,13 +102,13 @@ namespace WPFBlockCrash
         {
             bool IsPushedAnyKey = Operator.MoveBar(this, ref AcceleratingCount, input);
 
-            if (X < Width * EnlargementFactor / 4)
-                X = Width * EnlargementFactor / 4;
+            if (CenterX < Width * EnlargementFactor / 4)
+                CenterX = Width * EnlargementFactor / 4;
 
-            if (X > dInfo.Width - Width * EnlargementFactor / 4)
-                X = dInfo.Width - Width * EnlargementFactor / 4;
+            if (CenterX > dInfo.Width - Width * EnlargementFactor / 4)
+                CenterX = dInfo.Width - Width * EnlargementFactor / 4;
 
-            MX = X;
+            MX = CenterX;
 
             return IsPushedAnyKey;
         }

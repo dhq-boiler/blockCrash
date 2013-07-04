@@ -15,10 +15,14 @@ namespace WPFBlockCrash
         private Image[] gh;
         private DisplayInfo dInfo;
         public int ActCount { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int CenterX { get; set; }
+        public int CenterY { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public int Top { get { return CenterY - Height / 2; } }
+        public int Bottom { get { return CenterY + Height / 2; } }
+        public int Left { get { return CenterX - Width / 2; } }
+        public int Right { get { return CenterX + Width / 2; } }
         public int DX { get; set; }
         public int DY { get; set; }
         public int Level { get; set; }
@@ -51,13 +55,13 @@ namespace WPFBlockCrash
             Width = (int)gh[0].Width;
             Height = (int)gh[0].Height;
 
-            X = dInfo.Width / 2 + 30;
-            Y = 540 - Height + 2;
+            CenterX = dInfo.Width / 2 + 30;
+            CenterY = 540 - Height + 2;
             DX = 0;
             DY = 0;
             Radius = 60;
             ActCount = 0;
-            OldY = Y;
+            OldY = CenterY;
             IsDead = false;
             PlaySound = false;
             Penetrability = EPenetrability.NON_PENETRATING;
@@ -87,7 +91,7 @@ namespace WPFBlockCrash
             else
                 src = gh[0];
 
-            g.DrawImage(src, X - Width / 2, Y - Height / 2);
+            g.DrawImage(src, CenterX - Width / 2, CenterY - Height / 2);
         }
 
         internal void LvUp(int incLv)
@@ -149,7 +153,7 @@ namespace WPFBlockCrash
                 {
                     if (input.AT)
                     {
-                        Y = Y - 5;
+                        CenterY = CenterY - 5;
                         int r = Main.rand.Next() % 1;
                         int rx = (Main.rand.Next() % 5) + 1;
                         int ry = (Main.rand.Next() % 5) + 1;
@@ -166,7 +170,7 @@ namespace WPFBlockCrash
                     }
                     else
                     {
-                        Y = Y - 5;
+                        CenterY = CenterY - 5;
 
                         //初速設定？
                         switch (baccel)
@@ -215,41 +219,41 @@ namespace WPFBlockCrash
         {
             PlaySound = false;
 
-            X += DX;
-            Y += DY;
+            CenterX += DX;
+            CenterY += DY;
 
-            if (X < Width / 2)
+            if (CenterX < Width / 2)
             {
-                X = Width / 2;
+                CenterX = Width / 2;
                 DX *= -1;
 
                 PlaySound = true;
             }
 
-            if (X > dInfo.Width - Width / 2)
+            if (CenterX > dInfo.Width - Width / 2)
             {
-                X = dInfo.Width - Width / 2;
+                CenterX = dInfo.Width - Width / 2;
                 DX *= -1;
                 PlaySound = true;
             }
 
-            if (Y < Height / 2 + 30)
+            if (CenterY < Height / 2 + 30)
             {
-                Y = Height / 2 + 30;
+                CenterY = Height / 2 + 30;
                 DY *= -1;
                 PlaySound = true;
             }
 
-            if (Y > dInfo.Height)
+            if (CenterY > dInfo.Height)
                 IsDead = true;
         }
 
         internal void Reset()
         {
             Penetrability = EPenetrability.NON_PENETRATING;
-            X = dInfo.Width / 2 + 30;
-            Y = 540 - Height + 2;
-            OldY = Y;
+            CenterX = dInfo.Width / 2 + 30;
+            CenterY = 540 - Height + 2;
+            OldY = CenterY;
             DX = 0;
             DY = 0;
             ActCount = 0;
@@ -265,6 +269,7 @@ namespace WPFBlockCrash
 
         internal void PowerUp() // アイテム取得による貫通化
         {
+            if (!Main.PenetrationEnables) return;
             if (!IsSmall)
                 Penetrability = EPenetrability.PENETRATING;
             PenetratingCount = 150;
@@ -272,6 +277,8 @@ namespace WPFBlockCrash
 
         internal void Penetration() // バー中央ヒットによる貫通化
         {
+            if (!Main.PenetrationEnables) return;
+
             Penetrability = EPenetrability.PENETRATING;
             PenetratingCount = 50;
         }
@@ -281,8 +288,8 @@ namespace WPFBlockCrash
             IsSmall = true;
             IsNewCount = 30; 
             int r = (Main.rand.Next() ^ Main.rand.Next()) % 7;
-            X = ballX;
-            Y = ballY;
+            CenterX = ballX;
+            CenterY = ballY;
             DX += r - 3;
             DY += (6 - r) - 2;
             if (DY == 0)
