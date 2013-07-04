@@ -22,7 +22,7 @@ namespace WPFBlockCrash
 		private List<Ball> willBeAddedSmallBalls;
 		private Block[] block;
 		
-		private int bdwidth, bdheight, blwidth, blheight, bkwidth, bkheight;
+		private int barWidth, barHeight, ballWidth, ballHeight, blockWidth, blockHeight;
 
 		private int exwidth;
 		private bool boundFlag;
@@ -93,15 +93,15 @@ namespace WPFBlockCrash
 			alphacombo = 0;
 
 			//バーの幅と高さ
-			bdwidth = bar.Width;
-			bdheight = bar.Height;
+			barWidth = bar.Width;
+			barHeight = bar.Height;
 
 			// バーが拡大する長さ
-			exwidth = (int)bdwidth/2;
+			exwidth = (int)barWidth/2;
 
 			//ボールの幅と高さ
-			blwidth = ball.Width;
-			blheight = ball.Height;
+			ballWidth = ball.Width;
+			ballHeight = ball.Height;
 
 			//音声ファイル読み込み。
 			playerBH = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
@@ -114,8 +114,8 @@ namespace WPFBlockCrash
 
 			builder.CreateStage(out block, ref sumblock, extendon);
 
-			bkwidth = block[0].Width;
-			bkheight = block[0].Height;
+			blockWidth = block[0].Width;
+			blockHeight = block[0].Height;
 		}
 
 		public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
@@ -213,16 +213,19 @@ namespace WPFBlockCrash
 			//バーの処理
 			bar.Process(input, g, uc, takeOver);
 
+			//発射前のメインボールのX座標
 			if (ball.ActCount == 0)
 			{
 				ball.X = bar.MX;
 			}
 
+			//吸着時のメインボールのX座標
 			if (ball.ballstop)
 			{
 				ball.X = bar.MX + ball.xoffset;
 			}
 
+			//吸着時のスモールボールのX座標
 			foreach (Ball smallBall in SmallBalls)
 			{
 				if (smallBall.ballstop)// ボールが止まっていれば
@@ -261,9 +264,9 @@ namespace WPFBlockCrash
 				}
 			}
 
-			++vspeed; // 進まなくなったとき用カウントの増加
+			//++vspeed; // 進まなくなったとき用カウントの増加
 
-			if (vspeed == 1000)
+			if (++vspeed == 1000)
 			{
 				vspeed = 0;
 				ball.spchange();
@@ -431,17 +434,17 @@ namespace WPFBlockCrash
 					int blockX = block[i].X;
 					int blockY = block[i].Y;
 
-					if (blockX - bkwidth / 2 < 0)
-						blockendX = blockX - bkwidth / 2 + 800;
-					if (blockX + bkwidth / 2 >= 800)
-						blockendX = blockX + bkwidth / 2 - 800;
+					if (blockX - blockWidth / 2 < 0)
+						blockendX = blockX - blockWidth / 2 + 800;
+					if (blockX + blockWidth / 2 >= 800)
+						blockendX = blockX + blockWidth / 2 - 800;
 
 					for (int j = 0; j < 2; ++j)
 					{
-						if (ballX < blockX + bkwidth / 2
-							&& ballX > blockX - bkwidth / 2
-							&& ballY + blheight / 2 > blockY - bkheight / 2
-							&& ballY + blheight / 2 < blockY + bkheight / 2)
+						if (ballX < blockX + blockWidth / 2
+							&& ballX > blockX - blockWidth / 2
+							&& ballY + ballHeight / 2 > blockY - blockHeight / 2
+							&& ballY + ballHeight / 2 < blockY + blockHeight / 2)
 						{
 							vspeed = 0;
 
@@ -451,10 +454,10 @@ namespace WPFBlockCrash
 							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 								ball.DY = -ball.DY;
 						}
-						else if (ballX < blockX + bkwidth / 2
-							&& ballX > blockX - bkwidth / 2
-							&& ballY - blheight / 2 > blockY - bkheight / 2
-							&& ballY - blheight / 2 < blockY + bkheight / 2)
+						else if (ballX < blockX + blockWidth / 2
+							&& ballX > blockX - blockWidth / 2
+							&& ballY - ballHeight / 2 > blockY - blockHeight / 2
+							&& ballY - ballHeight / 2 < blockY + blockHeight / 2)
 						{
 							vspeed = 0;
 
@@ -463,10 +466,10 @@ namespace WPFBlockCrash
 							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 								ball.DY = -ball.DY;
 						}
-						else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
-							&& ballX + blwidth / 2 > blockX - bkwidth / 2
-							&& ballY > blockY - bkheight / 2
-							&& ballY < blockY + bkheight / 2)
+						else if (ballX + ballWidth / 2 < blockX - blockWidth / 2 + ballWidth
+							&& ballX + ballWidth / 2 > blockX - blockWidth / 2
+							&& ballY > blockY - blockHeight / 2
+							&& ballY < blockY + blockHeight / 2)
 						{
 							vspeed = 0;
 
@@ -475,10 +478,10 @@ namespace WPFBlockCrash
 							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 								ball.DX = -ball.DX;
 						}
-						else if (ballX - blwidth / 2 < blockX + bkwidth / 2
-							&& ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
-							&& ballY > blockY - bkheight / 2
-							&& ballY < blockY + bkheight / 2)
+						else if (ballX - ballWidth / 2 < blockX + blockWidth / 2
+							&& ballX - ballWidth / 2 > blockX + blockWidth / 2 - ballWidth
+							&& ballY > blockY - blockHeight / 2
+							&& ballY < blockY + blockHeight / 2)
 						{
 							vspeed = 0;
 
@@ -511,17 +514,17 @@ namespace WPFBlockCrash
 					int blockX = block[i].X;
 					int blockY = block[i].Y;
 
-					if (blockX - bkwidth / 2 < 0)
-						blockendX = blockX - bkwidth / 2 + 800;
-					if (blockX + bkwidth / 2 >= 800)
-						blockendX = blockX + bkwidth / 2 - 800;
+					if (blockX - blockWidth / 2 < 0)
+						blockendX = blockX - blockWidth / 2 + 800;
+					if (blockX + blockWidth / 2 >= 800)
+						blockendX = blockX + blockWidth / 2 - 800;
 
 					for (int j = 0; j < 2; ++j)
 					{
-						if (ballX < blockX + bkwidth / 2
-							&& ballX > blockX - bkwidth / 2
-							&& ballY + blheight / 2 > blockY - bkheight / 2
-							&& ballY + blheight / 2 < blockY + bkheight / 2)
+						if (ballX < blockX + blockWidth / 2
+							&& ballX > blockX - blockWidth / 2
+							&& ballY + ballHeight / 2 > blockY - blockHeight / 2
+							&& ballY + ballHeight / 2 < blockY + blockHeight / 2)
 						{
 							vspeed = 0;
 
@@ -531,10 +534,10 @@ namespace WPFBlockCrash
 
 							demolishFlag = true;
 						}
-						else if (ballX < blockX + bkwidth / 2
-							&& ballX > blockX - bkwidth / 2
-							&& ballY - blheight / 2 > blockY - bkheight / 2
-							&& ballY - blheight / 2 < blockY + bkheight / 2)
+						else if (ballX < blockX + blockWidth / 2
+							&& ballX > blockX - blockWidth / 2
+							&& ballY - ballHeight / 2 > blockY - blockHeight / 2
+							&& ballY - ballHeight / 2 < blockY + blockHeight / 2)
 						{
 							vspeed = 0;
 
@@ -544,10 +547,10 @@ namespace WPFBlockCrash
 
 							demolishFlag = true;
 						}
-						else if (ballX + blwidth / 2 < blockX - bkwidth / 2 + blwidth
-							&& ballX + blwidth / 2 > blockX - bkwidth / 2
-							&& ballY > blockY - bkheight / 2
-							&& ballY < blockY + bkheight / 2)
+						else if (ballX + ballWidth / 2 < blockX - blockWidth / 2 + ballWidth
+							&& ballX + ballWidth / 2 > blockX - blockWidth / 2
+							&& ballY > blockY - blockHeight / 2
+							&& ballY < blockY + blockHeight / 2)
 						{
 							vspeed = 0;
 
@@ -557,10 +560,10 @@ namespace WPFBlockCrash
 
 							demolishFlag = true;
 						}
-						else if (ballX - blwidth / 2 < blockX + bkwidth / 2
-							&& ballX - blwidth / 2 > blockX + bkwidth / 2 - blwidth
-							&& ballY > blockY - bkheight / 2
-							&& ballY < blockY + bkheight / 2)
+						else if (ballX - ballWidth / 2 < blockX + blockWidth / 2
+							&& ballX - ballWidth / 2 > blockX + blockWidth / 2 - ballWidth
+							&& ballY > blockY - blockHeight / 2
+							&& ballY < blockY + blockHeight / 2)
 						{
 							vspeed = 0;
 
@@ -591,7 +594,7 @@ namespace WPFBlockCrash
 					if (Bar != EBarType.SHORT)
 					{
 						bar.ExtendWidth();
-						bdwidth += exwidth;
+						barWidth += exwidth;
 					}
 					break;
 				case EItemType.ITEMTYPE_POWERUP:
@@ -637,10 +640,10 @@ namespace WPFBlockCrash
 			int ballY = ball.Y;
 
 
-			if (Math.Abs(barY - ballY) < blheight / 2 + bdheight / 2)
+			if (Math.Abs(barY - ballY) < ballHeight / 2 + barHeight / 2)
 			{
-				if (barX + bdwidth / 2 > ballX
-					&& barX - bdwidth / 2 < ballX)
+				if (barX + barWidth / 2 > ballX
+					&& barX - barWidth / 2 < ballX)
 				{
 					ball.Radius = 20;
 
@@ -653,7 +656,7 @@ namespace WPFBlockCrash
 						combocount = 0;
 						bar.IsMove = false;
 					}
-					else if (ballX < barX - bdwidth / 2 * 2 / 3)
+					else if (ballX < barX - barWidth / 2 * 2 / 3)
 					{
 						combocount = 0;
 						bar.IsMove = false;
@@ -666,7 +669,7 @@ namespace WPFBlockCrash
 
 						boundFlag = true;
 					}
-					else if (ballX > barX + bdwidth / 2 * 2 / 3)
+					else if (ballX > barX + barWidth / 2 * 2 / 3)
 					{
 						combocount = 0;
 						bar.IsMove = false;
@@ -738,7 +741,7 @@ namespace WPFBlockCrash
 			bar.BallCatch(false);
 			sballcount = 0;
 			vspeed = 0;
-			bdwidth = bar.Width;
+			barWidth = bar.Width;
 			combocount = 0;
 			bar.Reset();
 			ball.Reset();
