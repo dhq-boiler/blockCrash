@@ -43,5 +43,10 @@ namespace WPFBlockCrash
                     block[i] = new Block(50 + (8 + 225) * (i - 44), 30 * 12 + 15, extendOn, EBlockColor.CYAN);
             }
         }
+
+        public override void BlockProcess(Input input, System.Drawing.Graphics g, UserChoice uc, TakeOver takeOver, Block[] block, ref int ballDeadCount, int sumblock)
+        {
+            StageUtil.CommonBlockProcess(input, g, uc, takeOver, block, ref ballDeadCount, sumblock);
+        }
     }
 }

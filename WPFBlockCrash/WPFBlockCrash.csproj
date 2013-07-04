@@ -69,6 +69,7 @@
     <Compile Include="Ranking.cs" />
     <Compile Include="IStageBuilder.cs" />
     <Compile Include="StageSelect.cs" />
+    <Compile Include="StageUtil.cs" />
     <Compile Include="Title.cs" />
     <Compile Include="VIRTOSSlider.cs" />
     <Page Include="BlockCrashView.xaml">

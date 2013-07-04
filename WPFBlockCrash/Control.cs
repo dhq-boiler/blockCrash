@@ -39,6 +39,7 @@ namespace WPFBlockCrash
 		private int vspeed;
 		private DisplayInfo dInfo;
 		private IOperator Operator;
+		private StageBuilder builder;
 
 		private readonly Font font = new Font("Consolas", 16);
 
@@ -109,7 +110,7 @@ namespace WPFBlockCrash
 			// 残機表示の読み込み
 			gh = new Bitmap(Main.ResourceDirectory + "ball_b.png");
 
-			StageBuilder builder = StageBuilder.CreateStageBuilder(Stage);
+			builder = StageBuilder.CreateStageBuilder(Stage);
 
 			builder.CreateStage(out block, ref sumblock, extendon);
 
@@ -197,35 +198,8 @@ namespace WPFBlockCrash
 			bool BallIsDead;
 			int count = 0;
 
-			for (int i = 0; i < sumblock; ++i)
-			{
-				if (block[i].IsDead)
-					++count;
-
-				switch (Stage)
-				{
-					case EStageType.ONAJIMISAN:
-						if (i < 7)
-							block[i].Process(input, g, uc, takeOver);
-						else if (i > 6 && i < 14)
-							block[i].Process(input, g, uc, takeOver);
-						else if (i > 13 && i < 21)
-							block[i].Process(input, g, uc, takeOver);
-						else
-							block[i].Process(input, g, uc, takeOver);
-						break;
-					default:
-						if (i % 4 == 0)
-							block[i].Process(input, g, uc, takeOver);
-						else if (i % 4 == 1)
-							block[i].Process(input, g, uc, takeOver);
-						else if (i % 4 == 2)
-							block[i].Process(input, g, uc, takeOver);
-						else
-							block[i].Process(input, g, uc, takeOver);
-						break;
-				}
-			}
+			//ブロックの描画処理
+			builder.BlockProcess(input, g, uc, takeOver, block, ref count, sumblock);
 
 			if (count == sumblock)
 				clear = true;

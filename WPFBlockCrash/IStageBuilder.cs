@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,8 @@ namespace WPFBlockCrash
     abstract class StageBuilder
     {
         abstract public void CreateStage(out Block[] block, ref int sumblock, bool extendOn);
+
+        abstract public void BlockProcess(Input input, Graphics g, UserChoice uc, TakeOver takeOver,  Block[] block, ref int ballDeadCount, int sumblock);
 
         public static StageBuilder CreateStageBuilder(EStageType StageType)
         {

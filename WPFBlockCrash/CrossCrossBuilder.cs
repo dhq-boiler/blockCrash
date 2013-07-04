@@ -48,5 +48,10 @@ namespace WPFBlockCrash
                     block[i].ScrollFlag = -1;
             }
         }
+
+        public override void BlockProcess(Input input, System.Drawing.Graphics g, UserChoice uc, TakeOver takeOver, Block[] block, ref int ballDeadCount, int sumblock)
+        {
+            StageUtil.CommonBlockProcess(input, g, uc, takeOver, block, ref ballDeadCount, sumblock);
+        }
     }
 }
