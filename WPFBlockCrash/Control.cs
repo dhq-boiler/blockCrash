@@ -744,9 +744,8 @@ namespace WPFBlockCrash
 				if (smallBall.IsNewCount > 0) // 増えたばかりならコンティニュー
 					continue;
 
-				if ((ballX - smallBall.X) * (ballX - smallBall.X) + (ballY - smallBall.Y) * (ballY - smallBall.Y) <= 20 * 20)
-				{// 衝突判定
-
+				if ((ballX - smallBall.X) * (ballX - smallBall.X) + (ballY - smallBall.Y) * (ballY - smallBall.Y) <= 20 * 20) // 衝突判定
+				{
 					ball.DX = -ball.DX;
 					ball.DY = ball.DY;
 					smallBall.DX = -smallBall.DX;
@@ -760,12 +759,10 @@ namespace WPFBlockCrash
 
 		internal void Reset()
 		{
-
 			SmallBalls = new LinkedList<Ball>();
 			ballcatch = false;
 			bar.BallCatch(false);
 			sballcount = 0;
-			--Stock;
 			vspeed = 0;
 			bdwidth = bar.Width;
 			combocount = 0;
