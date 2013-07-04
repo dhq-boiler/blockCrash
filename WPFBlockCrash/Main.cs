@@ -32,6 +32,8 @@ namespace WPFBlockCrash
         private UserChoice userChoice;
         private TakeOver takeOver;
         private WPFBlockCrash.BlockCrashView.EOperatingType OldOperatingType;
+        private Title title;
+        private bool ResultIgnore;
         
         public Main(DisplayInfo dInfo, WPFBlockCrash.BlockCrashView.EOperatingType OperatingType)
         {
@@ -55,15 +57,19 @@ namespace WPFBlockCrash
             switch (OperatingType)
             {
                 case BlockCrashView.EOperatingType.DESKTOP_KEYBOARD:
-                    CurrentState = new Title(this, dInfo, new DesktopKeyboard());
+                    CurrentState = title = new Title(this, dInfo, new DesktopKeyboard());
                     break;
                 case BlockCrashView.EOperatingType.VIRTOS_SLIDER:
-                    CurrentState = new Title(this, dInfo, new VIRTOSSlider());
+                    CurrentState = title = new Title(this, dInfo, new VIRTOSSlider());
                     break;
                 case BlockCrashView.EOperatingType.AUTO:
-                    CurrentState = new Title(this, dInfo, new AutomaticOperator());
+                    CurrentState = title = new Title(this, dInfo, new AutomaticOperator());
                     break;
+                default:
+                    throw new InvalidOperationException("EOperatingType is UNKNOWN.");
             }
+
+            ResultIgnore = true;
         }
 
         public void ProcessLoop(Input input, Graphics g)
@@ -84,18 +90,26 @@ namespace WPFBlockCrash
                 if (input.barx == 50 || (input.eB && input.lB && input.rB))
                 {
                     input.AT = false;
+                    //title.SwapOperatingMode();
+                    //Reconstruct(dInfo, OperatingType);
                     SwapOperatingMode();
                     Restart(input);
                 }
             }
 
             ProcessResult r = CurrentState.Process(input, g, userChoice, takeOver);
-            CurrentState = r.NextState;
+            if (!ResultIgnore)
+                CurrentState = r.NextState;
+            else
+            {
+                CurrentState = title;
+                ResultIgnore = false;
+            }
 
             input.ClearSmaller();
         }
 
-        private void Restart(Input input)
+        public void Restart(Input input)
         {
             input.Clear();
 
@@ -128,6 +142,9 @@ namespace WPFBlockCrash
 
         internal void SwapOperatingMode()
         {
+            if (OldOperatingType == BlockCrashView.EOperatingType.UNKNOWN)
+                OldOperatingType = BlockCrashView.EOperatingType.AUTO;
+
             WPFBlockCrash.BlockCrashView.EOperatingType temp = OperatingType;
             OperatingType = OldOperatingType;
             OldOperatingType = temp;

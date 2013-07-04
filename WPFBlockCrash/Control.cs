@@ -166,12 +166,20 @@ namespace WPFBlockCrash
 
 				if (message.Process(input, g, uc, takeOver).IsDead)
 				{
-					return new ProcessResult()
-					{
-						IsDead = true,
-						NextState = new Ranking(Score, Bar, dInfo, Operator),
-						TakeOver = takeOver
-					};
+					if (input.AT)
+						return new ProcessResult()
+						{
+							IsDead = true,
+							NextState = new Title(Main.MainInstance, dInfo, Operator),
+							TakeOver = takeOver
+						};
+					else
+						return new ProcessResult()
+						{
+							IsDead = true,
+							NextState = new Ranking(Score, Bar, dInfo, Operator),
+							TakeOver = takeOver
+						};
 				}
 			}
 

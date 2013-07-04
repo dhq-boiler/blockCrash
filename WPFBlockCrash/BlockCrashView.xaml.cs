@@ -26,6 +26,7 @@ namespace WPFBlockCrash
     {
         public enum EOperatingType
         {
+            UNKNOWN,
             DESKTOP_KEYBOARD,
             VIRTOS_SLIDER,
             AUTO

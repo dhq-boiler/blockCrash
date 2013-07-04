@@ -12,6 +12,8 @@ namespace WPFBlockCrash
 
         public void SelectBar(BarSelect barSelect, ref int Bar, Input input, ref int autoCount)
         {
+            DesktopKeyboard.SelectBarByInputKey(ref Bar, input, ref autoCount);
+
             if (input.eB && autoCount > 10)
             {
                 barSelect.IsDead = true;
@@ -22,6 +24,8 @@ namespace WPFBlockCrash
 
         public void SelectStage(StageSelect stageSelect, ref int Stage, Input input, ref int autoCount)
         {
+            DesktopKeyboard.SelectStageByInputKey(ref Stage, input, ref autoCount);
+
             if (input.eB && autoCount > 10)
             {
                 stageSelect.IsDead = true;

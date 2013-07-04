@@ -10,6 +10,11 @@ namespace WPFBlockCrash
     {
         public void SelectBar(BarSelect barSelect, ref int BarType, Input input, ref int autoCount)
         {
+            SelectBarByInputKey(ref BarType, input, ref autoCount);
+        }
+
+        public static void SelectBarByInputKey(ref int BarType, Input input, ref int autoCount)
+        {
             if (input.rB)
             {
                 if (input.AT)
@@ -39,6 +44,11 @@ namespace WPFBlockCrash
 
 
         public void SelectStage(StageSelect stageSelect, ref int Stage, Input input, ref int autoCount)
+        {
+            SelectStageByInputKey(ref Stage, input, ref autoCount);
+        }
+
+        public static void SelectStageByInputKey(ref int Stage, Input input, ref int autoCount)
         {
             if (input.rB)
             {
