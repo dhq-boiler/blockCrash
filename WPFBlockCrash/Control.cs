@@ -54,8 +54,10 @@ namespace WPFBlockCrash
 		private int combocount { get; set; }
 		private bool comboon { get; set; }
 		private int combooncount { get; set; }
-        private bool ReflectVEnable;
-        private bool ReflectHEnable;
+		private bool ReflectVEnable;
+		private bool ReflectHEnable;
+        private bool ReflectEnable;
+        private bool ReflectEnableByBar;
 
 		public bool IsDead { get; set; }
 		public bool IsPlaying { get; set; }
@@ -433,161 +435,155 @@ namespace WPFBlockCrash
 
 			for (int i = 0; i < sumblock; ++i)
 			{
-				if (!block[i].IsDead)
-				{
-					int blockendX = 0;
-					int blockX = block[i].X;
-					int blockY = block[i].Y;
-
-					if (blockX - blockWidth / 2 < 0)
-						blockendX = blockX - blockWidth / 2 + 800;
-					if (blockX + blockWidth / 2 >= 800)
-						blockendX = blockX + blockWidth / 2 - 800;
-
-					for (int j = 0; j < 1; ++j)
-					{
-						if (ballX < blockX + blockWidth / 2
-							&& ballX > blockX - blockWidth / 2
-							&& ballY + ballHeight / 2 > blockY - blockHeight / 2
-							&& ballY + ballHeight / 2 < blockY + blockHeight / 2)
-						{
-							vspeed = 0;
-
-							block[i].IsDead = true;
-							demolishFlag = true;
-
-							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-								ball.DY = -ball.DY;
-						}
-						else if (ballX < blockX + blockWidth / 2
-							&& ballX > blockX - blockWidth / 2
-							&& ballY - ballHeight / 2 > blockY - blockHeight / 2
-							&& ballY - ballHeight / 2 < blockY + blockHeight / 2)
-						{
-							vspeed = 0;
-
-							block[i].IsDead = true;
-							demolishFlag = true;
-							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-								ball.DY = -ball.DY;
-						}
-						else if (ballX + ballWidth / 2 < blockX - blockWidth / 2 + ballWidth
-							&& ballX + ballWidth / 2 > blockX - blockWidth / 2
-							&& ballY > blockY - blockHeight / 2
-							&& ballY < blockY + blockHeight / 2)
-						{
-							vspeed = 0;
-
-							block[i].IsDead = true;
-							demolishFlag = true;
-							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-								ball.DX = -ball.DX;
-						}
-						else if (ballX - ballWidth / 2 < blockX + blockWidth / 2
-							&& ballX - ballWidth / 2 > blockX + blockWidth / 2 - ballWidth
-							&& ballY > blockY - blockHeight / 2
-							&& ballY < blockY + blockHeight / 2)
-						{
-							vspeed = 0;
-
-							block[i].IsDead = true;
-							demolishFlag = true;
-							if (ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-								ball.DX = -ball.DX;
-						}
-						if (blockendX != 0)
-							blockX = blockendX;
-						else
-							break;
-					}
-
-					if (block[i].IsDead)
-					{
-						int nonmovebonus = 0;
-						if (!bar.IsMove)
-							nonmovebonus = 500;
-						++combocount; 
-						Score += 100 + 50 * ball.Level + combocount * 100 + nonmovebonus;
-						ball.Radius = 0;
-					}
-				}
-				else if (block[i].ItemFlag)
-				{
-					if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-						continue;
-					int blockendX = 0;
-					int blockX = block[i].X;
-					int blockY = block[i].Y;
-
-					if (blockX - blockWidth / 2 < 0)
-						blockendX = blockX - blockWidth / 2 + 800;
-					if (blockX + blockWidth / 2 >= 800)
-						blockendX = blockX + blockWidth / 2 - 800;
-
-					for (int j = 0; j < 1; ++j)
-					{
-						if (ballX < blockX + blockWidth / 2
-							&& ballX > blockX - blockWidth / 2
-							&& ballY + ballHeight / 2 > blockY - blockHeight / 2
-							&& ballY + ballHeight / 2 < blockY + blockHeight / 2)
-						{
-							vspeed = 0;
-
-							block[i].ItemFlag = false;
-
-							ItemEffect(block[i].ItemType, ballX, ballY);
-
-							demolishFlag = true;
-						}
-						else if (ballX < blockX + blockWidth / 2
-							&& ballX > blockX - blockWidth / 2
-							&& ballY - ballHeight / 2 > blockY - blockHeight / 2
-							&& ballY - ballHeight / 2 < blockY + blockHeight / 2)
-						{
-							vspeed = 0;
-
-							block[i].ItemFlag = false;
-
-							ItemEffect(block[i].ItemType, ballX, ballY);
-
-							demolishFlag = true;
-						}
-						else if (ballX + ballWidth / 2 < blockX - blockWidth / 2 + ballWidth
-							&& ballX + ballWidth / 2 > blockX - blockWidth / 2
-							&& ballY > blockY - blockHeight / 2
-							&& ballY < blockY + blockHeight / 2)
-						{
-							vspeed = 0;
-
-							block[i].ItemFlag = false;
-
-							ItemEffect(block[i].ItemType, ballX, ballY);
-
-							demolishFlag = true;
-						}
-						else if (ballX - ballWidth / 2 < blockX + blockWidth / 2
-							&& ballX - ballWidth / 2 > blockX + blockWidth / 2 - ballWidth
-							&& ballY > blockY - blockHeight / 2
-							&& ballY < blockY + blockHeight / 2)
-						{
-							vspeed = 0;
-
-							block[i].ItemFlag = false;
-
-							ItemEffect(block[i].ItemType, ballX, ballY);
-
-							demolishFlag = true;
-						}
-						if (blockendX != 0)
-							blockX = blockendX;
-						else
-							break;
-					}
-
-					if (!block[i].ItemFlag)
-						Score += 300;
-				}
+                if (!block[i].IsDead)
+                {
+                    if (CheckCrashingBlock(ball, block[i]))
+                        break;
+                }
+                else if (block[i].ItemFlag)
+                {
+                    if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        continue;
+                    CheckGettingItem(ballX, ballY, i);
+                }
 			}
+		}
+
+		private void CheckGettingItem(int ballX, int ballY, int i)
+		{
+			int blockendX = 0;
+			int blockX = block[i].CenterX;
+			int blockY = block[i].CenterY;
+
+			if (blockX - blockWidth / 2 < 0)
+				blockendX = blockX - blockWidth / 2 + 800;
+			if (blockX + blockWidth / 2 >= 800)
+				blockendX = blockX + blockWidth / 2 - 800;
+
+			for (int j = 0; j < 1; ++j)
+			{
+				if (ballX < blockX + blockWidth / 2
+					&& ballX > blockX - blockWidth / 2
+					&& ballY + ballHeight / 2 > blockY - blockHeight / 2
+					&& ballY + ballHeight / 2 < blockY + blockHeight / 2)
+				{
+					vspeed = 0;
+
+					block[i].ItemFlag = false;
+
+					ItemEffect(block[i].ItemType, ballX, ballY);
+
+					demolishFlag = true;
+				}
+				else if (ballX < blockX + blockWidth / 2
+					&& ballX > blockX - blockWidth / 2
+					&& ballY - ballHeight / 2 > blockY - blockHeight / 2
+					&& ballY - ballHeight / 2 < blockY + blockHeight / 2)
+				{
+					vspeed = 0;
+
+					block[i].ItemFlag = false;
+
+					ItemEffect(block[i].ItemType, ballX, ballY);
+
+					demolishFlag = true;
+				}
+				else if (ballX + ballWidth / 2 < blockX - blockWidth / 2 + ballWidth
+					&& ballX + ballWidth / 2 > blockX - blockWidth / 2
+					&& ballY > blockY - blockHeight / 2
+					&& ballY < blockY + blockHeight / 2)
+				{
+					vspeed = 0;
+
+					block[i].ItemFlag = false;
+
+					ItemEffect(block[i].ItemType, ballX, ballY);
+
+					demolishFlag = true;
+				}
+				else if (ballX - ballWidth / 2 < blockX + blockWidth / 2
+					&& ballX - ballWidth / 2 > blockX + blockWidth / 2 - ballWidth
+					&& ballY > blockY - blockHeight / 2
+					&& ballY < blockY + blockHeight / 2)
+				{
+					vspeed = 0;
+
+					block[i].ItemFlag = false;
+
+					ItemEffect(block[i].ItemType, ballX, ballY);
+
+					demolishFlag = true;
+				}
+				if (blockendX != 0)
+					blockX = blockendX;
+				else
+					break;
+			}
+
+			if (!block[i].ItemFlag)
+				Score += 300;
+		}
+
+		private bool CheckCrashingBlock(Ball ball, Block block)
+		{
+			int blockendX = 0;
+			int ballCX = ball.CenterX;
+			int ballCY = ball.CenterY;
+			int blockCX = block.CenterX;
+			int blockCY = block.CenterY;
+
+			if (blockCX - blockWidth / 2 < 0)
+				blockendX = blockCX - blockWidth / 2 + 800;
+			if (blockCX + blockWidth / 2 >= 800)
+				blockendX = blockCX + blockWidth / 2 - 800;
+
+			bool IsOverlappedVertical = Math.Abs(blockCY - ballCY) < ballHeight / 2 + blockHeight / 2;
+			bool IsOverlappedHorizontal = Math.Abs(blockCX - ballCX) < ballWidth / 2 + blockWidth / 2;
+
+			if (IsOverlappedHorizontal && IsOverlappedVertical)
+			{
+				double OverlapDistanceX = double.MaxValue;
+				double OverlapDistanceY = double.MaxValue;
+
+				if (blockCY < ballCY)
+					OverlapDistanceY = (ball.Top - block.Bottom) / (double)block.Height;
+				else if (blockCY > ballCY)
+                    OverlapDistanceY = (block.Top - ball.Bottom) / (double)block.Height;
+
+				if (blockCX < ballCX)
+                    OverlapDistanceX = (ball.Left - block.Right) / (double)block.Width;
+				else
+                    OverlapDistanceX = (block.Left - ball.Right) / (double)block.Width;
+                    
+                if (ReflectEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && OverlapDistanceY < OverlapDistanceX)
+				{
+                    ReflectHorizontal(ball);
+                    ReflectEnable = false;
+				}
+                else if (ReflectEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && OverlapDistanceY >= OverlapDistanceX)
+				{
+                    ReflectVertical(ball);
+                    ReflectEnable = false;
+				}
+
+                block.IsDead = true;
+			}
+            else
+            {
+                ReflectEnable = true;
+            }
+
+			if (block.IsDead)
+			{
+				int NonMoveBonus = 0;
+				if (!bar.IsMove)
+					NonMoveBonus = 500;
+				++combocount;
+				Score += 100 + 50 * ball.Level + combocount * 100 + NonMoveBonus;
+				ball.Radius = 0;
+			}
+
+            return block.IsDead;
 		}
 
 		private void ItemEffect(EItemType eItemType, int ballX, int ballY)
@@ -652,68 +648,92 @@ namespace WPFBlockCrash
 				double OverlapDistanceX = double.MaxValue;
 				double OverlapDistanceY = double.MaxValue;
 
-				if (barCY < ballCY)
+				if (barCY < ballCY) //下辺反射
 					OverlapDistanceY = (ball.Top - bar.Bottom) / (double)bar.Height;
-				else if (barCY > ballCY)
+                else  //上辺反射
 					OverlapDistanceY = (bar.Top - ball.Bottom) / (double)bar.Height;
 
-				if (barCX < ballCX)
+                if (barCX < ballCX) //右辺反射
 					OverlapDistanceX = (ball.Left - bar.Right) / (double)bar.Width;
-				else
+                else //左辺反射
 					OverlapDistanceX = (bar.Left - ball.Right) / (double)bar.Width;
 
 				g.DrawString(string.Format("ODX:{0}", OverlapDistanceX), font, DrawUtil.BrushRGB(255, 120, 0), 20, 480);
 				g.DrawString(string.Format("ODY:{0}", OverlapDistanceY), font, DrawUtil.BrushRGB(255, 120, 0), 20, 520);
 
-                if (ReflectVEnable && ReflectHEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && Math.Abs(OverlapDistanceX - OverlapDistanceY) < 10)
-                {
-                    ReflectVerticalIfOverlapped(ball, barCX, ballCX);
-                    ReflectHorizontalIfOverlapped(ball, barCY, ballCY, barAccel);
-                }
-				else if (ReflectVEnable && OverlapDistanceY < 0d && OverlapDistanceY < OverlapDistanceX)
-                {
-					ReflectVerticalIfOverlapped(ball, barCX, ballCX);
-                }
-				else if (ReflectHEnable && OverlapDistanceX < 0d && OverlapDistanceY >= OverlapDistanceX)
+				if (ReflectEnableByBar && OverlapDistanceX < 0d && OverlapDistanceY < 0d && Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.1)
 				{
-                    ReflectHorizontalIfOverlapped(ball, barCY, ballCY, barAccel);
-                }
+					ReflectVerticalIfOverlapped(ball, bar);
+					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
+				}
+                else if (ReflectEnableByBar && OverlapDistanceY < 0d && OverlapDistanceX < 0d && OverlapDistanceY < OverlapDistanceX)
+				{
+					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
+				}
+                else if (ReflectEnableByBar && OverlapDistanceY < 0d && OverlapDistanceX < 0d && OverlapDistanceY >= OverlapDistanceX)
+				{
+					ReflectVerticalIfOverlapped(ball, bar);
+				}
 			}
-            else if (!IsOverlappedHorizontal && !IsOverlappedVertical)
-            {
-                ReflectHEnable = ReflectVEnable = true;
-            }
-		}
-
-		private void ReflectHorizontalIfOverlapped(Ball ball, int barCY, int ballCY, int barAccel)
-		{
-			if (barCY + barHeight / 2 > ballCY
-				&& barCY - barHeight / 2 < ballCY)
+			else if (!IsOverlappedHorizontal && !IsOverlappedVertical)
 			{
-				ReflectHorizontal(ball, barAccel);
-                ReflectHEnable = false;
+				ReflectEnableByBar = true;
 			}
 		}
 
-		private void ReflectVerticalIfOverlapped(Ball ball, int barCX, int ballCX)
+		private void ReflectHorizontalIfOverlapped(Ball ball, Bar bar, int barAccel)
 		{
-			if (bar.Right > ballCX && bar.Left < ballCX)
-			{
-				ReflectVertical(ball, barCX, ballCX);
-                ReflectVEnable = false;
-			}
+            //if (bar.CenterY + barHeight / 2 > ball.CenterY
+            //    && bar.CenterY - barHeight / 2 < ball.CenterY)
+            //{
+            if (ball.Left < bar.Left || ball.Right > bar.Right)
+				ReflectHorizontal(ball, bar, barAccel);
+			ReflectEnableByBar = false;
+            //}
 		}
 
-		private void ReflectHorizontal(Ball ball, int BarAccel)
+		private void ReflectHorizontalIfOverlapped(Ball ball, Block block)
+		{
+            //if (block.Bottom > ball.CenterY && block.Top < ball.CenterY)
+            //{
+				ReflectHorizontal(ball);
+				ReflectHEnable = false;
+            //}
+		}
+
+		private void ReflectVerticalIfOverlapped(Ball ball, Bar bar)
+		{
+            //if (bar.Right > ball.CenterX && bar.Left < ball.CenterX)
+            //{
+				ReflectVertical(ball, bar);
+				ReflectEnableByBar = false;
+            //}
+		}
+
+		private void ReflectVerticalIfOverlapped(Ball ball, Block block)
+		{
+            //if (block.Right > ball.CenterX && block.Left < ball.CenterX)
+            //{
+				ReflectVertical(ball);
+				ReflectVEnable = false;
+            //}
+		}
+
+		private void ReflectHorizontal(Ball ball)
 		{
 			ball.DX = -ball.DX;
-            ball.CenterX += ball.DX;
-            ball.CenterX += ball.DX * BarAccel;
+			ball.CenterX += ball.DX;
 
 			boundFlag = true;
 		}
 
-		private void ReflectVertical(Ball ball, int barCX, int ballCX)
+		private void ReflectHorizontal(Ball ball, Bar bar, int BarAccel)
+		{
+			ReflectHorizontal(ball);
+			ball.CenterX += ball.DX * BarAccel;
+		}
+
+		private void ReflectVertical(Ball ball)
 		{
 			ball.Radius = 20;
 
@@ -726,7 +746,31 @@ namespace WPFBlockCrash
 				combocount = 0;
 				bar.IsMove = false;
 			}
-			else if (ballCX < barCX - barWidth / 2 * 2 / 3 && ballCX > barCX + barWidth / 2 * 2 / 3)
+			else
+			{
+				combocount = 0;
+				bar.IsMove = false;
+				ball.DY = -ball.DY;
+				ball.CenterY = ball.CenterY - 5;
+				boundFlag = true;
+			}
+		}
+
+		private void ReflectVertical(Ball ball, Bar bar)
+		{
+			ball.Radius = 20;
+
+			if (Main.CatchBallEnables && ballcatch)// ボールがバーにくっつく状態
+			{
+				ball.DX = ball.DY = 0;
+				ball.ballstop = true;
+				if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
+					ball.xoffset = ball.CenterX - bar.MX;
+				combocount = 0;
+				bar.IsMove = false;
+			}
+			else if (ball.CenterX < bar.CenterX - barWidth / 2 * 2 / 3 
+                && ball.CenterX > bar.CenterX + barWidth / 2 * 2 / 3)
 			{
 				combocount = 0;
 				bar.IsMove = false;
@@ -741,7 +785,7 @@ namespace WPFBlockCrash
 			}
 			else
 			{
-				if (ballCX < barCX + 10 && ballCX > barCX - 10)
+				if (ball.CenterX < bar.CenterX + 10 && ball.CenterX > bar.CenterX - 10)
 				{
 					ball.Penetration();
 					ball.LvUp(1); // 速度が上がって短時間貫通化

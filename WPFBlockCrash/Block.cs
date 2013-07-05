@@ -48,10 +48,14 @@ namespace WPFBlockCrash
         public EItemType ItemType { get; private set; }
         public EBlockColor BlockColor { get; private set; }
 
-        public int X { get; private set; }
-        public int Y { get; private set; }
+        public int CenterX { get; private set; }
+        public int CenterY { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public int Top { get { return CenterY - Height / 2; } }
+        public int Bottom { get { return CenterY + Height / 2; } }
+        public int Left { get { return CenterX - Width / 2; } }
+        public int Right { get { return CenterX + Width / 2; } }
         public int ItemWidth { get; private set; }
         public int ItemHeight { get; private set; }
 
@@ -72,7 +76,7 @@ namespace WPFBlockCrash
                 }
 
                 if (!old && isdead)
-                    Debug.WriteLine("A Block is dead now. (" + X + ", " + Y + ")");
+                    Debug.WriteLine("A Block is dead now. (" + CenterX + ", " + CenterY + ")");
             }
         }
 
@@ -182,8 +186,8 @@ namespace WPFBlockCrash
             ItemType = EItemType.ITEMTYPE_INCRESE;
 #endif
 
-            this.X = x;
-            this.Y = y;
+            this.CenterX = x;
+            this.CenterY = y;
 
             count = 0;
             half = false;
@@ -206,27 +210,28 @@ namespace WPFBlockCrash
             if (!IsDead)
             {
                 if (scrollcount > 0)
-                    g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], scrollcount - Width, Y - Height / 2, Width, Height);
+                    g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], scrollcount - Width, CenterY - Height / 2, Width, Height);
 
-                g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], X - Width / 2, Y - Height / 2, Width, Height);
+                g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
             }
             else if (ItemFlag)
             {
                 if (half)
                 {
                     if (scrollcount > 0)
-                        g.DrawImage(itemgh[(int)ItemType], scrollcount - Width, Y - Height / 2, Width, Height);
+                        g.DrawImage(itemgh[(int)ItemType], scrollcount - Width, CenterY - Height / 2, Width, Height);
 
-                    g.DrawImage(itemgh[(int)ItemType], X - Width / 2, Y - Height / 2, Width, Height);
+                    g.DrawImage(itemgh[(int)ItemType], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
                 }
                 else
                 {
                     if (scrollcount > 0)
-                        g.DrawImage(itemgh[(int)ItemType], scrollcount - ItemWidth, Y - Height / 2, ItemWidth, ItemHeight);
+                        g.DrawImage(itemgh[(int)ItemType], scrollcount - ItemWidth, CenterY - Height / 2, ItemWidth, ItemHeight);
 
-                    g.DrawImage(itemgh[(int)ItemType], X - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
+                    g.DrawImage(itemgh[(int)ItemType], CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
                 }
             }
+#if !DEBUG
             else 
             {
                 if (count < 20)
@@ -236,19 +241,20 @@ namespace WPFBlockCrash
                     if (scrollcount > 0)
                     {
                         if (WasItem)
-                            g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollcount - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
+                            g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollcount - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
                         else
-                            g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollcount - Width, Y - Height / 2, Width, Height);
+                            g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollcount - Width, CenterY - Height / 2, Width, Height);
                     }
 
                     if (WasItem)
-                        g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), X - ItemWidth / 2, Y - ItemHeight / 2, ItemWidth, ItemHeight);
+                        g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
                     else
-                        g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), X - Width / 2, Y - Height / 2, Width, Height);
+                        g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), CenterX - Width / 2, CenterY - Height / 2, Width, Height);
 
                     ++count;
                 }
             }
+#endif
         }
 
         private void CalculatePosition()
@@ -257,32 +263,32 @@ namespace WPFBlockCrash
             {
                 if (scroll == 1)// 右スクロール
                 {
-                    X += (int)Main.RunningSpeedFactor;
+                    CenterX += (int)Main.RunningSpeedFactor;
                     
-                    if (X + Width / 2 >= 800)//画面外に出たら逆の画面へ
+                    if (CenterX + Width / 2 >= 800)//画面外に出たら逆の画面へ
                     {
-                        scrollcount = X + Width / 2 - 800;
+                        scrollcount = CenterX + Width / 2 - 800;
                     }
 
-                    if (X - Width / 2 >= 800)
+                    if (CenterX - Width / 2 >= 800)
                     {
-                        X -= 800;
+                        CenterX -= 800;
                         scrollcount = 0;
                     }
                 }
 
                 if (scroll == -1)// 左スクロール
                 {
-                    X -= (int)Main.RunningSpeedFactor;
+                    CenterX -= (int)Main.RunningSpeedFactor;
                     
-                    if (X - Width / 2 < 0)//画面外に出たら逆の画面へ
+                    if (CenterX - Width / 2 < 0)//画面外に出たら逆の画面へ
                     {
-                        scrollcount = X + Width / 2 + 800;
+                        scrollcount = CenterX + Width / 2 + 800;
                     }
                     
-                    if (X + Width / 2 < 0)
+                    if (CenterX + Width / 2 < 0)
                     {
-                        X += 800;
+                        CenterX += 800;
                         scrollcount = 0;
                     }
                 }

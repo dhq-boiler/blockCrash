@@ -23,8 +23,8 @@ namespace WPFBlockCrash
                 if (!block[i].IsDead)
                 {
                     int blockendX = 0;
-                    int blockX = block[i].X;
-                    int blockY = block[i].Y;
+                    int blockX = block[i].CenterX;
+                    int blockY = block[i].CenterY;
                     int blockWidth = block[i].Width;
                     int blockHeight = block[i].Height;
 
@@ -105,8 +105,8 @@ namespace WPFBlockCrash
                     if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
                         continue;
                     int blockendX = 0;
-                    int blockX = block[i].X;
-                    int blockY = block[i].Y;
+                    int blockX = block[i].CenterX;
+                    int blockY = block[i].CenterY;
                     int blockWidth = block[i].Width;
                     int blockHeight = block[i].Height;
 
