@@ -58,6 +58,8 @@ namespace WPFBlockCrash
         public int Right { get { return CenterX + Width / 2; } }
         public int ItemWidth { get; private set; }
         public int ItemHeight { get; private set; }
+        public int DX { get; set; }
+        public int DY { get; set; }
 
         private bool isdead;
         public bool scrollStop;

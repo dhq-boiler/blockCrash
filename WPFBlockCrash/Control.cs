@@ -68,6 +68,16 @@ namespace WPFBlockCrash
 				Debug.WriteLine("Update ReflectEnableByBar to " + reflectEnableByBar);
 			}
 		}
+		private bool reflectEnableByBlock;
+		private bool ReflectEnableByBlock
+		{
+			get { return reflectEnableByBlock; }
+			set
+			{
+				reflectEnableByBlock = value;
+				Debug.WriteLine("Update ReflectEnableByBlock to " + reflectEnableByBlock);
+			}
+		}
 
 		public bool IsDead { get; set; }
 		public bool IsPlaying { get; set; }
@@ -558,37 +568,44 @@ namespace WPFBlockCrash
 			bool IsOverlappedVertical = Math.Abs(blockCY - ballCY) < ballHeight / 2 + blockHeight / 2;
 			bool IsOverlappedHorizontal = Math.Abs(blockCX - ballCX) < ballWidth / 2 + blockWidth / 2;
 
-			if (IsOverlappedHorizontal && IsOverlappedVertical)
+			if (IsOverlappedVertical && IsOverlappedHorizontal)
 			{
 				double OverlapDistanceX = double.MaxValue;
 				double OverlapDistanceY = double.MaxValue;
 
-				if (blockCY < ballCY)
+				if (blockCY < ballCY) //下辺反射
 					OverlapDistanceY = (ball.Top - block.Bottom) / (double)block.Height;
-				else if (blockCY > ballCY)
+				else  //上辺反射
 					OverlapDistanceY = (block.Top - ball.Bottom) / (double)block.Height;
 
-				if (blockCX < ballCX)
+				if (blockCX < ballCX) //右辺反射
 					OverlapDistanceX = (ball.Left - block.Right) / (double)block.Width;
-				else
+				else //左辺反射
 					OverlapDistanceX = (block.Left - ball.Right) / (double)block.Width;
-					
-				if (ReflectEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && OverlapDistanceY < OverlapDistanceX)
-				{
-					ReflectHorizontal(ball);
-					ReflectEnable = false;
-				}
-				else if (ReflectEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && OverlapDistanceY >= OverlapDistanceX)
-				{
-					ReflectVertical(ball);
-					ReflectEnable = false;
-				}
 
-				block.IsDead = true;
-			}
-			else
-			{
-				ReflectEnable = true;
+				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
+				{
+					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
+					ReflectVerticalIfOverlapped(ball, block);
+					ReflectHorizontalIfOverlapped(ball, block);
+					block.IsDead = true;
+				}
+				else if (OverlapDistanceY < OverlapDistanceX)
+				{
+					Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
+					ReflectHorizontalIfOverlapped(ball, block);
+					block.IsDead = true;
+				}
+				else if (OverlapDistanceX < OverlapDistanceY)
+				{
+					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
+					ReflectVerticalIfOverlapped(ball, block);
+					block.IsDead = true;
+				}
+				else
+				{
+					Debug.WriteLine("N ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
+				}
 			}
 
 			if (block.IsDead)
@@ -676,38 +693,31 @@ namespace WPFBlockCrash
 				else //左辺反射
 					OverlapDistanceX = (bar.Left - ball.Right) / (double)bar.Width;
 
+#if DEBUG
 				g.DrawString(string.Format("ODX:{0}", OverlapDistanceX), font, DrawUtil.BrushRGB(255, 120, 0), 20, 480);
 				g.DrawString(string.Format("ODY:{0}", OverlapDistanceY), font, DrawUtil.BrushRGB(255, 120, 0), 20, 520);
+#endif
 
-				if (ReflectEnableByBar && /*OverlapDistanceX < 0d && OverlapDistanceY < 0d &&*/ Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.25)
+				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.25)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					ReflectVerticalIfOverlapped(ball, bar);
 					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
 				}
-				else if (ReflectEnableByBar && /*OverlapDistanceX < 0d &&*/ OverlapDistanceY < OverlapDistanceX)
+				else if (OverlapDistanceY < OverlapDistanceX)
 				{
 					Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
 				}
-				else if (ReflectEnableByBar && /*OverlapDistanceY < 0d &&*/ OverlapDistanceX < OverlapDistanceY)
+				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					ReflectVerticalIfOverlapped(ball, bar);
-				}
-				else if (!ReflectEnableByBar)
-				{
-					Debug.WriteLine("N ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 				}
 				else
 				{
 					Debug.WriteLine("N ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 				}
-			}
-			else if (!IsOverlappedHorizontal && !IsOverlappedVertical)
-			{
-				if (ReflectEnableByBar == false)
-					ReflectEnableByBar = true;
 			}
 		}
 
@@ -745,13 +755,43 @@ namespace WPFBlockCrash
 
 		private void ReflectHorizontalIfOverlapped(Ball ball, Block block)
 		{
+			if (ball.Right > block.Left && ball.Left < block.Left) //ブロックの左辺で重なり反射
+			{
+				if (ball.DX < 0)
+				{
+					Debug.Write("Accelerate " + ball.DX);
+					ball.DX = (int)(ball.DX + block.DX * 2);
+					Debug.WriteLine(" → " + ball.DX);
+				}
+				else
+				{
+					ReflectHorizontal(ball, block);
+				}
+			}
+			else if (ball.Left < block.Right && ball.Right > block.Right) //ブロックの右辺で重なり反射
+			{
+				if (ball.DX > 0)
+				{
+					Debug.Write("Accelerate " + ball.DX);
+					ball.DX = (int)(ball.DX + block.DX * 2);
+					Debug.WriteLine(" → " + ball.DX);
+				}
+				else
+				{
+					ReflectHorizontal(ball, block);
+				}
+			}
+		}
+
+		private void ReflectHorizontal(Ball ball, Block block)
+		{
 			ReflectHorizontal(ball);
-			ReflectHEnable = false;
+			Debug.WriteLine("ReflectHorizontal " + (ball.DX > 0 ? "→" : "←"));
 		}
 
 		private void ReflectVerticalIfOverlapped(Ball ball, Bar bar)
 		{
-			if (ball.Bottom > bar.Top) //バーの上辺で反射
+			if (ball.Bottom > bar.Top && ball.Top < bar.Top) //バーの上辺で反射
 			{
 				if (ball.DY < 0)
 				{
@@ -765,7 +805,7 @@ namespace WPFBlockCrash
 				}
 				ReflectEnableByBar = false;
 			}
-			else if (ball.Top < bar.Bottom) //バーの下辺で反射
+			else if (ball.Top < bar.Bottom && bar.Bottom < ball.Bottom) //バーの下辺で反射
 			{
 				if (ball.DY > 0)
 				{
@@ -783,11 +823,39 @@ namespace WPFBlockCrash
 
 		private void ReflectVerticalIfOverlapped(Ball ball, Block block)
 		{
-			//if (block.Right > ball.CenterX && block.Left < ball.CenterX)
-			//{
-				ReflectVertical(ball);
-				ReflectVEnable = false;
-			//}
+			if (ball.Bottom > block.Top && ball.Top < block.Top) //ブロックの上辺で反射
+			{
+				if (ball.DY < 0)
+				{
+					Debug.WriteLine("Accelerate " + ball.DY);
+					ball.DY = (int)(ball.DY * 1.2);
+					Debug.WriteLine(" → " + ball.DY);
+				}
+				else
+				{
+					ReflectVertical(ball, block);
+				}
+			}
+			else if (ball.Top < block.Bottom && block.Bottom < ball.Bottom) //ブロックの下辺で反射
+			{
+				if (ball.DY > 0)
+				{
+					Debug.WriteLine("Accelerate " + ball.DY);
+					ball.DY = (int)(ball.DY * 1.2);
+					Debug.WriteLine(" → " + ball.DY);
+				}
+				else
+				{
+					ReflectVertical(ball, block);
+				}
+			}
+		}
+
+		private void ReflectVertical(Ball ball, Block block)
+		{
+			++combocount;
+			ball.DY = -ball.DY;
+			boundFlag = true;
 		}
 
 		private void ReflectHorizontal(Ball ball)
