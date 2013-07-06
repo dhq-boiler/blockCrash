@@ -58,7 +58,16 @@ namespace WPFBlockCrash
 		private bool ReflectVEnable;
 		private bool ReflectHEnable;
 		private bool ReflectEnable;
-		private bool ReflectEnableByBar;
+		private bool reflectEnableByBar;
+		private bool ReflectEnableByBar
+		{
+			get { return reflectEnableByBar; }
+			set
+			{
+				reflectEnableByBar = value;
+				Debug.WriteLine("Update ReflectEnableByBar to " + reflectEnableByBar);
+			}
+		}
 
 		public bool IsDead { get; set; }
 		public bool IsPlaying { get; set; }
@@ -133,6 +142,7 @@ namespace WPFBlockCrash
 					{
 						message = new Message(EMessageType.FAILED, 50, dInfo);
 						IsPlaying = false;
+						ball.IsStop = true;
 					}
 
 					if (message.Process(input, g, uc, takeOver).IsDead)
@@ -149,6 +159,7 @@ namespace WPFBlockCrash
 					{
 						message = new Message(EMessageType.GAMEOVER, 120, dInfo);
 						IsPlaying = false;
+						ball.IsStop = true;
 					}
 
 					if (message.Process(input, g, uc, takeOver).IsDead)
@@ -168,6 +179,7 @@ namespace WPFBlockCrash
 				{
 					message = new Message(EMessageType.CLEAR, 200, dInfo);
 					IsPlaying = false;
+					ball.IsStop = true;
 				}
 
 				if (message.Process(input, g, uc, takeOver).IsDead)
@@ -206,8 +218,11 @@ namespace WPFBlockCrash
 			//ブロックの描画処理
 			builder.BlockProcess(input, g, uc, takeOver, block, ref count, sumblock);
 
+			//クリア判定
 			if (count == sumblock)
+			{
 				clear = true;
+			}
 
 			if (input.AT)
 			{
@@ -222,10 +237,12 @@ namespace WPFBlockCrash
 			if (ball.ActCount == 0)
 			{
 				ball.CenterX = bar.MX;
+				if (!ReflectEnableByBar)
+					ReflectEnableByBar = true;
 			}
 
 			//吸着時のメインボールのX座標
-			if (ball.ballstop)
+			if (ball.IsCatching)
 			{
 				ball.CenterX = bar.MX + ball.xoffset;
 			}
@@ -233,7 +250,7 @@ namespace WPFBlockCrash
 			//吸着時のスモールボールのX座標
 			foreach (Ball smallBall in SmallBalls)
 			{
-				if (smallBall.ballstop)// ボールが止まっていれば
+				if (smallBall.IsStop)// ボールが止まっていれば
 				{ 
 					smallBall.CenterX = bar.MX + smallBall.xoffset;
 					smallBall.CenterY = 527;
@@ -241,7 +258,7 @@ namespace WPFBlockCrash
 			}
 
 			// ボールの動き
-			if (!ball.ballstop)
+			if (!ball.IsStop && !ball.IsCatching)
 			{
 				++ballspup; // 速度上昇カウント
 
@@ -325,7 +342,7 @@ namespace WPFBlockCrash
 
 			ball.BarAccel(accel);
 
-			// 小玉があれば表示
+			// 小玉があれば加速させる？
 			foreach (Ball smallBall in SmallBalls)
 			{
 				smallBall.BarAccel(accel);
@@ -609,7 +626,7 @@ namespace WPFBlockCrash
 							break;
 
 						Ball newSmallBall = new Ball(dInfo);
-						newSmallBall.ballstop = false;
+						newSmallBall.IsStop = false;
 						newSmallBall.Increse(ballX, ballY);
 						willBeAddedSmallBalls.Add(newSmallBall);
 						++sballcount;
@@ -662,87 +679,85 @@ namespace WPFBlockCrash
 				g.DrawString(string.Format("ODX:{0}", OverlapDistanceX), font, DrawUtil.BrushRGB(255, 120, 0), 20, 480);
 				g.DrawString(string.Format("ODY:{0}", OverlapDistanceY), font, DrawUtil.BrushRGB(255, 120, 0), 20, 520);
 
-				if (ReflectEnableByBar && OverlapDistanceX < 0d && OverlapDistanceY < 0d && Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.1)
+				if (ReflectEnableByBar && /*OverlapDistanceX < 0d && OverlapDistanceY < 0d &&*/ Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.25)
 				{
+					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					ReflectVerticalIfOverlapped(ball, bar);
 					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
 				}
-				else if (ReflectEnableByBar && OverlapDistanceY < 0d && OverlapDistanceX < 0d && OverlapDistanceY < OverlapDistanceX)
+				else if (ReflectEnableByBar && /*OverlapDistanceX < 0d &&*/ OverlapDistanceY < OverlapDistanceX)
 				{
+					Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
 				}
-                else if (ReflectEnableByBar && OverlapDistanceY < 0d && OverlapDistanceX < 0d && OverlapDistanceY >= OverlapDistanceX)
-                {
-                    ReflectVerticalIfOverlapped(ball, bar);
-                }
-                else
-                {
-                    ;
-                }
+				else if (ReflectEnableByBar && /*OverlapDistanceY < 0d &&*/ OverlapDistanceX < OverlapDistanceY)
+				{
+					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
+					ReflectVerticalIfOverlapped(ball, bar);
+				}
+				else if (!ReflectEnableByBar)
+				{
+					Debug.WriteLine("N ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
+				}
+				else
+				{
+					Debug.WriteLine("N ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
+				}
 			}
 			else if (!IsOverlappedHorizontal && !IsOverlappedVertical)
 			{
-				ReflectEnableByBar = true;
+				if (ReflectEnableByBar == false)
+					ReflectEnableByBar = true;
 			}
 		}
 
 		private void ReflectHorizontalIfOverlapped(Ball ball, Bar bar, int barAccel)
 		{
-			//if (bar.CenterY + barHeight / 2 > ball.CenterY
-			//    && bar.CenterY - barHeight / 2 < ball.CenterY)
-			//{
-			//if (ball.Left < bar.Left || ball.Right > bar.Right)
-			if (ball.Right > bar.Left) //バーの左辺で重なり反射
+			if (ball.Right > bar.Left && ball.Left < bar.Left) //バーの左辺で重なり反射
 			{
 				if (ball.DX < 0)
 				{
-                    Debug.Write("Accelerate " + ball.DX);
-					ball.DX = (int)(ball.DX * 1.5);
-                    Debug.WriteLine(" → " + ball.DX);
+					Debug.Write("Accelerate " + ball.DX);
+					ball.DX = (int)(ball.DX + barAccel * 2);
+					Debug.WriteLine(" → " + ball.DX);
 				}
 				else
 				{
 					ReflectHorizontal(ball, bar, barAccel);
-                    Debug.WriteLine("Reflect Horizontal");
 				}
 				ReflectEnableByBar = false;
 			}
-			else if (ball.Left < bar.Right) //バーの右辺で重なり反射
+			else if (ball.Left < bar.Right && ball.Right > bar.Right) //バーの右辺で重なり反射
 			{
 				if (ball.DX > 0)
 				{
-                    Debug.Write("Accelerate " + ball.DX);
-					ball.DX = (int)(ball.DX * 1.5);
-                    Debug.WriteLine(" → " + ball.DX);
+					Debug.Write("Accelerate " + ball.DX);
+					ball.DX = (int)(ball.DX + barAccel * 2);
+					Debug.WriteLine(" → " + ball.DX);
 				}
 				else
 				{
-                    ReflectHorizontal(ball, bar, barAccel);
-                    Debug.WriteLine("Reflect HOrizontal");
+					ReflectHorizontal(ball, bar, barAccel);
 				}
 				ReflectEnableByBar = false;
 			}
-			//}
 		}
 
 		private void ReflectHorizontalIfOverlapped(Ball ball, Block block)
 		{
-			//if (block.Bottom > ball.CenterY && block.Top < ball.CenterY)
-			//{
-				ReflectHorizontal(ball);
-				ReflectHEnable = false;
-			//}
+			ReflectHorizontal(ball);
+			ReflectHEnable = false;
 		}
 
 		private void ReflectVerticalIfOverlapped(Ball ball, Bar bar)
 		{
-			//if (bar.Right > ball.CenterX && bar.Left < ball.CenterX)
-			//{
-			if (ball.Bottom > bar.Top) //下辺反射
+			if (ball.Bottom > bar.Top) //バーの上辺で反射
 			{
 				if (ball.DY < 0)
 				{
+					Debug.Write("Accelerate " + ball.DY);
 					ball.DY = (int)(ball.DY * 1.2);
+					Debug.WriteLine(" → " + ball.DY);
 				}
 				else
 				{
@@ -750,11 +765,13 @@ namespace WPFBlockCrash
 				}
 				ReflectEnableByBar = false;
 			}
-			else if (ball.Top < bar.Bottom) //上辺反射
+			else if (ball.Top < bar.Bottom) //バーの下辺で反射
 			{
 				if (ball.DY > 0)
 				{
+					Debug.Write("Accelerate " + ball.DY);
 					ball.DY = (int)(ball.DY * 1.2);
+					Debug.WriteLine(" → " + ball.DY);
 				}
 				else
 				{
@@ -762,7 +779,6 @@ namespace WPFBlockCrash
 				}
 				ReflectEnableByBar = false;
 			}
-			//}
 		}
 
 		private void ReflectVerticalIfOverlapped(Ball ball, Block block)
@@ -785,7 +801,8 @@ namespace WPFBlockCrash
 		private void ReflectHorizontal(Ball ball, Bar bar, int BarAccel)
 		{
 			ReflectHorizontal(ball);
-			ball.CenterX += ball.DX * BarAccel;
+			//ball.CenterX += ball.DX * BarAccel;
+			Debug.WriteLine("ReflectHorizontal " + (ball.DX > 0 ? "→" : "←"));
 		}
 
 		private void ReflectVertical(Ball ball)
@@ -795,8 +812,8 @@ namespace WPFBlockCrash
 			if (Main.CatchBallEnables && ballcatch)// ボールがバーにくっつく状態
 			{
 				ball.DX = ball.DY = 0;
-				ball.ballstop = true;
-				if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
+				ball.IsStop = true;
+				if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
 					ball.xoffset = ball.CenterX - bar.MX;
 				combocount = 0;
 				bar.IsMove = false;
@@ -817,9 +834,10 @@ namespace WPFBlockCrash
 
 			if (Main.CatchBallEnables && ballcatch)// ボールがバーにくっつく状態
 			{
+				ball.IsCatching = true;
 				ball.DX = ball.DY = 0;
-				ball.ballstop = true;
-				if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
+				ball.IsStop = true;
+				if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
 					ball.xoffset = ball.CenterX - bar.MX;
 				combocount = 0;
 				bar.IsMove = false;
@@ -832,11 +850,13 @@ namespace WPFBlockCrash
 				if (Bar == EBarType.SHORT)
 					ball.LvUp(1);
 
-				ball.DX = -ball.DX;
+				//ball.DX = -ball.DX;
 				ball.DY = -ball.DY;
 				ball.CenterY = ball.CenterY - 5;
 
 				boundFlag = true;
+
+				Debug.WriteLine("Reflect Vertical " + (ball.DY > 0 ? "↓" : "↑"));
 			}
 			else
 			{
@@ -853,6 +873,8 @@ namespace WPFBlockCrash
 				ball.DY = -ball.DY;
 				ball.CenterY = ball.CenterY - 5;
 				boundFlag = true;
+
+				Debug.WriteLine("Reflect Vertical " + (ball.DY > 0 ? "↓" : "↑"));
 			}
 		}
 

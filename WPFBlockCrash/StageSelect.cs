@@ -26,15 +26,16 @@ namespace WPFBlockCrash
 
         public int Score { get; set; }
         public int Stock { get; set; }
-        public int Bar { get; set; }
+        public EBarType Bar { get; set; }
 
         public bool IsDead { get; set; }
 
 
-        public StageSelect(DisplayInfo dInfo, IOperator Operator)
+        public StageSelect(DisplayInfo dInfo, IOperator Operator, UserChoice uc)
         {
             this.dInfo = dInfo;
             this.Operator = Operator;
+            this.Bar = uc.BarType;
 
             bargh = new Image[3];
             stagegh = new Image[6];
@@ -74,9 +75,11 @@ namespace WPFBlockCrash
             }
 
             Score = 0;
+#if DEBUG
+            Stock = 10;
+#else
             Stock = 2;
-            Bar = 1;
-
+#endif
             autocount = 0;
         }
 
@@ -91,6 +94,7 @@ namespace WPFBlockCrash
             if (IsDead)
             {
                 uc.StageType = (EStageType)Stage;
+                takeOver.Stock = Stock;
                 return new ProcessResult()
                 {
                     IsDead = IsDead,
@@ -142,7 +146,7 @@ namespace WPFBlockCrash
 
             g.DrawRectangle(new System.Drawing.Pen(DrawUtil.BrushRGB(255, 20, 30)), 60 + (Stage - 1) * 120, 200, 100, 80);
             g.DrawRectangle(new System.Drawing.Pen(DrawUtil.BrushRGB(255, 20, 30)), 400, 320, 350, 270);
-            g.DrawImage(bargh[Bar - 1], 40, 460);
+            g.DrawImage(bargh[(int)Bar - 1], 40, 460);
             g.DrawString(string.Format("SCORE：{0}", Score), font, DrawUtil.BrushRGB(255, 120, 0), 40, 500);
             g.DrawString(string.Format("STOCK：{0}", Stock), font, DrawUtil.BrushRGB(255, 120, 0), 40, 540);
         }
@@ -163,14 +167,14 @@ namespace WPFBlockCrash
             }
         }
 
-        public void SetValue(int bar, int stage, int score, int stock)
-        {
-            Bar = bar;
-            if(stage != 0)
-                clear[stage - 1] = true;
-            Score = score;
-            Stock = stock;
-        }
+        //public void SetValue(int bar, int stage, int score, int stock)
+        //{
+        //    Bar = bar;
+        //    if(stage != 0)
+        //        clear[stage - 1] = true;
+        //    Score = score;
+        //    Stock = stock;
+        //}
 
         internal void Reset()
         {

@@ -256,8 +256,8 @@ namespace WPFBlockCrash
             if (ballcatch)// ボールがバーにくっつく状態
             {
                 ball.DX = ball.DY = 0;
-                ball.ballstop = true;
-                if (ball.ballstop) // ＋なら右に，ーなら左にずれてる
+                ball.IsStop = true;
+                if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
                     ball.xoffset = ball.CenterX - bar.MX;
                 combocount = 0;
                 bar.IsMove = false;

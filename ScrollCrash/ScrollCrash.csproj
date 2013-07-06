@@ -34,8 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="libts">
-      <HintPath>..\..\touchscreen\libts\bin\x86\Release_Parallel\libts.dll</HintPath>
+    <Reference Include="libts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\touchscreen\libts\bin\Release_Parallel\libts.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvItmdUtil">
       <HintPath>..\..\..\..\..\..\Git\nmbridge\release_parallel\OpenCvItmdUtil.dll</HintPath>

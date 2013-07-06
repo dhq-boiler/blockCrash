@@ -77,7 +77,6 @@ namespace WPFBlockCrash
             }
         }
 
-
         public bool MoveBar(Bar bar, ref int AcceleratingCount, Input input)
         {
             bool IsPushedAnyKey = false;

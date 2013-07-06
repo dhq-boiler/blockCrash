@@ -8,7 +8,6 @@ namespace WPFBlockCrash
 {
     class Ball : IInputable
     {
-        public bool ballstop { get; set; }
         public int xoffset { get; set; }
         public int baccel { get; set; } 
         public int acbectl { get; set; } // 加速の向き
@@ -36,6 +35,8 @@ namespace WPFBlockCrash
 
         public bool IsSmall { get; set; }
         public int IsNewCount { get; set; }
+        public bool IsStop { get; set; }
+        public bool IsCatching { get; set; }
 
         public enum EPenetrability
         {
@@ -69,7 +70,7 @@ namespace WPFBlockCrash
             IsSmall = false;
             IsNewCount = 0;
             Level = 1;
-            ballstop = true;
+            IsStop = true;
             xoffset = 0;
             baccel = 0;
             acbectl = 0;
@@ -149,7 +150,7 @@ namespace WPFBlockCrash
         {
             if (input.eB)
             {
-                if (ActCount == 0 && !IsSmall || ballstop)
+                if (ActCount == 0 && !IsSmall || IsCatching)
                 {
                     if (input.AT)
                     {
@@ -194,7 +195,7 @@ namespace WPFBlockCrash
                         }
                     }
                     ActCount = 1;
-                    ballstop = false;
+                    IsCatching = false;
                 }
             }
         }

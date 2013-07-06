@@ -52,7 +52,7 @@ namespace WPFBlockCrash
                 return new ProcessResult()
                 {
                     IsDead = IsDead,
-                    NextState = new StageSelect(dInfo, Operator),
+                    NextState = new StageSelect(dInfo, Operator, uc),
                     UserChoice = uc,
                     TakeOver = takeOver
                 };
