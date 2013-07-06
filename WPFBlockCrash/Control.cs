@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -56,8 +57,8 @@ namespace WPFBlockCrash
 		private int combooncount { get; set; }
 		private bool ReflectVEnable;
 		private bool ReflectHEnable;
-        private bool ReflectEnable;
-        private bool ReflectEnableByBar;
+		private bool ReflectEnable;
+		private bool ReflectEnableByBar;
 
 		public bool IsDead { get; set; }
 		public bool IsPlaying { get; set; }
@@ -435,17 +436,17 @@ namespace WPFBlockCrash
 
 			for (int i = 0; i < sumblock; ++i)
 			{
-                if (!block[i].IsDead)
-                {
-                    if (CheckCrashingBlock(ball, block[i]))
-                        break;
-                }
-                else if (block[i].ItemFlag)
-                {
-                    if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
-                        continue;
-                    CheckGettingItem(ballX, ballY, i);
-                }
+				if (!block[i].IsDead)
+				{
+					if (CheckCrashingBlock(ball, block[i]))
+						break;
+				}
+				else if (block[i].ItemFlag)
+				{
+					if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+						continue;
+					CheckGettingItem(ballX, ballY, i);
+				}
 			}
 		}
 
@@ -548,30 +549,30 @@ namespace WPFBlockCrash
 				if (blockCY < ballCY)
 					OverlapDistanceY = (ball.Top - block.Bottom) / (double)block.Height;
 				else if (blockCY > ballCY)
-                    OverlapDistanceY = (block.Top - ball.Bottom) / (double)block.Height;
+					OverlapDistanceY = (block.Top - ball.Bottom) / (double)block.Height;
 
 				if (blockCX < ballCX)
-                    OverlapDistanceX = (ball.Left - block.Right) / (double)block.Width;
+					OverlapDistanceX = (ball.Left - block.Right) / (double)block.Width;
 				else
-                    OverlapDistanceX = (block.Left - ball.Right) / (double)block.Width;
-                    
-                if (ReflectEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && OverlapDistanceY < OverlapDistanceX)
+					OverlapDistanceX = (block.Left - ball.Right) / (double)block.Width;
+					
+				if (ReflectEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && OverlapDistanceY < OverlapDistanceX)
 				{
-                    ReflectHorizontal(ball);
-                    ReflectEnable = false;
+					ReflectHorizontal(ball);
+					ReflectEnable = false;
 				}
-                else if (ReflectEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && OverlapDistanceY >= OverlapDistanceX)
+				else if (ReflectEnable && OverlapDistanceX < 0d && OverlapDistanceY < 0d && OverlapDistanceY >= OverlapDistanceX)
 				{
-                    ReflectVertical(ball);
-                    ReflectEnable = false;
+					ReflectVertical(ball);
+					ReflectEnable = false;
 				}
 
-                block.IsDead = true;
+				block.IsDead = true;
 			}
-            else
-            {
-                ReflectEnable = true;
-            }
+			else
+			{
+				ReflectEnable = true;
+			}
 
 			if (block.IsDead)
 			{
@@ -583,7 +584,7 @@ namespace WPFBlockCrash
 				ball.Radius = 0;
 			}
 
-            return block.IsDead;
+			return block.IsDead;
 		}
 
 		private void ItemEffect(EItemType eItemType, int ballX, int ballY)
@@ -650,12 +651,12 @@ namespace WPFBlockCrash
 
 				if (barCY < ballCY) //下辺反射
 					OverlapDistanceY = (ball.Top - bar.Bottom) / (double)bar.Height;
-                else  //上辺反射
+				else  //上辺反射
 					OverlapDistanceY = (bar.Top - ball.Bottom) / (double)bar.Height;
 
-                if (barCX < ballCX) //右辺反射
+				if (barCX < ballCX) //右辺反射
 					OverlapDistanceX = (ball.Left - bar.Right) / (double)bar.Width;
-                else //左辺反射
+				else //左辺反射
 					OverlapDistanceX = (bar.Left - ball.Right) / (double)bar.Width;
 
 				g.DrawString(string.Format("ODX:{0}", OverlapDistanceX), font, DrawUtil.BrushRGB(255, 120, 0), 20, 480);
@@ -666,14 +667,18 @@ namespace WPFBlockCrash
 					ReflectVerticalIfOverlapped(ball, bar);
 					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
 				}
-                else if (ReflectEnableByBar && OverlapDistanceY < 0d && OverlapDistanceX < 0d && OverlapDistanceY < OverlapDistanceX)
+				else if (ReflectEnableByBar && OverlapDistanceY < 0d && OverlapDistanceX < 0d && OverlapDistanceY < OverlapDistanceX)
 				{
 					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
 				}
                 else if (ReflectEnableByBar && OverlapDistanceY < 0d && OverlapDistanceX < 0d && OverlapDistanceY >= OverlapDistanceX)
-				{
-					ReflectVerticalIfOverlapped(ball, bar);
-				}
+                {
+                    ReflectVerticalIfOverlapped(ball, bar);
+                }
+                else
+                {
+                    ;
+                }
 			}
 			else if (!IsOverlappedHorizontal && !IsOverlappedVertical)
 			{
@@ -683,40 +688,90 @@ namespace WPFBlockCrash
 
 		private void ReflectHorizontalIfOverlapped(Ball ball, Bar bar, int barAccel)
 		{
-            //if (bar.CenterY + barHeight / 2 > ball.CenterY
-            //    && bar.CenterY - barHeight / 2 < ball.CenterY)
-            //{
-            if (ball.Left < bar.Left || ball.Right > bar.Right)
-				ReflectHorizontal(ball, bar, barAccel);
-			ReflectEnableByBar = false;
-            //}
+			//if (bar.CenterY + barHeight / 2 > ball.CenterY
+			//    && bar.CenterY - barHeight / 2 < ball.CenterY)
+			//{
+			//if (ball.Left < bar.Left || ball.Right > bar.Right)
+			if (ball.Right > bar.Left) //バーの左辺で重なり反射
+			{
+				if (ball.DX < 0)
+				{
+                    Debug.Write("Accelerate " + ball.DX);
+					ball.DX = (int)(ball.DX * 1.5);
+                    Debug.WriteLine(" → " + ball.DX);
+				}
+				else
+				{
+					ReflectHorizontal(ball, bar, barAccel);
+                    Debug.WriteLine("Reflect Horizontal");
+				}
+				ReflectEnableByBar = false;
+			}
+			else if (ball.Left < bar.Right) //バーの右辺で重なり反射
+			{
+				if (ball.DX > 0)
+				{
+                    Debug.Write("Accelerate " + ball.DX);
+					ball.DX = (int)(ball.DX * 1.5);
+                    Debug.WriteLine(" → " + ball.DX);
+				}
+				else
+				{
+                    ReflectHorizontal(ball, bar, barAccel);
+                    Debug.WriteLine("Reflect HOrizontal");
+				}
+				ReflectEnableByBar = false;
+			}
+			//}
 		}
 
 		private void ReflectHorizontalIfOverlapped(Ball ball, Block block)
 		{
-            //if (block.Bottom > ball.CenterY && block.Top < ball.CenterY)
-            //{
+			//if (block.Bottom > ball.CenterY && block.Top < ball.CenterY)
+			//{
 				ReflectHorizontal(ball);
 				ReflectHEnable = false;
-            //}
+			//}
 		}
 
 		private void ReflectVerticalIfOverlapped(Ball ball, Bar bar)
 		{
-            //if (bar.Right > ball.CenterX && bar.Left < ball.CenterX)
-            //{
-				ReflectVertical(ball, bar);
+			//if (bar.Right > ball.CenterX && bar.Left < ball.CenterX)
+			//{
+			if (ball.Bottom > bar.Top) //下辺反射
+			{
+				if (ball.DY < 0)
+				{
+					ball.DY = (int)(ball.DY * 1.2);
+				}
+				else
+				{
+					ReflectVertical(ball, bar);
+				}
 				ReflectEnableByBar = false;
-            //}
+			}
+			else if (ball.Top < bar.Bottom) //上辺反射
+			{
+				if (ball.DY > 0)
+				{
+					ball.DY = (int)(ball.DY * 1.2);
+				}
+				else
+				{
+					ReflectVertical(ball, bar);
+				}
+				ReflectEnableByBar = false;
+			}
+			//}
 		}
 
 		private void ReflectVerticalIfOverlapped(Ball ball, Block block)
 		{
-            //if (block.Right > ball.CenterX && block.Left < ball.CenterX)
-            //{
+			//if (block.Right > ball.CenterX && block.Left < ball.CenterX)
+			//{
 				ReflectVertical(ball);
 				ReflectVEnable = false;
-            //}
+			//}
 		}
 
 		private void ReflectHorizontal(Ball ball)
@@ -770,7 +825,7 @@ namespace WPFBlockCrash
 				bar.IsMove = false;
 			}
 			else if (ball.CenterX < bar.CenterX - barWidth / 2 * 2 / 3 
-                && ball.CenterX > bar.CenterX + barWidth / 2 * 2 / 3)
+				&& ball.CenterX > bar.CenterX + barWidth / 2 * 2 / 3)
 			{
 				combocount = 0;
 				bar.IsMove = false;

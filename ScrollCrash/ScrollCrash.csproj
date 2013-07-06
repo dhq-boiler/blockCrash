@@ -35,8 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="libts">
-      <HintPath>..\..\..\..\..\..\Git\touchscreen\libts\bin\release_parallel\libts.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\touchscreen\libts\bin\x86\Release_Parallel\libts.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvItmdUtil">
       <HintPath>..\..\..\..\..\..\Git\nmbridge\release_parallel\OpenCvItmdUtil.dll</HintPath>
