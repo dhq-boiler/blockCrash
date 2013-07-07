@@ -38,6 +38,8 @@ namespace WPFBlockCrash
         public bool IsStop { get; set; }
         public bool IsCatching { get; set; }
 
+        private LinkedList<Ball> OverlappingBalls;
+
         public enum EPenetrability
         {
             NON_PENETRATING,
@@ -74,6 +76,8 @@ namespace WPFBlockCrash
             xoffset = 0;
             baccel = 0;
             acbectl = 0;
+
+            OverlappingBalls = new LinkedList<Ball>();
         }
 
         private void Draw(Graphics g)
@@ -126,6 +130,8 @@ namespace WPFBlockCrash
         {
             if (ActCount != 0 || IsSmall)
                 Move();
+
+            UpdateOverlapping();
 
             //キー処理
             KeyGet(input);
@@ -300,6 +306,31 @@ namespace WPFBlockCrash
 
             CenterX = ballX;
             CenterY = ballY;
+        }
+
+        public void UpdateOverlapping()
+        {
+            LinkedList<Ball> removes = new LinkedList<Ball>();
+            foreach (var ball in OverlappingBalls)
+            {
+                if (!Collision.BallsIsOverlapping(this, ball))
+                    removes.AddLast(ball);
+            }
+
+            foreach (var removeBall in removes)
+            {
+                OverlappingBalls.Remove(removeBall);
+            }
+        }
+
+        public void BeginOverlapping(Ball other)
+        {
+            OverlappingBalls.AddLast(other);
+        }
+
+        public bool IsOverlapping(Ball other)
+        {
+            return OverlappingBalls.Contains(other);
         }
     }
 }

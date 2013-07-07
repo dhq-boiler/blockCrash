@@ -44,20 +44,19 @@ namespace WPFBlockCrash
 
 		private readonly Font font = new Font("Consolas", 16);
 
-		public EBarType Bar { get; set; }
+		public EBarType BarType { get; set; }
 		public EStageType Stage { get; set; }
 		public int Score { get; set; }
 		public int Stock { get; set; }
 		public int sballcount { get; set; }
-		public bool ballcatch { get; set; }
+		private bool isballcatch;
+		public bool IsBallCatch { get { return isballcatch; } set { isballcatch = value; } }
 		public bool clear;
 		private int alphacombo { get; set; }
-		private int combocount { get; set; }
+		private int combocount;
+		private int ComboCount { get { return combocount; } set { combocount = value; } }
 		private bool comboon { get; set; }
 		private int combooncount { get; set; }
-		private bool ReflectVEnable;
-		private bool ReflectHEnable;
-		private bool ReflectEnable;
 		private bool reflectEnableByBar;
 		private bool ReflectEnableByBar
 		{
@@ -89,14 +88,14 @@ namespace WPFBlockCrash
 			this.dInfo = dInfo;
 			this.Operator = Operator;
 
-			Bar = userChoice.BarType;
+			BarType = userChoice.BarType;
 
 			bool extendon = true;
-			if (Bar == EBarType.SHORT)
+			if (BarType == EBarType.SHORT)
 				extendon = false;
 	
 			//バーとボールのインスタンスを生成
-			bar = new Bar(Bar, dInfo, Operator);
+			bar = new Bar(BarType, dInfo, Operator);
 			ball = new Ball(dInfo);
 			ballspup = 0;
 
@@ -110,8 +109,8 @@ namespace WPFBlockCrash
 			Stock = takeOver.Stock;
 			Stage = userChoice.StageType;
 			vspeed = 0;
-			ballcatch = false;
-			combocount = 0;
+			IsBallCatch = false;
+			ComboCount = 0;
 			comboon = false;
 			combooncount = 0;
 			alphacombo = 0;
@@ -177,7 +176,7 @@ namespace WPFBlockCrash
 						return new ProcessResult()
 						{
 							IsDead = true,
-							NextState = new Ranking(Score, Bar, dInfo, Operator),
+							NextState = new Ranking(Score, BarType, dInfo, Operator),
 							TakeOver = takeOver
 						};
 					}
@@ -205,7 +204,7 @@ namespace WPFBlockCrash
 						return new ProcessResult()
 						{
 							IsDead = true,
-							NextState = new Ranking(Score, Bar, dInfo, Operator),
+							NextState = new Ranking(Score, BarType, dInfo, Operator),
 							TakeOver = takeOver
 						};
 				}
@@ -272,7 +271,7 @@ namespace WPFBlockCrash
 			{
 				++ballspup; // 速度上昇カウント
 
-				switch (Bar) // バーによりの速度上昇の早さが違う
+				switch (BarType) // バーによりの速度上昇の早さが違う
 				{
 
 					case EBarType.LONG:
@@ -322,15 +321,15 @@ namespace WPFBlockCrash
 			//デバック用
 
 			// コンボ表示　邪魔にならないよう透明化処理する  
-			if (combocount > 1)
+			if (ComboCount > 1)
 			{
-				g.DrawString(string.Format("{0} COMBO!", combocount), font, DrawUtil.BrushRGB(255, 120, 0), 20, 400);
+				g.DrawString(string.Format("{0} COMBO!", ComboCount), font, DrawUtil.BrushRGB(255, 120, 0), 20, 400);
 				combooncount = 0;
 				comboon = true;
-				alphacombo = combocount;
+				alphacombo = ComboCount;
 			}
 
-			if(combocount == 0 && comboon)
+			if(ComboCount == 0 && comboon)
 			{
 				if (combooncount < 20)
 				{
@@ -583,23 +582,30 @@ namespace WPFBlockCrash
 				else //左辺反射
 					OverlapDistanceX = (block.Left - ball.Right) / (double)block.Width;
 
-				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
+				if (OverlapDistanceX > 0d || OverlapDistanceY > 0d)
+					return false;
+
+				if (ball.Penetrability == Ball.EPenetrability.PENETRATING)
+				{
+					block.IsDead = true;
+				}
+				else if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					ReflectVerticalIfOverlapped(ball, block);
-					ReflectHorizontalIfOverlapped(ball, block);
+					Collision.ReflectVerticalIfOverlapped(ball, block, ref isballcatch, ref combocount, ref boundFlag);
+					Collision.ReflectHorizontalIfOverlapped(ball, block, ref boundFlag);
 					block.IsDead = true;
 				}
 				else if (OverlapDistanceY < OverlapDistanceX)
 				{
 					Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					ReflectHorizontalIfOverlapped(ball, block);
+					Collision.ReflectHorizontalIfOverlapped(ball, block, ref boundFlag);
 					block.IsDead = true;
 				}
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					ReflectVerticalIfOverlapped(ball, block);
+					Collision.ReflectVerticalIfOverlapped(ball, block, ref isballcatch, ref combocount, ref boundFlag);
 					block.IsDead = true;
 				}
 				else
@@ -613,8 +619,8 @@ namespace WPFBlockCrash
 				int NonMoveBonus = 0;
 				if (!bar.IsMove)
 					NonMoveBonus = 500;
-				++combocount;
-				Score += 100 + 50 * ball.Level + combocount * 100 + NonMoveBonus;
+				++ComboCount;
+				Score += 100 + 50 * ball.Level + ComboCount * 100 + NonMoveBonus;
 				ball.Radius = 0;
 			}
 
@@ -627,7 +633,7 @@ namespace WPFBlockCrash
 			switch (eItemType)
 			{
 				case EItemType.ITEMTYPE_LONG:
-					if (Bar != EBarType.SHORT)
+					if (BarType != EBarType.SHORT)
 					{
 						bar.ExtendWidth();
 						barWidth += exwidth;
@@ -659,7 +665,7 @@ namespace WPFBlockCrash
 					break;
 				case EItemType.ITEMTYPE_BALLCATCHER:
 					bar.BallCatch( true );
-					ballcatch = true;
+					IsBallCatch = true;
 					break;
 			}
 		}
@@ -701,248 +707,23 @@ namespace WPFBlockCrash
 				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.25)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					ReflectVerticalIfOverlapped(ball, bar);
-					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
+					Collision.ReflectVerticalIfOverlapped(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag, ref reflectEnableByBar);
+					Collision.ReflectHorizontalIfOverlapped(ball, bar, barAccel, ref boundFlag, ref reflectEnableByBar);
 				}
 				else if (OverlapDistanceY < OverlapDistanceX)
 				{
 					Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					ReflectHorizontalIfOverlapped(ball, bar, barAccel);
+					Collision.ReflectHorizontalIfOverlapped(ball, bar, barAccel, ref boundFlag, ref reflectEnableByBar);
 				}
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					ReflectVerticalIfOverlapped(ball, bar);
+					Collision.ReflectVerticalIfOverlapped(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag, ref reflectEnableByBar);
 				}
 				else
 				{
 					Debug.WriteLine("N ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 				}
-			}
-		}
-
-		private void ReflectHorizontalIfOverlapped(Ball ball, Bar bar, int barAccel)
-		{
-			if (ball.Right > bar.Left && ball.Left < bar.Left) //バーの左辺で重なり反射
-			{
-				if (ball.DX < 0)
-				{
-					Debug.Write("Accelerate " + ball.DX);
-					ball.DX = (int)(ball.DX + barAccel * 2);
-					Debug.WriteLine(" → " + ball.DX);
-				}
-				else
-				{
-					ReflectHorizontal(ball, bar, barAccel);
-				}
-				ReflectEnableByBar = false;
-			}
-			else if (ball.Left < bar.Right && ball.Right > bar.Right) //バーの右辺で重なり反射
-			{
-				if (ball.DX > 0)
-				{
-					Debug.Write("Accelerate " + ball.DX);
-					ball.DX = (int)(ball.DX + barAccel * 2);
-					Debug.WriteLine(" → " + ball.DX);
-				}
-				else
-				{
-					ReflectHorizontal(ball, bar, barAccel);
-				}
-				ReflectEnableByBar = false;
-			}
-		}
-
-		private void ReflectHorizontalIfOverlapped(Ball ball, Block block)
-		{
-			if (ball.Right > block.Left && ball.Left < block.Left) //ブロックの左辺で重なり反射
-			{
-				if (ball.DX < 0)
-				{
-					Debug.Write("Accelerate " + ball.DX);
-					ball.DX = (int)(ball.DX + block.DX * 2);
-					Debug.WriteLine(" → " + ball.DX);
-				}
-				else
-				{
-					ReflectHorizontal(ball, block);
-				}
-			}
-			else if (ball.Left < block.Right && ball.Right > block.Right) //ブロックの右辺で重なり反射
-			{
-				if (ball.DX > 0)
-				{
-					Debug.Write("Accelerate " + ball.DX);
-					ball.DX = (int)(ball.DX + block.DX * 2);
-					Debug.WriteLine(" → " + ball.DX);
-				}
-				else
-				{
-					ReflectHorizontal(ball, block);
-				}
-			}
-		}
-
-		private void ReflectHorizontal(Ball ball, Block block)
-		{
-			ReflectHorizontal(ball);
-			Debug.WriteLine("ReflectHorizontal " + (ball.DX > 0 ? "→" : "←"));
-		}
-
-		private void ReflectVerticalIfOverlapped(Ball ball, Bar bar)
-		{
-			if (ball.Bottom > bar.Top && ball.Top < bar.Top) //バーの上辺で反射
-			{
-				if (ball.DY < 0)
-				{
-					Debug.Write("Accelerate " + ball.DY);
-					ball.DY = (int)(ball.DY * 1.2);
-					Debug.WriteLine(" → " + ball.DY);
-				}
-				else
-				{
-					ReflectVertical(ball, bar);
-				}
-				ReflectEnableByBar = false;
-			}
-			else if (ball.Top < bar.Bottom && bar.Bottom < ball.Bottom) //バーの下辺で反射
-			{
-				if (ball.DY > 0)
-				{
-					Debug.Write("Accelerate " + ball.DY);
-					ball.DY = (int)(ball.DY * 1.2);
-					Debug.WriteLine(" → " + ball.DY);
-				}
-				else
-				{
-					ReflectVertical(ball, bar);
-				}
-				ReflectEnableByBar = false;
-			}
-		}
-
-		private void ReflectVerticalIfOverlapped(Ball ball, Block block)
-		{
-			if (ball.Bottom > block.Top && ball.Top < block.Top) //ブロックの上辺で反射
-			{
-				if (ball.DY < 0)
-				{
-					Debug.WriteLine("Accelerate " + ball.DY);
-					ball.DY = (int)(ball.DY * 1.2);
-					Debug.WriteLine(" → " + ball.DY);
-				}
-				else
-				{
-					ReflectVertical(ball, block);
-				}
-			}
-			else if (ball.Top < block.Bottom && block.Bottom < ball.Bottom) //ブロックの下辺で反射
-			{
-				if (ball.DY > 0)
-				{
-					Debug.WriteLine("Accelerate " + ball.DY);
-					ball.DY = (int)(ball.DY * 1.2);
-					Debug.WriteLine(" → " + ball.DY);
-				}
-				else
-				{
-					ReflectVertical(ball, block);
-				}
-			}
-		}
-
-		private void ReflectVertical(Ball ball, Block block)
-		{
-			++combocount;
-			ball.DY = -ball.DY;
-			boundFlag = true;
-		}
-
-		private void ReflectHorizontal(Ball ball)
-		{
-			ball.DX = -ball.DX;
-			ball.CenterX += ball.DX;
-
-			boundFlag = true;
-		}
-
-		private void ReflectHorizontal(Ball ball, Bar bar, int BarAccel)
-		{
-			ReflectHorizontal(ball);
-			//ball.CenterX += ball.DX * BarAccel;
-			Debug.WriteLine("ReflectHorizontal " + (ball.DX > 0 ? "→" : "←"));
-		}
-
-		private void ReflectVertical(Ball ball)
-		{
-			ball.Radius = 20;
-
-			if (Main.CatchBallEnables && ballcatch)// ボールがバーにくっつく状態
-			{
-				ball.DX = ball.DY = 0;
-				ball.IsStop = true;
-				if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
-					ball.xoffset = ball.CenterX - bar.MX;
-				combocount = 0;
-				bar.IsMove = false;
-			}
-			else
-			{
-				combocount = 0;
-				bar.IsMove = false;
-				ball.DY = -ball.DY;
-				ball.CenterY = ball.CenterY - 5;
-				boundFlag = true;
-			}
-		}
-
-		private void ReflectVertical(Ball ball, Bar bar)
-		{
-			ball.Radius = 20;
-
-			if (Main.CatchBallEnables && ballcatch)// ボールがバーにくっつく状態
-			{
-				ball.IsCatching = true;
-				ball.DX = ball.DY = 0;
-				ball.IsStop = true;
-				if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
-					ball.xoffset = ball.CenterX - bar.MX;
-				combocount = 0;
-				bar.IsMove = false;
-			}
-			else if (ball.CenterX < bar.CenterX - barWidth / 2 * 2 / 3 
-				&& ball.CenterX > bar.CenterX + barWidth / 2 * 2 / 3)
-			{
-				combocount = 0;
-				bar.IsMove = false;
-				if (Bar == EBarType.SHORT)
-					ball.LvUp(1);
-
-				//ball.DX = -ball.DX;
-				ball.DY = -ball.DY;
-				ball.CenterY = ball.CenterY - 5;
-
-				boundFlag = true;
-
-				Debug.WriteLine("Reflect Vertical " + (ball.DY > 0 ? "↓" : "↑"));
-			}
-			else
-			{
-				if (ball.CenterX < bar.CenterX + 10 && ball.CenterX > bar.CenterX - 10)
-				{
-					ball.Penetration();
-					ball.LvUp(1); // 速度が上がって短時間貫通化
-				}
-
-				combocount = 0;
-				bar.IsMove = false;
-				if (Bar == EBarType.SHORT)
-					ball.LvUp(1);
-				ball.DY = -ball.DY;
-				ball.CenterY = ball.CenterY - 5;
-				boundFlag = true;
-
-				Debug.WriteLine("Reflect Vertical " + (ball.DY > 0 ? "↓" : "↑"));
 			}
 		}
 
@@ -966,74 +747,65 @@ namespace WPFBlockCrash
 				if (smallBall.IsNewCount > 0) // 増えたばかりならコンティニュー
 					continue;
 
-                if (BallsIsOverlapping(ball, smallBall)) // 衝突判定
+				// 衝突判定
+				if (!ball.IsOverlapping(smallBall)
+					&& !smallBall.IsOverlapping(ball) //省略可
+					&& Collision.BallsIsOverlapping(ball, smallBall)) 
 				{
-                    Bounce(ball, smallBall);
+					Bounce(ball, smallBall);
+					ball.BeginOverlapping(smallBall);
+					smallBall.BeginOverlapping(ball);
 				}
 			}
 		}
 
-        private static bool BallsIsOverlapping(Ball ball1, Ball ball2)
-        {
-            return Math.Pow(ball1.CenterX - ball2.CenterX, 2) + Math.Pow(ball1.CenterY - ball2.CenterY, 2) <= Math.Pow(20, 2);
-        }
+		private void Bounce(Ball ball1, Ball ball2)
+		{
+			double OverlapDistanceX = 0d;
+			double OverlapDistanceY = 0d;
 
-        private void Bounce(Ball ball1, Ball ball2)
-        {
-            double OverlapDistanceX = double.MaxValue;
-            double OverlapDistanceY = double.MaxValue;
+			if (ball2.CenterY < ball1.CenterY) //下辺反射
+				OverlapDistanceY = (ball1.Top - ball2.Bottom) / (double)ball2.Height;
+			else  //上辺反射
+				OverlapDistanceY = (ball2.Top - ball1.Bottom) / (double)ball2.Height;
 
-            if (ball2.CenterY < ball1.CenterY) //下辺反射
-                OverlapDistanceY = (ball1.Top - ball2.Bottom) / (double)ball2.Height;
-            else  //上辺反射
-                OverlapDistanceY = (ball2.Top - ball1.Bottom) / (double)ball2.Height;
+			if (ball2.CenterX < ball1.CenterX) //右辺反射
+				OverlapDistanceX = (ball1.Left - ball2.Right) / (double)ball2.Width;
+			else //左辺反射
+				OverlapDistanceX = (ball2.Left - ball1.Right) / (double)ball2.Width;
 
-            if (ball2.CenterX < ball1.CenterX) //右辺反射
-                OverlapDistanceX = (ball1.Left - ball2.Right) / (double)ball2.Width;
-            else //左辺反射
-                OverlapDistanceX = (ball2.Left - ball1.Right) / (double)ball2.Width;
+			//重複領域が生じない場合，バウンドしない
+			if (OverlapDistanceX > 0d || OverlapDistanceY > 0d)
+			{
+				return;
+			}
 
-            //重複領域が生じない場合，バウンドしない
-            if (OverlapDistanceX > 0 || OverlapDistanceY > 0)
-            {
-                return;
-            }
+			if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.25)
+			{
+				Collision.ReflectVerticalIfOverlapped(ball1, ball2);
+				Collision.ReflectHorizontalIfOverlapped(ball1, ball2);
+			}
+			else if (OverlapDistanceY < OverlapDistanceX)
+			{
+				Collision.ReflectHorizontalIfOverlapped(ball1, ball2);
+			}
+			else if (OverlapDistanceX < OverlapDistanceY)
+			{
+				Collision.ReflectVerticalIfOverlapped(ball2, ball2);
+			}
 
-            double mass_ball1 = ball1.Width * ball1.Height;
-            double mass_ball2 = ball2.Width * ball2.Height;
-            double vx1 = ball1.DX;
-            double vy1 = ball1.DY;
-            double vx2 = ball2.DX;
-            double vy2 = ball2.DY;
-
-            var newX = BounceCalculate(mass_ball1, mass_ball2, vx1, vx2);
-            var newY = BounceCalculate(mass_ball1, mass_ball2, vy1, vy2);
-
-            ball1.DX = (int)newX.Item1;
-            ball2.DX = (int)newX.Item2;
-            ball1.DY = (int)newY.Item1;
-            ball2.DY = (int)newY.Item2;
-
-            boundFlag = true;
-        }
-
-        private Tuple<double, double> BounceCalculate(double mass_ball1, double mass_ball2, double v1, double v2)
-        {
-            double newV1 = (-v1 + v2) * (1 + Main.ElasticCoefficient) / (mass_ball1 / mass_ball2 + 1) + v1;
-            double newV2 = (-v2 + v1) * (1 + Main.ElasticCoefficient) / (mass_ball2 / mass_ball1 + 1) + v2;
-            return new Tuple<double, double>(newV1, newV2);
-        }
-		
+			boundFlag = true;
+		}
 
 		internal void Reset()
 		{
 			SmallBalls = new LinkedList<Ball>();
-			ballcatch = false;
+			IsBallCatch = false;
 			bar.BallCatch(false);
 			sballcount = 0;
 			vspeed = 0;
 			barWidth = bar.Width;
-			combocount = 0;
+			ComboCount = 0;
 			bar.Reset();
 			ball.Reset();
 			for (int i = 0; i < sumblock; ++i)

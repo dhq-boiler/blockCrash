@@ -53,7 +53,7 @@
     <Compile Include="Bar.cs" />
     <Compile Include="BarSelect.cs" />
     <Compile Include="Block.cs" />
-    <Compile Include="CollisionDetection.cs" />
+    <Compile Include="Collision.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="CrossCrossBuilder.cs" />
     <Compile Include="DesktopKeyboard.cs" />

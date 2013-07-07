@@ -22,7 +22,7 @@ namespace WPFBlockCrash
 
         public static readonly double ElasticCoefficient = 1.0;
         public static readonly double RunningSpeedFactor = 1.5;
-        public static readonly bool PenetrationEnables = false;
+        public static readonly bool PenetrationEnables = true;
         public static readonly bool CatchBallEnables = false;
         public static readonly string ResourceDirectory = Directory.GetCurrentDirectory() + "\\res\\";
         public static readonly Random rand = new Random(Environment.TickCount);
@@ -93,8 +93,6 @@ namespace WPFBlockCrash
                 if (input.barx == 50 || (input.eB && input.lB && input.rB))
                 {
                     input.AT = false;
-                    //title.SwapOperatingMode();
-                    //Reconstruct(dInfo, OperatingType);
                     SwapOperatingMode();
                     Restart(input);
                 }
