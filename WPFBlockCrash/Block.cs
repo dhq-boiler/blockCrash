@@ -102,7 +102,7 @@ namespace WPFBlockCrash
             }
         }
 
-        private bool WasItem;
+        private bool WasItem; //is used "Release" mode build.
         public bool HalfFlag
         {
             get { return half; }
@@ -164,7 +164,7 @@ namespace WPFBlockCrash
             barextend = extendon;
             IsDead = false;
             
-#if true
+#if false
             int r = Main.rand.Next() % 5;
             //int r = 1; デバック用
             if (r == 1)

@@ -198,7 +198,7 @@ namespace WPFBlockCrash
         {
             if (ball.Right > bar.Left && ball.Left < bar.Left) //バーの左辺で重なり反射
             {
-                if (ball.DX < 0)
+                if (ball.DX < 0 && barAccel < 0)
                 {
                     Debug.Write("Accelerate " + ball.DX);
                     ball.DX = (int)(ball.DX + barAccel * 2);
@@ -212,7 +212,7 @@ namespace WPFBlockCrash
             }
             else if (ball.Left < bar.Right && ball.Right > bar.Right) //バーの右辺で重なり反射
             {
-                if (ball.DX > 0)
+                if (ball.DX > 0 && barAccel > 0)
                 {
                     Debug.Write("Accelerate " + ball.DX);
                     ball.DX = (int)(ball.DX + barAccel * 2);
@@ -228,14 +228,81 @@ namespace WPFBlockCrash
 
         public static void ReflectHorizontalIfOverlapped(Ball ball1, Ball ball2)
         {
-            ball1.DX = -ball1.DX;
-            ball2.DX = -ball2.DX;
+            if (ball1.Right > ball2.Left && ball1.Left < ball2.Left)
+            {
+                if (ball1.DX > 0 && ball2.DX > 0)
+                {
+                    if (ball1.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball1.DX = (int)(ball1.DX * 1.1);
+                    if (ball2.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball2.DX = (int)(ball2.DX * 1.1);
+                }
+                else
+                {
+                    if (ball1.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball1.DX = -ball1.DX;
+                    if (ball2.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                    ball2.DX = -ball2.DX;
+                }
+            }
+            else if (ball1.Left < ball2.Right && ball1.Right > ball2.Right)
+            {
+                if (ball1.DX < 0 && ball2.DX < 0)
+                {
+                    if (ball1.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball1.DX = (int)(ball1.DX * 1.1);
+                    if (ball2.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball2.DX = (int)(ball2.DX * 1.1);
+                }
+                else
+                {
+                    if (ball1.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball1.DX = -ball1.DX;
+                    if (ball2.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball2.DX = -ball2.DX;
+                }
+            }
         }
 
         public static void ReflectVerticalIfOverlapped(Ball ball1, Ball ball2)
         {
             ball1.DY = -ball1.DY;
             ball2.DY = -ball2.DY;
+
+            if (ball1.Bottom > ball2.Top && ball1.Top < ball2.Top)
+            {
+                if (ball1.DY > 0 && ball2.DY > 0)
+                {
+                    if (ball1.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball1.DY = (int)(ball1.DY * 1.1);
+                    if (ball2.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball2.DY = (int)(ball2.DY * 1.1);
+                }
+                else
+                {
+                    if (ball1.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball1.DY = -ball1.DY;
+                    if (ball2.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball2.DY = -ball2.DY;
+                }
+            }
+            else if (ball1.Top < ball2.Bottom && ball1.Bottom > ball2.Bottom)
+            {
+                if (ball1.DY < 0 && ball2.DY < 0)
+                {
+                    if (ball1.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball1.DY = (int)(ball1.DY * 1.1);
+                    if (ball2.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball2.DY = (int)(ball2.DY * 1.1);
+                }
+                else
+                {
+                    if (ball1.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball1.DY = -ball1.DY;
+                    if (ball2.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+                        ball2.DY = -ball2.DY;
+                }
+            }
         }
     }
 }
