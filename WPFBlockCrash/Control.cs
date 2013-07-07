@@ -966,17 +966,58 @@ namespace WPFBlockCrash
 				if (smallBall.IsNewCount > 0) // 増えたばかりならコンティニュー
 					continue;
 
-				if ((ballX - smallBall.CenterX) * (ballX - smallBall.CenterX) + (ballY - smallBall.CenterY) * (ballY - smallBall.CenterY) <= 20 * 20) // 衝突判定
+				if (Math.Pow(ballX - smallBall.CenterX, 2) + Math.Pow(ballY - smallBall.CenterY, 2) <= Math.Pow(20, 2)) // 衝突判定
 				{
-					ball.DX = -ball.DX;
-					ball.DY = ball.DY;
-					smallBall.DX = -smallBall.DX;
-					smallBall.DY = smallBall.DY;
-
-					boundFlag = true;
+                    Bounce(ball, smallBall);
 				}
 			}
 		}
+
+        private void Bounce(Ball ball1, Ball ball2)
+        {
+            double OverlapDistanceX = double.MaxValue;
+            double OverlapDistanceY = double.MaxValue;
+
+            if (ball2.CenterY < ball1.CenterY) //下辺反射
+                OverlapDistanceY = (ball1.Top - ball2.Bottom) / (double)ball2.Height;
+            else  //上辺反射
+                OverlapDistanceY = (ball2.Top - ball1.Bottom) / (double)ball2.Height;
+
+            if (ball2.CenterX < ball1.CenterX) //右辺反射
+                OverlapDistanceX = (ball1.Left - ball2.Right) / (double)ball2.Width;
+            else //左辺反射
+                OverlapDistanceX = (ball2.Left - ball1.Right) / (double)ball2.Width;
+
+            //重複領域が生じない場合，バウンドしない
+            if (OverlapDistanceX > 0 || OverlapDistanceY > 0)
+            {
+                return;
+            }
+
+            double mass_ball1 = ball1.Width * ball1.Height;
+            double mass_ball2 = ball2.Width * ball2.Height;
+            double vx1 = ball1.DX;
+            double vy1 = ball1.DY;
+            double vx2 = ball2.DX;
+            double vy2 = ball2.DY;
+
+            var newX = BounceCalculate(mass_ball1, mass_ball2, vx1, vx2);
+            var newY = BounceCalculate(mass_ball1, mass_ball2, vy1, vy2);
+
+            ball1.DX = (int)newX.Item1;
+            ball2.DX = (int)newX.Item2;
+            ball1.DY = (int)newY.Item1;
+            ball2.DY = (int)newY.Item2;
+
+            boundFlag = true;
+        }
+
+        private Tuple<double, double> BounceCalculate(double mass_ball1, double mass_ball2, double v1, double v2)
+        {
+            double newV1 = (-v1 + v2) * (1 + Main.ElasticCoefficient) / (mass_ball1 / mass_ball2 + 1) + v1;
+            double newV2 = (-v2 + v1) * (1 + Main.ElasticCoefficient) / (mass_ball2 / mass_ball1 + 1) + v2;
+            return new Tuple<double, double>(newV1, newV2);
+        }
 		
 
 		internal void Reset()

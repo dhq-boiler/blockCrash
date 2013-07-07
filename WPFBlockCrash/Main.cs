@@ -20,6 +20,7 @@ namespace WPFBlockCrash
             RANKING
         }
 
+        public static readonly double ElasticCoefficient = 1.0;
         public static readonly double RunningSpeedFactor = 1.5;
         public static readonly bool PenetrationEnables = false;
         public static readonly bool CatchBallEnables = false;
