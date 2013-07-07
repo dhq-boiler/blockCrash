@@ -60,7 +60,8 @@ namespace BlockCrashGUI
             switch (e.Key)
             {
                 case Key.Space:
-                    view.KeyDownSpaceButton();
+                    //view.KeyDownSpaceButton();
+                    view.KeyDownEnterButton();
                     break;
                 case Key.Left:
                     view.KeyDownLButton();
@@ -79,7 +80,8 @@ namespace BlockCrashGUI
             switch (e.Key)
             {
                 case Key.Space:
-                    view.KeyUpSpaceButton();
+                    //view.KeyUpSpaceButton();
+                    view.KeyUpEnterButton();
                     break;
                 case Key.Left:
                     view.KeyUpLButton();
