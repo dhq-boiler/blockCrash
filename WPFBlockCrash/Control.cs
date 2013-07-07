@@ -644,7 +644,7 @@ namespace WPFBlockCrash
 
 						Ball newSmallBall = new Ball(dInfo);
 						newSmallBall.IsStop = false;
-						newSmallBall.Increse(ballX, ballY);
+						newSmallBall.Increse(ball, ballX, ballY);
 						willBeAddedSmallBalls.Add(newSmallBall);
 						++sballcount;
 						++ct;
@@ -966,12 +966,17 @@ namespace WPFBlockCrash
 				if (smallBall.IsNewCount > 0) // 増えたばかりならコンティニュー
 					continue;
 
-				if (Math.Pow(ballX - smallBall.CenterX, 2) + Math.Pow(ballY - smallBall.CenterY, 2) <= Math.Pow(20, 2)) // 衝突判定
+                if (BallsIsOverlapping(ball, smallBall)) // 衝突判定
 				{
                     Bounce(ball, smallBall);
 				}
 			}
 		}
+
+        private static bool BallsIsOverlapping(Ball ball1, Ball ball2)
+        {
+            return Math.Pow(ball1.CenterX - ball2.CenterX, 2) + Math.Pow(ball1.CenterY - ball2.CenterY, 2) <= Math.Pow(20, 2);
+        }
 
         private void Bounce(Ball ball1, Ball ball2)
         {

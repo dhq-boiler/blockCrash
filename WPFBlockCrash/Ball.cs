@@ -284,17 +284,22 @@ namespace WPFBlockCrash
             PenetratingCount = 50;
         }
 
-        internal void Increse(int ballX, int ballY)
+        internal void Increse(Ball mainball, int ballX, int ballY)
         {
             IsSmall = true;
-            IsNewCount = 30; 
-            int r = (Main.rand.Next() ^ Main.rand.Next()) % 7;
+            IsNewCount = 30;
+
+            double mainBallSpeed = Math.Sqrt(Math.Pow(mainball.DX, 2) + Math.Pow(mainball.DY, 2));
+
+            int degree = Main.rand.Next(0, 360);
+
+            double radian = 2 * Math.PI / 360d * degree;
+
+            DX = (int)(Math.Cos(radian) * mainBallSpeed);
+            DY = (int)(Math.Sin(radian) * mainBallSpeed);
+
             CenterX = ballX;
             CenterY = ballY;
-            DX += r - 3;
-            DY += (6 - r) - 2;
-            if (DY == 0)
-                DY = -1;
         }
     }
 }
