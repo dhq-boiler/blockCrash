@@ -178,7 +178,7 @@ namespace WPFBlockCrash
             barextend = extendon;
             IsDead = false;
             
-#if false
+#if true
             int r = Main.rand.Next() % 5;
             //int r = 1; デバック用
             if (r == 1)
