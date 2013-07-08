@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace WPFBlockCrash
 {
+
     class Main
     {
         enum EActType
@@ -15,255 +16,119 @@ namespace WPFBlockCrash
             TITLE,
             BAR_SELECT,
             STAGE_SELECT,
-            CONTROL
+            CONTROL,
+            RANKING
         }
 
-        private StageSelect stageSelect;
-        private Control control;
-        private Message message;
-        private BarSelect barSelect;
-        private Title title;
-
-        //private int m_actcount;
-        private EActType ActType;
-
-        private int act;
-        private int stock;
-        private int c;
-        private bool keycheck;
-        private bool automode;
-        private DisplayInfo dInfo;
-        public static readonly Uri ResourceDirectory = new Uri(Directory.GetCurrentDirectory() + "\\res\\");
+        public static readonly double ElasticCoefficient = 1.0;
+        public static readonly double RunningSpeedFactor = 1.5;
+        public static readonly bool PenetrationEnables = true;
+        public static readonly bool CatchBallEnables = false;
+        public static readonly string ResourceDirectory = Directory.GetCurrentDirectory() + "\\res\\";
         public static readonly Random rand = new Random(Environment.TickCount);
-        
-        public Main(DisplayInfo dInfo)
-        {
-            this.dInfo = dInfo;
+        public static Main MainInstance = null;
 
-            title = new Title();
-            barSelect = new BarSelect();
-            stageSelect = new StageSelect();
-            //m_actcount = 0;
-            ActType = EActType.TITLE;
-            act = 0;
-            stock = 0;
-            keycheck = true;
-            automode = false;
-            c = 0;
+        public DisplayInfo dInfo { get; private set; }
+
+        private IInputable CurrentState;
+        private WPFBlockCrash.BlockCrashView.EOperatingType OperatingType;
+        private int AutoModeControl;
+        private UserChoice userChoice;
+        private TakeOver takeOver;
+        private WPFBlockCrash.BlockCrashView.EOperatingType OldOperatingType;
+        private Title title;
+        private bool ResultIgnore;
+        
+        public Main(DisplayInfo dInfo, WPFBlockCrash.BlockCrashView.EOperatingType OperatingType)
+        {
+            MainInstance = this;
+            this.dInfo = dInfo;
+            this.OperatingType = OperatingType;
+
+            Reconstruct(dInfo, OperatingType);
+            userChoice = new UserChoice();
+            takeOver = new TakeOver()
+            {
+                DisplayInfo = dInfo,
+                Score = 0,
+                Stock = 2
+            };
+            AutoModeControl = 0;
         }
 
-        public void ProcessLoop(Input input, DrawingContext dc)
+        private void Reconstruct(DisplayInfo dInfo, WPFBlockCrash.BlockCrashView.EOperatingType OperatingType)
         {
-            //using (DrawingContext dc = dg.Open())
-            //{
+            switch (OperatingType)
+            {
+                case BlockCrashView.EOperatingType.DESKTOP_KEYBOARD:
+                    CurrentState = title = new Title(this, dInfo, new DesktopKeyboard());
+                    break;
+                case BlockCrashView.EOperatingType.VIRTOS_SLIDER:
+                    CurrentState = title = new Title(this, dInfo, new VIRTOSSlider());
+                    break;
+                case BlockCrashView.EOperatingType.AUTO:
+                    CurrentState = title = new Title(this, dInfo, new AutomaticOperator());
+                    break;
+                default:
+                    throw new InvalidOperationException("EOperatingType is UNKNOWN.");
+            }
 
-            DrawUtil.DrawBox(dc, 0, 0, 800, 600, Color.FromRgb(0, 0, 0), 1, Color.FromRgb(0, 0, 0));
+            ResultIgnore = true;
+        }
+
+        public void ProcessLoop(Input input, Graphics g)
+        {
+            g.FillRectangle(Brushes.Black, 0, 0, 800, 600);
 
             if (input.IsPushedKeys)
             {
                 input.rB = input.RB.Output;
                 input.lB = input.LB.Output;
                 input.eB = input.EB.Output;
-                //input.rB = input.RB;
-                //input.lB = input.LB;
-                //input.eB = input.EB;
-                //input.RB = input.LB = input.EB = false;
             }
 
             if (input.AT) //自動化状態
             {
                 ATMode(input);
 
-                if (input.barx == 50)
+                if (input.barx == 50 || (input.eB && input.lB && input.rB))
                 {
                     input.AT = false;
+                    SwapOperatingMode();
                     Restart(input);
                 }
             }
 
-            //if (automode && input.AT == false)
-            //{
-                //Restart(input);
-            //}
-
-            //switch (m_actcount)
-            switch (ActType)
+            ProcessResult r = CurrentState.Process(input, g, userChoice, takeOver);
+            if (!ResultIgnore)
+                CurrentState = r.NextState;
+            else
             {
-                //case 0:
-                case EActType.TITLE:
-                    {
-                        if (title.Process(input, dc))
-                            //m_actcount = 1;
-                            ActType = EActType.BAR_SELECT;
-                        //input.ClearSmaller();
-                    }
-                    break;
-                //case 1:
-                case EActType.BAR_SELECT:
-                    {
-                        if (barSelect.Process(input, dc))
-                        {
-                            stageSelect.SetValue(barSelect.mBar, 1, 0, 2);
-                            //m_actcount = 2;
-                            ActType = EActType.STAGE_SELECT;
-                        }
-                        //input.ClearSmaller();
-                    }
-                    break;
-                //case 2:
-                case EActType.STAGE_SELECT:
-                    {
-                        if (stageSelect.Process(input, dc))
-                        {
-                            //m_actcount = 3;
-                            ActType = EActType.CONTROL;
-                            stock = stageSelect.Stock;
-                            control = new Control(stageSelect.Bar, stageSelect.Stage, stageSelect.Score, stock, dInfo);
-                        }
-                        //input.ClearSmaller();
-                    }
-                    break;
-                //case 3:
-                case EActType.CONTROL:
-                    {
-                        if (control.Process(input, dc))
-                        {
-                            stock = control.Stock;
-                            if (stock > 1)
-                            {
-                                if (act == 0)
-                                {
-                                    message = new Message(1, 50, dInfo);
-                                    ++act;
-                                }
-
-                                if (message.Process(input, dc))
-                                {
-                                    control.Reset();
-                                    --stock;
-                                    act = 0;
-                                    message = null;
-                                }
-                            }
-                            else
-                            {
-                                if (act == 0)
-                                {
-                                    message = new Message(3, 200, dInfo);
-                                    ++act;
-                                }
-
-                                if (message.Process(input, dc))
-                                {
-                                    //m_actcount = 0;
-                                    ActType = EActType.TITLE;
-                                    act = 0;
-                                    title.IsDead = false;
-                                    
-                                    barSelect.IsDead = false;
-
-                                    stageSelect.Reset();
-                                    //stageSelect.SetFlag(false);
-                                    stageSelect.IsDead = false;
-                                    message = null;
-                                    control = null;
-                                }
-                            }
-                        }
-                        else if (control.clear)
-                        {
-                            if (act == 0)
-                            {
-                                message = new Message(2, 200, dInfo);
-                                ++act;
-                            }
-
-                            if (message.Process(input, dc))
-                            {
-                                //if (input.AT) // 疲れるからタイトルへ
-                               // {
-                                    //m_actcount = 1;
-                                ActType = EActType.TITLE;
-                                    //barSelect.SetFlag(false);
-                                title.IsDead = false;
-                                    barSelect.IsDead = false;
-                                ///}
-                                //else
-                               // {
-                                //    m_actcount = 2;
-                                //    stageSelect.SetValue(control.Bar, control.Stage, control.Score, control.Stock);
-                                //}
-                                act = 0;
-                                //stageSelect.SetFlag(false);
-                                stageSelect.IsDead = false;
-                                message = null;
-                                control = null;
-                            }
-                        }
-                        //keycheck = true;
-                        //input.ClearSmaller();
-                    }
-                    break;
+                CurrentState = title;
+                ResultIgnore = false;
             }
+
             input.ClearSmaller();
-            //input.ClearArray();
-            //}
         }
 
-        private void Restart(Input input)
+        public void Restart(Input input)
         {
             input.Clear();
-            title = null;
-            barSelect = null;
-            stageSelect = null;
 
-            title = new Title();
-            barSelect = new BarSelect();
-            stageSelect = new StageSelect();
-
-            act = 0;
-            stock = 0;
-            keycheck = true;
-            automode = false;
-
-            //switch (m_actcount)
-            switch (ActType)
-            {
-                //case 0 :
-                case EActType.TITLE:
-                    break;
-                //case 1:
-                case EActType.BAR_SELECT:
-                    //barSelect.SetFlag(false);
-                    barSelect.IsDead = false;
-                    break;
-                //case 2:
-                case EActType.STAGE_SELECT:
-                    //barSelect.SetFlag(false);
-                    barSelect.IsDead = false;
-                    //stageSelect.SetFlag(false);
-                    stageSelect.IsDead = false;
-                    control = null;
-                    break;
-            }
-
-            //m_actcount = 0;
-            ActType = EActType.TITLE;
+            Reconstruct(dInfo, OperatingType);
         }
 
         public void ATMode(Input input)
         {
             if (input.AT)
             {
-                if (c < 15)
+                if (AutoModeControl < 15)
                 {
-                    ++c;
+                    ++AutoModeControl;
                 }
                 else
                 {
-                    c = 0;
-
-                    //Random rand = new Random(Environment.TickCount);
+                    AutoModeControl = 0;
 
                     int r = rand.Next() % 3;
 
@@ -275,6 +140,16 @@ namespace WPFBlockCrash
                         input.eB = true;
                 }
             }
+        }
+
+        internal void SwapOperatingMode()
+        {
+            if (OldOperatingType == BlockCrashView.EOperatingType.UNKNOWN)
+                OldOperatingType = BlockCrashView.EOperatingType.AUTO;
+
+            WPFBlockCrash.BlockCrashView.EOperatingType temp = OperatingType;
+            OperatingType = OldOperatingType;
+            OldOperatingType = temp;
         }
     }
 }

@@ -276,6 +276,8 @@ namespace ScrollCrash
 
                                 int ThumbValidPixels = ScrollBar.Thumb.ValidateArea.Width * ScrollBar.Thumb.ValidateArea.Height;
 
+                                blockCrashView.Initialize(WPFBlockCrash.BlockCrashView.EOperatingType.VIRTOS_SLIDER);
+                                blockCrashView.IsAuto = false;
                                 blockCrashView.RunGame();
 
                                 timerToProcess = new DispatcherTimer();

@@ -2,13 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Drawing;
 
 namespace WPFBlockCrash
 {
-    class Ball
+    class Ball : IInputable
     {
+        public int xoffset { get; set; }
+        public int baccel { get; set; } 
+        public int acbectl { get; set; } // 加速の向き
+        private Image[] gh;
+        private DisplayInfo dInfo;
+        public int ActCount { get; set; }
+        public int cx;
+        public int CenterX { get { return cx; } set { cx = value; } }
+        public int cy;
+        public int CenterY { get { return cy; } set { cy = value; } }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int Top { get { return CenterY - Height / 2; } }
+        public int Bottom { get { return CenterY + Height / 2; } }
+        public int Left { get { return CenterX - Width / 2; } }
+        public int Right { get { return CenterX + Width / 2; } }
+        public int dx;
+        public int DX { get { return dx; } set { dx = value; } }
+        public int dy;
+        public int DY { get { return dy; } set { dy = value; } }
+        public int Level { get; set; }
+        public int Radius { get; set; }
+        public int OldY { get; set; }
+        public bool IsDead { get; set; }
+        public bool PlaySound { get; set; }
+        public EPenetrability Penetrability { get; set; }
+
+        public int PenetratingCount { get; set; }
+
+        public bool IsSmall { get; set; }
+        public int IsNewCount { get; set; }
+        public bool IsStop { get; set; }
+        public bool IsCatching { get; set; }
+
+        private LinkedList<Ball> OverlappingBalls;
+
         public enum EPenetrability
         {
             NON_PENETRATING,
@@ -18,41 +53,54 @@ namespace WPFBlockCrash
         public Ball(DisplayInfo dInfo)
         {
             this.dInfo = dInfo;
-            gh = new ImageSource[3];
-            gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball_a.png"));
-            gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball2.bmp"));
-            gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "ball3.bmp"));
+            gh = new Image[4];
+            gh[0] = new Bitmap(Main.ResourceDirectory + "ball.png");
+            gh[1] = new Bitmap(Main.ResourceDirectory + "ball_pene.png");
+            gh[2] = new Bitmap(Main.ResourceDirectory + "ball2.png");
+            gh[3] = new Bitmap(Main.ResourceDirectory + "ball2_pene.png");
 
             Width = (int)gh[0].Width;
             Height = (int)gh[0].Height;
 
-            X = dInfo.Width / 2 + 30;
-            Y = 540 - Height + 2;
+            CenterX = dInfo.Width / 2 + 30;
+            CenterY = 540 - Height + 2;
             DX = 0;
             DY = 0;
             Radius = 60;
             ActCount = 0;
-            OldY = Y;
+            OldY = CenterY;
             IsDead = false;
             PlaySound = false;
             Penetrability = EPenetrability.NON_PENETRATING;
             PenetratingCount = 0;
             IsSmall = false;
+            IsNewCount = 0;
             Level = 1;
+            IsStop = true;
+            xoffset = 0;
+            baccel = 0;
+            acbectl = 0;
+
+            OverlappingBalls = new LinkedList<Ball>();
         }
 
-        public void Draw(DrawingContext dc)
+        private void Draw(Graphics g)
         {
-            ImageSource src = null;
+            Image src = null;
 
             if (Penetrability == EPenetrability.PENETRATING)
-                src = gh[1];
+            {
+                if (IsSmall)
+                    src = gh[3];
+                else
+                    src = gh[1];
+            }
             else if (IsSmall)
                 src = gh[2];
             else
                 src = gh[0];
 
-            DrawUtil.DrawGraph(dc, X - Width / 2, Y - Height / 2, src);
+            g.DrawImage(src, CenterX - Width / 2, CenterY - Height / 2);
         }
 
         internal void LvUp(int incLv)
@@ -75,18 +123,19 @@ namespace WPFBlockCrash
 
         internal void spchange()
         {
-            if (IsSmall)
-                return;
-            //Random rand = new Random(Environment.TickCount);
+            if (IsSmall) return;
+
             int r = Main.rand.Next() % 5;
             DX += r - 6;
             DY += (10 - r) - 6;
         }
 
-        internal bool Process(Input input, DrawingContext dc)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             if (ActCount != 0 || IsSmall)
                 Move();
+
+            UpdateOverlapping();
 
             //キー処理
             KeyGet(input);
@@ -97,22 +146,83 @@ namespace WPFBlockCrash
                 if (PenetratingCount == 0)
                     Penetrability = EPenetrability.NON_PENETRATING;
             }
+            if (IsNewCount > 0)
+            {
+                --IsNewCount;
+            }
 
-            Draw(dc);
+            Draw(g);
 
-            return IsDead;
+            return new ProcessResult() { IsDead = IsDead };
         }
 
         private void KeyGet(Input input)
         {
             if (input.eB)
             {
-                if (ActCount == 0 && !IsSmall)
+                if (ActCount == 0 && !IsSmall || IsCatching)
                 {
-                    DX = 3;
-                    DY = -3;
+                    if (input.AT)
+                    {
+                        CenterY = CenterY - 5;
+                        int r = Main.rand.Next() % 1;
+                        int rx = (Main.rand.Next() % 5) + 1;
+                        int ry = (Main.rand.Next() % 5) + 1;
+
+                        if (r == 0)
+                        {
+                            DX = (int)(rx * Main.RunningSpeedFactor);
+                            DY = (int)(-ry * Main.RunningSpeedFactor);
+                        }
+                        else {
+                            DX = (int)(-rx * Main.RunningSpeedFactor);
+                            DY = (int)(-ry * Main.RunningSpeedFactor);
+                        }
+                    }
+                    else
+                    {
+                        CenterY = CenterY - 5;
+
+                        //初速設定？
+                        switch (baccel)
+                        {
+                            case 0:
+                                DX = (int)((2 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DY = (int)(-(2 + Level) * Main.RunningSpeedFactor);
+                                break;
+                            case 1:
+                                DX = (int)((3 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
+                                break;
+                            case 2:
+                                DX = (int)((4 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
+                                break;
+                            case 3:
+                                DX = (int)((5 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
+                                break;
+                        }
+                    }
                     ActCount = 1;
+                    IsCatching = false;
                 }
+            }
+        }
+
+        public void BarAccel(int bac)
+        {
+            baccel = bac;
+            if (baccel == 0)
+            {
+                acbectl = 1; //初速？
+            }
+            else if (baccel > 0)
+                acbectl = 1;
+            else
+            {
+                acbectl = -1;
+                baccel = -baccel;
             }
         }
 
@@ -120,87 +230,111 @@ namespace WPFBlockCrash
         {
             PlaySound = false;
 
-            X += DX;
-            Y += DY;
+            CenterX += DX;
+            CenterY += DY;
 
-            if (X < Width / 2)
+            if (CenterX < Width / 2)
             {
-                X = Width / 2;
+                CenterX = Width / 2;
                 DX *= -1;
 
                 PlaySound = true;
             }
 
-            if (X > dInfo.Width - Width / 2)
+            if (CenterX > dInfo.Width - Width / 2)
             {
-                X = dInfo.Width - Width / 2;
+                CenterX = dInfo.Width - Width / 2;
                 DX *= -1;
                 PlaySound = true;
             }
 
-            if (Y < Height / 2 + 30)
+            if (CenterY < Height / 2 + 30)
             {
-                Y = Height / 2 + 30;
+                CenterY = Height / 2 + 30;
                 DY *= -1;
                 PlaySound = true;
             }
 
-            if (Y > dInfo.Height)
+            if (CenterY > dInfo.Height)
                 IsDead = true;
         }
-
-
-        private ImageSource[] gh;
-        private DisplayInfo dInfo;
-        public int ActCount { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int DX { get; set; }
-        public int DY { get; set; }
-        public int Level { get; set; }
-        public int Radius { get; set; }
-        public int OldY { get; set; }
-        public bool IsDead { get; set; }
-        public bool PlaySound { get; set; }
-        public EPenetrability Penetrability { get; set; }
-
-        public int PenetratingCount { get; set; }
-
-        public bool IsSmall { get; set; }
 
         internal void Reset()
         {
             Penetrability = EPenetrability.NON_PENETRATING;
-            X = dInfo.Width / 2 + 30;
-            Y = 540 - Height + 2;
-            OldY = Y;
+            CenterX = dInfo.Width / 2 + 30;
+            CenterY = 540 - Height + 2;
+            OldY = CenterY;
             DX = 0;
             DY = 0;
             ActCount = 0;
             IsDead = false;
             Radius = 1;
-            Level = 1;
+            Level -= 5;
+            if (Level < 1)
+                Level = 1;
+            xoffset = 0;
+            baccel = 0;
+            acbectl = 0;
         }
 
-        internal void PowerUp()
+        internal void PowerUp() // アイテム取得による貫通化
         {
+            if (!Main.PenetrationEnables) return;
             if (!IsSmall)
                 Penetrability = EPenetrability.PENETRATING;
             PenetratingCount = 150;
         }
 
-        internal void Increse(int ballX, int ballY)
+        internal void Penetration() // バー中央ヒットによる貫通化
+        {
+            if (!Main.PenetrationEnables) return;
+
+            Penetrability = EPenetrability.PENETRATING;
+            PenetratingCount = 50;
+        }
+
+        internal void Increse(Ball mainball, int ballX, int ballY)
         {
             IsSmall = true;
-            int r = (Main.rand.Next() ^ Main.rand.Next()) % 7;
-            X = ballX;
-            Y = ballY;
-            DX += r - 3;
-            DY += (6 - r) - 2;
-            if (DY == 0)
-                DY = -1;
+            IsNewCount = 30;
+
+            double mainBallSpeed = Math.Sqrt(Math.Pow(mainball.DX, 2) + Math.Pow(mainball.DY, 2));
+
+            int degree = Main.rand.Next(0, 360);
+
+            double radian = 2 * Math.PI / 360d * degree;
+
+            DX = (int)(Math.Cos(radian) * mainBallSpeed);
+            DY = (int)(Math.Sin(radian) * mainBallSpeed);
+
+            CenterX = ballX;
+            CenterY = ballY;
+        }
+
+        public void UpdateOverlapping()
+        {
+            LinkedList<Ball> removes = new LinkedList<Ball>();
+            foreach (var ball in OverlappingBalls)
+            {
+                if (!Collision.BallsIsOverlapping(this, ball))
+                    removes.AddLast(ball);
+            }
+
+            foreach (var removeBall in removes)
+            {
+                OverlappingBalls.Remove(removeBall);
+            }
+        }
+
+        public void BeginOverlapping(Ball other)
+        {
+            OverlappingBalls.AddLast(other);
+        }
+
+        public bool IsOverlapping(Ball other)
+        {
+            return OverlappingBalls.Contains(other);
         }
     }
 }

@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -47,17 +48,32 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutomaticOperator.cs" />
     <Compile Include="Ball.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="BarSelect.cs" />
     <Compile Include="Block.cs" />
+    <Compile Include="Collision.cs" />
     <Compile Include="Control.cs" />
+    <Compile Include="CrossCrossBuilder.cs" />
+    <Compile Include="DesktopKeyboard.cs" />
     <Compile Include="DisplayInfo.cs" />
     <Compile Include="DrawUtil.cs" />
+    <Compile Include="FourTowerBuilder.cs" />
+    <Compile Include="IInputable.cs" />
+    <Compile Include="IOperator.cs" />
+    <Compile Include="IRefrectable.cs" />
     <Compile Include="KeyInput.cs" />
+    <Compile Include="LawOfCyclesBuilder.cs" />
     <Compile Include="Message.cs" />
+    <Compile Include="OnajimisanBuilder.cs" />
+    <Compile Include="ProductorIsUsBuilder.cs" />
+    <Compile Include="Ranking.cs" />
+    <Compile Include="IStageBuilder.cs" />
     <Compile Include="StageSelect.cs" />
+    <Compile Include="StageUtil.cs" />
     <Compile Include="Title.cs" />
+    <Compile Include="VIRTOSSlider.cs" />
     <Page Include="BlockCrashView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

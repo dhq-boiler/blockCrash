@@ -1,157 +1,121 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Media;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace WPFBlockCrash
 {
-    class BarSelect
+    class BarSelect : IInputable
     {
-        private ImageSource[] barGh;
-        private ImageSource bSelectGh;
-        private bool selectFlag;
-        private bool decisionFlag;
-        private SoundPlayer sh;
-        private SoundPlayer dh;
-        private int keyCount;
+        private Image[] barGh;
+        private Image bSelectGh;
         private int autoCount;
+        public bool IsDead { get; set; }
 
+        private IOperator Operator;
+        private DisplayInfo dInfo;
 
-        public BarSelect()
+        private int Bar;
+        private readonly Font font = new Font("Consolas", 16);
+
+        public BarSelect(DisplayInfo dInfo, IOperator Operator)
         {
-            barGh = new ImageSource[3];
+            this.dInfo = dInfo;
+            this.Operator = Operator;
+            barGh = new Image[3];
 
-            mBar = 1;
-            keyCount = 8;
+            Bar = 1;
 
-            barGh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "bar.bmp"));
-            barGh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "barsecond.bmp"));
-            barGh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "barthird.bmp"));
-            bSelectGh = new BitmapImage(new Uri(Main.ResourceDirectory, "barselect.png"));
-
-            selectFlag = false;
-            decisionFlag = false;
+            barGh[0] = new Bitmap(Main.ResourceDirectory + "bar.bmp");
+            barGh[1] = new Bitmap(Main.ResourceDirectory + "barsecond.bmp");
+            barGh[2] = new Bitmap(Main.ResourceDirectory + "barthird.bmp");
+            bSelectGh = new Bitmap(Main.ResourceDirectory + "barselect.png");
 
             IsDead = false;
-
             autoCount = 0;
-
-            sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
-            dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
         }
 
-        public bool Process(Input input, DrawingContext dc)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             //キー処理
             KeyGet(input);
 
             //描画処理
-            Draw(dc);
+            Draw(g);
 
-            return IsDead;
+            if (IsDead)
+            {
+                uc.BarType = (EBarType)Bar;
+                return new ProcessResult()
+                {
+                    IsDead = IsDead,
+                    NextState = new StageSelect(dInfo, Operator, uc),
+                    UserChoice = uc,
+                    TakeOver = takeOver
+                };
+            }
+            else
+                return new ProcessResult()
+                {
+                    IsDead = IsDead,
+                    NextState = this
+                };
         }
 
         private void KeyGet(Input input)
         {
-            if (input.rB)
-            {
-                if (input.AT)
-                    ++autoCount;
+            Operator.SelectBar(this, ref Bar, input, ref autoCount);
 
-                ++mBar;
-
-                if (mBar > 3)
-                    mBar = 1;
-
-                input.rB = false;
-            }
-
-            if (input.lB)
-            {
-                if (input.AT)
-                    ++autoCount;
-
-                --mBar;
-
-                if (mBar < 1)
-                    mBar = 3;
-
-                input.lB = false;
-            }
-
-            if (input.barx < 700d / 3d * 1d && input.barx >= 50)
-            {
-                mBar = 1;
-            }
-            else if (input.barx >= 700d / 3d * 1d && input.barx < 700d / 3d * 2d)
-            {
-                mBar = 2;
-            }
-            else if (input.barx >= 700d / 3d * 2d && input.barx < 700d)
-            {
-                mBar = 3;
-            }
-
-            if (input.AT)
-            {
-                if (input.eB && autoCount > 10)
-                {
-                    IsDead = true;
-                    input.eB = false;
-                    autoCount = 0;
-                }
-            }
-            else if (input.eB)
+            if (!input.AT && input.eB)
             {
                 IsDead = true;
                 input.eB = false;
             }
         }
 
-        private void Draw(DrawingContext dc)
+        private void Draw(Graphics g)
         {
-            DrawUtil.DrawGraph(dc, 30, 0, bSelectGh);
+            g.DrawImage(bSelectGh, 30, 0);
 
-            switch (mBar)
+            switch (Bar)
             {
                 case 1:
                     {
-                        DrawUtil.DrawString(dc, 440, 240, "BAR NAME：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 560, 240, "ノーマルバー", RGB(255, 255, 128));
-                        DrawUtil.DrawString(dc, 440, 300, "BALL SPEED：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 300, "★", RGB(255, 180, 128));
-                        DrawUtil.DrawString(dc, 440, 360, "TECHNICAL：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 360, "★", RGB(255, 180, 128));
-                        DrawUtil.DrawString(dc, 440, 420, "DIFFICULTY：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 420, "★", RGB(255, 180, 128));
+                        g.DrawString("BAR NAME：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 240));
+                        g.DrawString("ノーマルバー", font, DrawUtil.BrushRGB(255, 255, 128), new PointF(560, 240));
+                        g.DrawString("BALL SPEED：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 300));
+                        g.DrawString("★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 300));
+                        g.DrawString("TECHNICAL：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 360));
+                        g.DrawString("★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 360));
+                        g.DrawString("DIFFICULTY：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 420));
+                        g.DrawString("★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 420));
                     }
                     break;
                 case 2:
                     {
-                        DrawUtil.DrawString(dc, 440, 240, "BAR NAME：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 560, 240, "２号機", RGB(255, 255, 128));
-                        DrawUtil.DrawString(dc, 440, 300, "BALL SPEED：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 300, "★　★　★", RGB(255, 180, 128));
-                        DrawUtil.DrawString(dc, 440, 360, "TECHNICAL：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 360, "★　★", RGB(255, 180, 128));
-                        DrawUtil.DrawString(dc, 440, 420, "DIFFICULTY：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 420, "★　★", RGB(255, 180, 128));
+                        g.DrawString("BAR NAME：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 240));
+                        g.DrawString("2号機", font, DrawUtil.BrushRGB(255, 255, 128), new PointF(560, 240));
+                        g.DrawString("BALL SPEED：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 300));
+                        g.DrawString("★　★　★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 300));
+                        g.DrawString("TECHNICAL：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 360));
+                        g.DrawString("★　★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 360));
+                        g.DrawString("DIFFICULTY：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 420));
+                        g.DrawString("★　★", font, DrawUtil.BrushRGB(255, 180, 128), new PointF(570, 420));
                     }
                     break;
                 case 3:
                     {
-                        DrawUtil.DrawString(dc, 440, 240, "BAR NAME：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 560, 240, "３つめ", RGB(255, 255, 128));
-                        DrawUtil.DrawString(dc, 440, 300, "BALL SPEED：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 300, "★　★　★　★　★", RGB(255, 0, 128));
-                        DrawUtil.DrawString(dc, 440, 360, "TECHNICAL：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 360, "★　★　★", RGB(255, 0, 128));
-                        DrawUtil.DrawString(dc, 440, 420, "DIFFICULTY：", RGB(255, 180, 0));
-                        DrawUtil.DrawString(dc, 570, 420, "★　★　★　★　★", RGB(255, 0, 128));
+                        g.DrawString("BAR NAME：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 240));
+                        g.DrawString("３つめ", font, DrawUtil.BrushRGB(255, 255, 128), new PointF(560, 240));
+                        g.DrawString("BALL SPEED：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 300));
+                        g.DrawString("★　★　★　★　★", font, DrawUtil.BrushRGB(255, 0, 128), new PointF(570, 300));
+                        g.DrawString("TECHNICAL：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 360));
+                        g.DrawString("★　★　★", font, DrawUtil.BrushRGB(255, 0, 128), new PointF(570, 360));
+                        g.DrawString("DIFFICULTY：", font, DrawUtil.BrushRGB(255, 180, 0), new PointF(440, 420));
+                        g.DrawString("★　★　★　★　★", font, DrawUtil.BrushRGB(255, 0, 128), new PointF(570, 420));
                     }
                     break;
             }
@@ -159,21 +123,13 @@ namespace WPFBlockCrash
             for (int i = 0; i < 3; ++i)
             {
                 if (i == 2)
-                    DrawUtil.DrawGraph(dc, 125, 200 + i * 120, barGh[i]);
+                    g.DrawImage(barGh[i], 125, 200 + i * 120);
                 else
-                    DrawUtil.DrawGraph(dc, 100, 200 + i * 120, barGh[i]);
+                    g.DrawImage(barGh[i], 100, 200 + i * 120);
             }
 
-            DrawUtil.DrawBox(dc, 80, 190 + (mBar - 1) * 120, 250, 224 + (mBar - 1) * 120, RGB(255, 20, 30));
-            DrawUtil.DrawBox(dc, 400, 220, 750, 478, RGB(255, 20, 30));
+            g.DrawRectangle(new Pen(DrawUtil.BrushRGB(255, 20, 30)), 80, 190 + (Bar - 1) * 120, 170, 40);
+            g.DrawRectangle(new Pen(DrawUtil.BrushRGB(255, 20, 30)), 400, 220, 370, 250);
         }
-
-        private Color RGB(byte r, byte g, byte b)
-        {
-            return Color.FromRgb(r, g, b);
-        }
-
-        public int mBar { get; set; }
-        public bool IsDead { get; set; }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace WPFBlockCrash
 {
@@ -16,28 +14,58 @@ namespace WPFBlockCrash
         ITEMTYPE_INCRESE,
         ITEMTYPE_1UP,
         ITEMTYPE_SCOREUP,
-        ITEMTYPE_NO
+        ITEMTYPE_BALLCATCHER,
+        ITEMTYPE_NO,
     }
 
-    class Block
+    enum EBlockColor
+    {
+        RED,
+        BLUE,
+        PURPLE,
+        CYAN
+    }
+
+    class Block : IInputable
     {
         private static bool IsFirstInstance = true;
-        private static ImageSource[] gh = new ImageSource[8];
-        private static ImageSource[] itemgh = new ImageSource[5];
+        private static Image[] gh = new Image[8];
+        private static Image[] itemgh = new Image[6];
 
         private bool half;
         private int count;
 
-        public EItemType ItemType { get; private set; }
+        public int ImageHandle { get; set; }
 
-        public int X { get; private set; }
-        public int Y { get; private set; }
+        // スクロールブロック用変数,0=スクロールなし,1=右スクロール,-1=左スクロール
+        private int ScrollDirection = 0;
+        // スクロールカウント
+        private int scrollCount = 0;
+
+        // スクロール時にブロック破壊と同時にアイテムを取得しないように変数を実装
+        public int matchlessCount = 0;
+
+        public EItemType ItemType { get; private set; }
+        public EBlockColor BlockColor { get; private set; }
+
+        public int CenterX { get; private set; }
+        public int CenterY { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public int Top { get { return CenterY - Height / 2; } }
+        public int Bottom { get { return CenterY + Height / 2; } }
+        public int Left { get { return CenterX - Width / 2; } }
+        public int Right { get { return CenterX + Width / 2; } }
         public int ItemWidth { get; private set; }
         public int ItemHeight { get; private set; }
+        public int dx;
+        public int DX { get { return dx; } set { dx = value; } }
+        public int dy;
+        public int DY { get { return dy; } set { dy = value; } }
 
-        private bool isdead;
+        public bool isdead;
+        public bool scrollStop;
+        public bool barextend;
         public bool IsDead
         {
             get { return isdead; }
@@ -45,8 +73,14 @@ namespace WPFBlockCrash
             {
                 bool old = isdead;
                 isdead = value;
+
+                if (value == true && ItemFlag)
+                {
+                    matchlessCount = 10; // 10フレーム無敵に                    
+                }
+
                 if (!old && isdead)
-                    Debug.WriteLine("A Block is dead now. (" + X + ", " + Y + ")");
+                    Debug.WriteLine("A Block is dead now. (" + CenterX + ", " + CenterY + ")");
             }
         }
 
@@ -62,7 +96,15 @@ namespace WPFBlockCrash
             }
         }
 
-        private bool WasItem;
+        private int ItemHandleOffset
+        {
+            get
+            {
+                return ItemFlag ? 4 : 0;
+            }
+        }
+
+        private bool WasItem; //is used "Release" mode build.
         public bool HalfFlag
         {
             get { return half; }
@@ -76,52 +118,83 @@ namespace WPFBlockCrash
             }
         }
 
-        public Block(int x, int y)
+        // ブロックのスクロールを制御する関数
+        public int IsScrolling
+        {
+            set
+            {
+                ScrollDirection = value;
+                scrollStop = false;
+            }
+        }
+
+        /// <summary>
+        /// ブロックがスクロールして画面をまたいで判定が存在する時,true
+        /// </summary>
+        public bool IsMirroring { get; private set; }
+
+        public int MirrorCenterX { get { return MirrorLeft + (MirrorRight - MirrorLeft) / 2; } }
+        public int MirrorCenterY { get { return MirrorTop + (MirrorBottom - MirrorTop) / 2; } }
+        public int MirrorTop { get { return CenterY - Height / 2; } }       //現状Y方向のスクロールはない
+        public int MirrorBottom { get { return CenterY + Height / 2; } }    //現状Y方向のスクロールはない
+        public int MirrorLeft { get { return CenterX - Width / 2 - Main.MainInstance.dInfo.Width; } }
+        public int MirrorRight { get { return CenterX + Width / 2 - Main.MainInstance.dInfo.Width; } }
+
+        public Block(int x, int y, bool extendon, EBlockColor blockColor)
         {
             if (IsFirstInstance)
             {
-                gh = new ImageSource[8];
-                itemgh = new ImageSource[5];
+                gh = new Image[8];
+                itemgh = new Image[6];
 
-                gh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "block1.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "block2.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "block3.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "block4.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "block1in.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[5] = new BitmapImage(new Uri(Main.ResourceDirectory, "block2in.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[6] = new BitmapImage(new Uri(Main.ResourceDirectory, "block3in.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                gh[7] = new BitmapImage(new Uri(Main.ResourceDirectory, "block4in.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                gh[0] = new Bitmap(Main.ResourceDirectory + "block1.bmp");
+                gh[1] = new Bitmap(Main.ResourceDirectory + "block2.bmp");
+                gh[2] = new Bitmap(Main.ResourceDirectory + "block3.bmp");
+                gh[3] = new Bitmap(Main.ResourceDirectory + "block4.bmp");
+                gh[4] = new Bitmap(Main.ResourceDirectory + "block1in.bmp");
+                gh[5] = new Bitmap(Main.ResourceDirectory + "block2in.bmp");
+                gh[6] = new Bitmap(Main.ResourceDirectory + "block3in.bmp");
+                gh[7] = new Bitmap(Main.ResourceDirectory + "block4in.bmp");
 
-                itemgh[0] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_long.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[1] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_powerup.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[2] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_increse.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[3] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_1up.bmp")) { CreateOptions = BitmapCreateOptions.None };
-                itemgh[4] = new BitmapImage(new Uri(Main.ResourceDirectory, "item_scoreup.bmp")) { CreateOptions = BitmapCreateOptions.None };
+                itemgh[0] = new Bitmap(Main.ResourceDirectory + "item_long.bmp");
+                itemgh[1] = new Bitmap(Main.ResourceDirectory + "item_powerup.bmp");
+                itemgh[2] = new Bitmap(Main.ResourceDirectory + "item_increse.bmp");
+                itemgh[3] = new Bitmap(Main.ResourceDirectory + "item_1up.bmp");
+                itemgh[4] = new Bitmap(Main.ResourceDirectory + "item_scoreup.bmp");
+                itemgh[5] = new Bitmap(Main.ResourceDirectory + "item_mag.bmp");
 
                 IsFirstInstance = false;
             }
 
-            BitmapImage bs = gh[0] as BitmapImage;
-            BitmapImage bsitem = itemgh[0] as BitmapImage;
+            Bitmap bs = gh[0] as Bitmap;
+            Bitmap bsitem = itemgh[0] as Bitmap;
                         
-            Width = (int)bs.PixelWidth;
-            Height = (int)bs.PixelHeight;
-            ItemWidth = (int)bsitem.PixelWidth;
-            ItemHeight = (int)bsitem.PixelHeight;
+            Width = (int)bs.Width;
+            Height = (int)bs.Height;
+            ItemWidth = (int)bsitem.Width;
+            ItemHeight = (int)bsitem.Height;
 
+            BlockColor = blockColor;
+            barextend = extendon;
             IsDead = false;
-
-            //Random rand = new Random(Environment.TickCount);
+            
 #if true
             int r = Main.rand.Next() % 5;
+            //int r = 1; デバック用
             if (r == 1)
             {
-                ItemFlag = true;
-                ItemType = (EItemType)(Main.rand.Next() % 5);
+                itemflag = true;
+                if (barextend) // バーが伸びる状態
+                    ItemType = (EItemType)(Main.rand.Next() % 6);
+                else {
+                     ItemType = (EItemType)((Main.rand.Next() % 5) + 1 );
+                }
+                    
+                
             }
             else
             {
-                ItemFlag = false;
+                itemflag = false;
                 ItemType = EItemType.ITEMTYPE_NO;
             }
 #else
@@ -129,51 +202,114 @@ namespace WPFBlockCrash
             ItemType = EItemType.ITEMTYPE_INCRESE;
 #endif
 
-            this.X = x;
-            this.Y = y;
+            this.CenterX = x;
+            this.CenterY = y;
 
             count = 0;
             half = false;
         }
 
-        internal void Process(DrawingContext dc, int blockhandle)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
-            Draw(dc, blockhandle);
+            CalculatePosition();
+
+            Draw(g);
+
+            if (matchlessCount > 0)
+                --matchlessCount;
+
+            return new ProcessResult() { IsDead = IsDead };
         }
 
-        private void Draw(DrawingContext dc, int blockhandle)
+        private void Draw(Graphics g)
         {
-            if (half)
+            if (!IsDead)
             {
-                if (!IsDead)
-                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
-                else if (ItemFlag)
-                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
+                if (IsMirroring)
+                    g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], scrollCount - Width, CenterY - Height / 2, Width, Height);
+
+                g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
+            }
+            else if (ItemFlag)
+            {
+                if (half)
+                {
+                    if (IsMirroring)
+                        g.DrawImage(itemgh[(int)ItemType], scrollCount - Width, CenterY - Height / 2, Width, Height);
+
+                    g.DrawImage(itemgh[(int)ItemType], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
+                }
                 else
                 {
-                    if (count < 20)
-                    {
-                        dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
-                        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
-                        dc.Pop();
-                        ++count;
-                    }
+                    if (IsMirroring)
+                        g.DrawImage(itemgh[(int)ItemType], scrollCount - ItemWidth, CenterY - Height / 2, ItemWidth, ItemHeight);
+
+                    g.DrawImage(itemgh[(int)ItemType], CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
                 }
             }
-            else
+#if !DEBUG
+            else 
             {
-                if (!IsDead)
-                    DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, gh[blockhandle]);
-                else if (ItemFlag)
-                    DrawUtil.DrawExtendGraph(dc, X - ItemWidth / 2, Y - ItemHeight / 2, X + Width / 2, Y + Height / 2, itemgh[(int)ItemType]);
-                else
+                if (count < 20)
                 {
-                    if (count < 20)
+                    float opacity = (255f / 40) * (20 - count) / byte.MaxValue;
+
+                    if (IsMirroring)
                     {
-                        dc.PushOpacity((255d / 40) * (20 - count) / byte.MaxValue);
-                        DrawUtil.DrawExtendGraph(dc, X - Width / 2, Y - Height / 2, X + Width / 2, Y + Height / 2, WasItem ? itemgh[(int)ItemType] : gh[blockhandle]);
-                        dc.Pop();
-                        ++count;
+                        if (WasItem)
+                            g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollCount - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
+                        else
+                            g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollCount - Width, CenterY - Height / 2, Width, Height);
+                    }
+
+                    if (WasItem)
+                        g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
+                    else
+                        g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), CenterX - Width / 2, CenterY - Height / 2, Width, Height);
+
+                    ++count;
+                }
+            }
+#endif
+        }
+
+        private void CalculatePosition()
+        {
+            if (!scrollStop) // スクロールストップフラグが立ってたらストップ
+            {
+                if (ScrollDirection == 1)// 右スクロール
+                {
+                    CenterX += (int)Main.RunningSpeedFactor;
+                    
+                    if (CenterX + Width / 2 >= 800) //画面右外に出始める
+                    {
+                        IsMirroring = true;
+                        scrollCount = CenterX + Width / 2 - 800;
+                    }
+
+                    if (CenterX - Width / 2 >= 800) //画面右外に完全に出る
+                    {
+                        IsMirroring = false;
+                        CenterX -= 800;
+                        scrollCount = 0;
+                    }
+                }
+
+                if (ScrollDirection == -1)// 左スクロール
+                {
+                    CenterX -= (int)Main.RunningSpeedFactor;
+                    
+                    if (CenterX - Width / 2 < 0) //画面左外に出始める
+                    {
+                        IsMirroring = true;
+                        scrollCount = CenterX + Width / 2 + 800;
+                    }
+                    
+                    if (CenterX + Width / 2 < 0) //画面左外に完全に出る
+                    {
+                        IsMirroring = false;
+                        CenterX += 800;
+                        scrollCount = 0;
                     }
                 }
             }

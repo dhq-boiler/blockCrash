@@ -1,72 +1,118 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace WPFBlockCrash
 {
-    class Title
+    class Title : IInputable
     {
-        public Title()
-        {
-            try
-            {
-                titleGh = new BitmapImage(new Uri(Main.ResourceDirectory, "title.png"));
-            }
-            catch (Exception e)
-            {
+        private Image titleGh;
+        public bool IsDead { get; set; }
+        public bool selectSoundFlag { get; private set; }
+        public bool decisionSoundFlag { get; private set; }
+        public int atcount { get; private set; }
 
-            }
+        private Main main;
+        private DisplayInfo dInfo;
+        private IOperator Operator;
+        //private IOperator OtherOperator;
+        
+        public Title(Main main, DisplayInfo dInfo, IOperator Operator)
+        {
+            this.main = main;
+            this.dInfo = dInfo;
+            this.Operator = Operator;
+
+            titleGh = new Bitmap(Main.ResourceDirectory + "title.png");
+
+            //OtherOperator = new AutomaticOperator();
 
             selectSoundFlag = false;
             decisionSoundFlag = false;
             IsDead = false;
-
-            sh = new SoundPlayer(Main.ResourceDirectory + "bound.wav");
-            dh = new SoundPlayer(Main.ResourceDirectory + "demolish.wav");
+            atcount = 0;
         }
 
-        public bool Process(Input input, DrawingContext dc)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             //キー処理
             KeyGet(input);
 
             //描画処理
-            Draw(dc);
+            Draw(g);
 
-            return IsDead;
+            if (IsDead)
+                return new ProcessResult() { IsDead = IsDead, NextState = new BarSelect(dInfo, Operator) };
+            else
+                return new ProcessResult() { IsDead = IsDead, NextState = this };
         }
 
         private void KeyGet(Input input)
         {
-            if (input.barx == 750)
+            if (!input.AT && input.barx == 750)
             {
                 input.AT = true;
+                //main.SwapOperatingMode();
+                //main.Restart(input);
+                //ChangeMode();
+                //SwapOperatingMode();
+                main.SwapOperatingMode();
+                main.Restart(input);
             }
 
-            if (input.rB || input.lB || input.eB) //いずれかのボタンが押されている
+            if (input.rB || input.eB) //いずれかのボタンが押されている
             {
                 IsDead = true;
             }
+
+            if (!input.AT && input.lB) //左ボタンがおしっぱ
+            {
+                ++atcount;
+                if (atcount > 100)
+                {
+                    input.AT = true;
+                    //main.SwapOperatingMode();
+                    //main.Restart(input);
+                }
+            }
         }
 
-        private void Draw(DrawingContext dc)
+        //public void SwapOperatingMode()
+        //{
+        //    IOperator temp = Operator;
+
+        //    Operator = OtherOperator;
+
+        //    OtherOperator = temp;
+        //}
+
+        //private void ChangeMode(WPFBlockCrash.BlockCrashView.EOperatingType OperatingType)
+        //{
+        //    switch (OperatingType)
+        //    {
+        //        case BlockCrashView.EOperatingType.DESKTOP_KEYBOARD:
+        //            Operator = new DesktopKeyboard();
+        //            break;
+        //        case BlockCrashView.EOperatingType.VIRTOS_SLIDER:
+        //            Operator = new VIRTOSSlider();
+        //            break;
+        //        case BlockCrashView.EOperatingType.AUTO:
+        //            Operator = new AutomaticOperator();
+        //            break;
+        //        default:
+        //            throw new InvalidOperationException("EOperatingType is UNKNOWN.");
+        //    }
+        //}
+
+        private void Draw(Graphics g)
         {
             //タイトル表示
-            //dc.DrawImage(titleGh, new Rect(0, 0, titleGh.Width, titleGh.Height));
-            DrawUtil.DrawGraph(dc, 0, 0, titleGh);
+            g.DrawImage(titleGh, 0, 0);
         }
-
-        private ImageSource titleGh;
-        public bool IsDead { get; set; }
-        public bool selectSoundFlag { get; private set; }
-        public bool decisionSoundFlag { get; private set; }
-        private SoundPlayer sh;
-        private SoundPlayer dh;
     }
 }

@@ -1,77 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace WPFBlockCrash
 {
-    class Message
+    public enum EMessageType
     {
-        private int pattern;
+        UNKNOWN,
+        FAILED,
+        CLEAR,
+        GAMEOVER
+    }
+
+    class Message : IInputable
+    {
+        private EMessageType MessageType { get; set; }
         private int count;
         private string message;
+        private readonly string message2 = "残機に応じてスコアにボーナスが乗ります!!";
         private DisplayInfo dInfo;
         private DateTime? BeginDisplayTime;
 
+        private readonly Font font = new Font("Consolas", 20);
+
         public bool IsDead { get; set; }
 
-        public Message(int pattern, int count, DisplayInfo dInfo)
+
+        public Message(EMessageType MessageType, int count, DisplayInfo dInfo)
         {
             this.dInfo = dInfo;
-            this.pattern = pattern;
+            this.MessageType = MessageType;
             this.count = count;
 
             IsDead = false;
 
-            switch (pattern)
+            switch (MessageType)
             {
-                case 1:
+                case EMessageType.FAILED:
                     message = "BALL FAILED!!";
                     break;
-                case 2:
+                case EMessageType.CLEAR:
                     message = "CLEAR!!";
                     break;
-                case 3:
+                case EMessageType.GAMEOVER:
                     message = "GAME OVER!!";
                     break;
             }
         }
 
-        internal bool Process(Input input, DrawingContext dc)
+        public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
             //キー処理
             KeyGet(input);
 
             //描画処理
-            Draw(dc);
+            Draw(g);
 
-            return IsDead;
+            return new ProcessResult() { IsDead = IsDead };
         }
 
-        private void Draw(DrawingContext dc)
+        private void Draw(Graphics g)
         {
             if (count > 0)
             {
-                dc.PushOpacity(128d / byte.MaxValue);
-                DrawUtil.DrawBox(dc, 0, 0, dInfo.Width, dInfo.Height, RGB(30, 30, 30));
-                dc.Pop();
-                DrawUtil.DrawString(dc, 250, 300, message, RGB(255, 255, 255), 32);
+                //半透明黒で画面を暗転させる
+                g.DrawRectangle(new System.Drawing.Pen(DrawUtil.BrushRGB(128, 30, 30, 30)), 0, 0, dInfo.Width, dInfo.Height);
+
+                //メインメッセージ
+                g.DrawString(message, font, DrawUtil.BrushRGB(255, 255, 255), 300, 300);
+
+                if (MessageType == EMessageType.CLEAR)
+                    g.DrawString(message2, font, DrawUtil.BrushRGB(255, 255, 255), 150, 350);
+
                 --count;
             }
             else
                 IsDead = true;
         }
 
-        private Color RGB(byte r, byte g, byte b)
-        {
-            return Color.FromRgb(r, g, b);
-        }
-
         private void KeyGet(Input input)
         {
-            //if (input.key256[Input.KEY_INPUT_SPACE] == 1)
             if (BeginDisplayTime == null)
                 BeginDisplayTime = DateTime.Now;
             else if ((DateTime.Now - BeginDisplayTime.Value).TotalSeconds >= 1)

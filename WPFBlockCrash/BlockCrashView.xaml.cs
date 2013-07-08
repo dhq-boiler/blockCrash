@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -23,35 +24,56 @@ namespace WPFBlockCrash
     /// </summary>
     public partial class BlockCrashView : UserControl
     {
+        public enum EOperatingType
+        {
+            UNKNOWN,
+            DESKTOP_KEYBOARD,
+            VIRTOS_SLIDER,
+            AUTO
+        }
+
+        private Main main;
+        public Input input;
         private DispatcherTimer timerToRun;
-        private DispatcherTimer timerToRender;
         private WriteableBitmap bitmap;
-        private RenderTargetBitmap bs;
+        private const int DisplayWidth = 800;
+        private const int DisplayHeight = 600;
+
+        public bool IsInitialized { get; set; }
 
         public BlockCrashView()
         {
             InitializeComponent();
 
-            input = new Input();
-            //input.AT = true;
-            main = new Main(new DisplayInfo() { Width = 800, Height = 600 });
+            bitmap = new WriteableBitmap(DisplayWidth, DisplayHeight, 92, 92, PixelFormats.Bgr24, null);
 
+            input = new Input();
         }
 
-        private RenderTargetBitmap CreateBitmap(int width, int height, double dpi, Action<DrawingContext> render)
+        public void Initialize(EOperatingType OperatingType)
         {
-            GC.Collect();
-            RenderTargetBitmap bitmap = null;
-            DrawingVisual drawingVisual = new DrawingVisual();
-            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+            main = new Main(new DisplayInfo() { Width = DisplayWidth, Height = DisplayHeight }, OperatingType);
+            IsInitialized = true;
+        }
+
+        private WriteableBitmap RenderBitmap(Action<Graphics> Run_Main_ProcessLoop)
+        {
+            try
             {
-                render(drawingContext);
+                bitmap.Lock();
+                using (var bmp = new Bitmap(bitmap.PixelWidth, bitmap.PixelHeight, bitmap.BackBufferStride, System.Drawing.Imaging.PixelFormat.Format24bppRgb, bitmap.BackBuffer))
+                {
+                    using (Graphics g = Graphics.FromImage(bmp))
+                    {
+                        Run_Main_ProcessLoop(g);
+                    }
+                }
+                bitmap.AddDirtyRect(new Int32Rect(0, 0, DisplayWidth, DisplayHeight));
             }
-
-            if (bitmap == null)
-                bitmap = new RenderTargetBitmap(width, height, dpi, dpi, PixelFormats.Default);
-            bitmap.Render(drawingVisual);
-
+            finally
+            {
+                bitmap.Unlock();
+            }
             return bitmap;
         }
 
@@ -65,44 +87,19 @@ namespace WPFBlockCrash
 
         public void RunGame()
         {
-            timerToRender = new DispatcherTimer();
-            timerToRender.Tick += timerToRender_Tick;
-            timerToRender.Interval = TimeSpan.FromMilliseconds(1);
-            timerToRender.Start();
+            if (!IsInitialized)
+                throw new InvalidOperationException("Not Initialize yet.");
 
             timerToRun = new DispatcherTimer();
             timerToRun.Tick += timerToRun_Tick;
-            timerToRun.Interval = TimeSpan.FromMilliseconds(1);
+            timerToRun.Interval = TimeSpan.FromMilliseconds(1000d / 60);
             timerToRun.Start();
-        }
-
-        private object render_object = new object();
-
-        private void timerToRender_Tick(object sender, EventArgs e)
-        {
-            if (bs == null)
-                return;
-
-            WriteableBitmap wb = null;
-
-            lock (render_object)
-            {
-                wb = new WriteableBitmap(bs);
-            }
-
-            SetBitmapToImage(image, wb);
         }
 
         private void timerToRun_Tick(object sender, EventArgs e)
         {
             main.ATMode(input);
-            RenderTargetBitmap rtb = null;
-            rtb = CreateBitmap(800, 600, 96, dc => main.ProcessLoop(input, dc));
-
-            lock (render_object)
-            {
-                bs = rtb;
-            }
+            SetBitmapToImage(image, RenderBitmap(g => main.ProcessLoop(input, g)));
         }
 
 
@@ -151,13 +148,8 @@ namespace WPFBlockCrash
 
         public void ExitGame()
         {
-            timerToRender.Stop();
             timerToRun.Stop();
         }
-
-        private Thread th;
-        private Main main;
-        public Input input { get; set; }
 
         public void KeyUpSpaceButton()
         {

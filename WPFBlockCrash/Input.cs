@@ -16,7 +16,6 @@ namespace WPFBlockCrash
         public const int KEY_INPUT_RIGHT = 0xCD;
         public const int KEY_INPUT_ESCAPE = 0x01;
 
-
         public Input()
         {
             RB = new KeyInput() { TimeToContinuousInput = TimeSpan.FromMilliseconds(1000) };
@@ -27,16 +26,10 @@ namespace WPFBlockCrash
 
         public void Clear()
         {
-            //ClearLarger();
             ClearSmaller();
 
             key256 = new char[256];
         }
-
-        //public void ClearLarger()
-        //{
-        //    RB = LB = EB = false;
-        //}
 
         public void ClearSmaller()
         {
@@ -47,15 +40,6 @@ namespace WPFBlockCrash
         {
             key256 = new char[256];
         }
-
-        ////入力状態変数
-        //public bool RB { get; set; }
-
-        ////入力状態変数
-        //public bool LB { get; set; }
-
-        ////入力状態変数
-        //public bool EB { get; set; }
 
         public KeyInput RB { get; set; }
         public KeyInput LB { get; set; }

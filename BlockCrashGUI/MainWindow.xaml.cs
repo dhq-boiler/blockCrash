@@ -24,7 +24,35 @@ namespace BlockCrashGUI
         {
             InitializeComponent();
 
+            try
+            {
+                string[] args = Environment.CommandLine.Split(' ');
+                WPFBlockCrash.BlockCrashView.EOperatingType selectOperationMode = (WPFBlockCrash.BlockCrashView.EOperatingType)int.Parse(args[0]);
+                view.Initialize(selectOperationMode);
+            }
+            catch (NullReferenceException)
+            {
+                SetKeyboardMode();
+            }
+            catch (ArgumentNullException)
+            {
+                SetKeyboardMode();
+            }
+            catch (FormatException)
+            {
+                SetKeyboardMode();
+            }
+            catch (InvalidCastException)
+            {
+                SetKeyboardMode();
+            }
+
             view.RunGame();
+        }
+
+        private void SetKeyboardMode()
+        {
+            view.Initialize(WPFBlockCrash.BlockCrashView.EOperatingType.DESKTOP_KEYBOARD);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -32,7 +60,8 @@ namespace BlockCrashGUI
             switch (e.Key)
             {
                 case Key.Space:
-                    view.KeyDownSpaceButton();
+                    //view.KeyDownSpaceButton();
+                    view.KeyDownEnterButton();
                     break;
                 case Key.Left:
                     view.KeyDownLButton();
@@ -51,7 +80,8 @@ namespace BlockCrashGUI
             switch (e.Key)
             {
                 case Key.Space:
-                    view.KeyUpSpaceButton();
+                    //view.KeyUpSpaceButton();
+                    view.KeyUpEnterButton();
                     break;
                 case Key.Left:
                     view.KeyUpLButton();
