@@ -105,92 +105,102 @@ namespace WPFBlockCrash
             }
         }
 
-        private static void ReflectHorizontal(Ball ball, Bar bar, int BarAccel, ref bool boundFlag)
-        {
-            ReflectHorizontal(ball, ref boundFlag);
-            //ball.CenterX += ball.DX * BarAccel;
-            Debug.WriteLine("ReflectHorizontal " + (ball.DX > 0 ? "→" : "←"));
-        }
+        //private static void ReflectHorizontal(ref int ballDX, ref int ballDY, ref int ballCX, int BarAccel, ref bool boundFlag)
+        //{
+        //    ReflectHorizontal(ref ballDX, ref ballDY, ref ballCX, ref boundFlag);
+        //    //ball.CenterX += ball.DX * BarAccel;
+        //    Debug.WriteLine("ReflectHorizontal " + (ballDX > 0 ? "→" : "←"));
+        //}
 
-        private static void ReflectHorizontal(Ball ball, ref bool boundFlag)
+        private static void ReflectHorizontal(ref int ballDX, ref int ballDY, ref int ballCX, ref bool boundFlag)
         {
-            ball.DX = -ball.DX;
-            ball.CenterX += ball.DX;
+            ballDX = -ballDX;
+            ballCX += ballDX;
 
             boundFlag = true;
+            Debug.WriteLine("ReflectHorizontal " + (ballDX > 0 ? "→" : "←"));
         }
 
-        private static void ReflectHorizontal(Ball ball, Block block, ref bool boundFlag)
+        private static void ReflectHorizontal(Ball ball, Bar bar, int barAccel, ref bool boundFlag)
         {
-            ReflectHorizontal(ball, ref boundFlag);
-            Debug.WriteLine("ReflectHorizontal " + (ball.DX > 0 ? "→" : "←"));
+            ReflectHorizontal(ref ball.dx, ref ball.dy, ref ball.cx, ref boundFlag);
         }
 
-        public static void ReflectHorizontalIfOverlapped(Ball ball, Block block, ref bool boundFlag)
+        //private static void ReflectHorizontal(ref int ballDX, ref int ballDY, ref int ballCX, ref bool boundFlag)
+        //{
+        //    ReflectHorizontal(ref ballDX, ref ballDY, ref ballCX, ref boundFlag);
+        //    Debug.WriteLine("ReflectHorizontal " + (ballDX > 0 ? "→" : "←"));
+        //}
+
+        public static void ReflectHorizontalIfOverlapped(int ballTop, int ballBottom, int ballLeft, int ballRight, ref int ballDX, ref int ballDY, ref int ballCX,
+            int blockTop, int blockBottom, int blockLeft, int blockRight, ref int blockDX,
+            ref bool boundFlag)
         {
-            if (ball.Right > block.Left && ball.Left < block.Left) //ブロックの左辺で重なり反射
+            if (ballRight > blockLeft && ballLeft < blockLeft) //ブロックの左辺で重なり反射
             {
-                if (ball.DX < 0)
+                if (ballDX < 0)
                 {
-                    Debug.Write("Accelerate " + ball.DX);
-                    ball.DX = (int)(ball.DX + block.DX * 2);
-                    Debug.WriteLine(" → " + ball.DX);
+                    Debug.Write("Accelerate " + ballDX);
+                    ballDX = (int)(ballDX + blockDX * 2);
+                    Debug.WriteLine(" → " + ballDX);
                 }
                 else
                 {
-                    ReflectHorizontal(ball, block, ref boundFlag);
+                    ReflectHorizontal(ref ballDX, ref ballDY, ref ballCX, ref boundFlag);
                 }
             }
-            else if (ball.Left < block.Right && ball.Right > block.Right) //ブロックの右辺で重なり反射
+            else if (ballLeft < blockRight && ballRight > blockRight) //ブロックの右辺で重なり反射
             {
-                if (ball.DX > 0)
+                if (ballDX > 0)
                 {
-                    Debug.Write("Accelerate " + ball.DX);
-                    ball.DX = (int)(ball.DX + block.DX * 2);
-                    Debug.WriteLine(" → " + ball.DX);
+                    Debug.Write("Accelerate " + ballDX);
+                    ballDX = (int)(ballDX + blockDX * 2);
+                    Debug.WriteLine(" → " + ballDX);
                 }
                 else
                 {
-                    ReflectHorizontal(ball, block, ref boundFlag);
+                    ReflectHorizontal(ref ballDX, ref ballDY, ref ballCX, ref boundFlag);
                 }
             }
         }
 
 
-        public static void ReflectVerticalIfOverlapped(Ball ball, Block block, ref bool ballcatch, ref int combocount, ref bool boundFlag)
+        public static void ReflectVerticalIfOverlapped(int ballTop, int ballBottom, int ballLeft, int ballRight, ref int ballDX, ref int ballDY,
+            int blockTop, int blockBottom, int blockLeft, int blockRight, ref int blockDX, ref int blockDY,
+            ref bool ballcatch, ref int combocount, ref bool boundFlag)
         {
-            if (ball.Bottom > block.Top && ball.Top < block.Top) //ブロックの上辺で反射
+            if (ballBottom > blockTop && ballTop < blockTop) //ブロックの上辺で反射
             {
-                if (ball.DY < 0)
+                if (ballDY < 0)
                 {
-                    Debug.WriteLine("Accelerate " + ball.DY);
-                    ball.DY = (int)(ball.DY * 1.2);
-                    Debug.WriteLine(" → " + ball.DY);
+                    Debug.WriteLine("Accelerate " + ballDY);
+                    ballDY = (int)(ballDY * 1.2);
+                    Debug.WriteLine(" → " + ballDY);
                 }
                 else
                 {
-                    ReflectVertical(ball, block, ref combocount, ref boundFlag);
+                    ReflectVertical(ref ballDY, ref combocount, ref boundFlag);
                 }
             }
-            else if (ball.Top < block.Bottom && block.Bottom < ball.Bottom) //ブロックの下辺で反射
+            else if (ballTop < blockBottom && blockBottom < ballBottom) //ブロックの下辺で反射
             {
-                if (ball.DY > 0)
+                if (ballDY > 0)
                 {
-                    Debug.WriteLine("Accelerate " + ball.DY);
-                    ball.DY = (int)(ball.DY * 1.2);
-                    Debug.WriteLine(" → " + ball.DY);
+                    Debug.WriteLine("Accelerate " + ballDY);
+                    ballDY = (int)(ballDY * 1.2);
+                    Debug.WriteLine(" → " + ballDY);
                 }
                 else
                 {
-                    ReflectVertical(ball, block, ref combocount, ref boundFlag);
+                    ReflectVertical(ref ballDY, ref combocount, ref boundFlag);
                 }
             }
         }
 
-        private static void ReflectVertical(Ball ball, Block block, ref int combocount, ref bool boundFlag)
+        private static void ReflectVertical(ref int ballDY, ref int combocount, ref bool boundFlag)
         {
             ++combocount;
-            ball.DY = -ball.DY;
+            ballDY = -ballDY;
             boundFlag = true;
         }
 

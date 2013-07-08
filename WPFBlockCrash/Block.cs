@@ -58,10 +58,12 @@ namespace WPFBlockCrash
         public int Right { get { return CenterX + Width / 2; } }
         public int ItemWidth { get; private set; }
         public int ItemHeight { get; private set; }
-        public int DX { get; set; }
-        public int DY { get; set; }
+        public int dx;
+        public int DX { get { return dx; } set { dx = value; } }
+        public int dy;
+        public int DY { get { return dy; } set { dy = value; } }
 
-        private bool isdead;
+        public bool isdead;
         public bool scrollStop;
         public bool barextend;
         public bool IsDead
@@ -176,7 +178,7 @@ namespace WPFBlockCrash
             barextend = extendon;
             IsDead = false;
             
-#if false
+#if true
             int r = Main.rand.Next() % 5;
             //int r = 1; デバック用
             if (r == 1)
