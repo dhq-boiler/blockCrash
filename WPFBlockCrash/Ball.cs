@@ -14,16 +14,20 @@ namespace WPFBlockCrash
         private Image[] gh;
         private DisplayInfo dInfo;
         public int ActCount { get; set; }
-        public int CenterX { get; set; }
-        public int CenterY { get; set; }
+        public int cx;
+        public int CenterX { get { return cx; } set { cx = value; } }
+        public int cy;
+        public int CenterY { get { return cy; } set { cy = value; } }
         public int Width { get; set; }
         public int Height { get; set; }
         public int Top { get { return CenterY - Height / 2; } }
         public int Bottom { get { return CenterY + Height / 2; } }
         public int Left { get { return CenterX - Width / 2; } }
         public int Right { get { return CenterX + Width / 2; } }
-        public int DX { get; set; }
-        public int DY { get; set; }
+        public int dx;
+        public int DX { get { return dx; } set { dx = value; } }
+        public int dy;
+        public int DY { get { return dy; } set { dy = value; } }
         public int Level { get; set; }
         public int Radius { get; set; }
         public int OldY { get; set; }
