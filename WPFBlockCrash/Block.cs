@@ -38,12 +38,12 @@ namespace WPFBlockCrash
         public int ImageHandle { get; set; }
 
         // スクロールブロック用変数,0=スクロールなし,1=右スクロール,-1=左スクロール
-        private int scroll = 0;
+        private int ScrollDirection = 0;
         // スクロールカウント
-        private int scrollcount = 0;
+        private int scrollCount = 0;
 
         // スクロール時にブロック破壊と同時にアイテムを取得しないように変数を実装
-        public int matchlesscount = 0;
+        public int matchlessCount = 0;
 
         public EItemType ItemType { get; private set; }
         public EBlockColor BlockColor { get; private set; }
@@ -74,7 +74,7 @@ namespace WPFBlockCrash
 
                 if (value == true && ItemFlag)
                 {
-                    matchlesscount = 10; // 10フレーム無敵に                    
+                    matchlessCount = 10; // 10フレーム無敵に                    
                 }
 
                 if (!old && isdead)
@@ -117,14 +117,26 @@ namespace WPFBlockCrash
         }
 
         // ブロックのスクロールを制御する関数
-        public int ScrollFlag
+        public int IsScrolling
         {
             set
             {
-                scroll = value;
+                ScrollDirection = value;
                 scrollStop = false;
             }
         }
+
+        /// <summary>
+        /// ブロックがスクロールして画面をまたいで判定が存在する時,true
+        /// </summary>
+        public bool IsMirroring { get; private set; }
+
+        public int MirrorCenterX { get { return MirrorLeft + (MirrorRight - MirrorLeft) / 2; } }
+        public int MirrorCenterY { get { return MirrorTop + (MirrorBottom - MirrorTop) / 2; } }
+        public int MirrorTop { get { return CenterY - Height / 2; } }       //現状Y方向のスクロールはない
+        public int MirrorBottom { get { return CenterY + Height / 2; } }    //現状Y方向のスクロールはない
+        public int MirrorLeft { get { return CenterX - Width / 2 - Main.MainInstance.dInfo.Width; } }
+        public int MirrorRight { get { return CenterX + Width / 2 - Main.MainInstance.dInfo.Width; } }
 
         public Block(int x, int y, bool extendon, EBlockColor blockColor)
         {
@@ -201,8 +213,8 @@ namespace WPFBlockCrash
 
             Draw(g);
 
-            if (matchlesscount > 0)
-                --matchlesscount;
+            if (matchlessCount > 0)
+                --matchlessCount;
 
             return new ProcessResult() { IsDead = IsDead };
         }
@@ -211,8 +223,8 @@ namespace WPFBlockCrash
         {
             if (!IsDead)
             {
-                if (scrollcount > 0)
-                    g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], scrollcount - Width, CenterY - Height / 2, Width, Height);
+                if (IsMirroring)
+                    g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], scrollCount - Width, CenterY - Height / 2, Width, Height);
 
                 g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
             }
@@ -220,15 +232,15 @@ namespace WPFBlockCrash
             {
                 if (half)
                 {
-                    if (scrollcount > 0)
-                        g.DrawImage(itemgh[(int)ItemType], scrollcount - Width, CenterY - Height / 2, Width, Height);
+                    if (IsMirroring)
+                        g.DrawImage(itemgh[(int)ItemType], scrollCount - Width, CenterY - Height / 2, Width, Height);
 
                     g.DrawImage(itemgh[(int)ItemType], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
                 }
                 else
                 {
-                    if (scrollcount > 0)
-                        g.DrawImage(itemgh[(int)ItemType], scrollcount - ItemWidth, CenterY - Height / 2, ItemWidth, ItemHeight);
+                    if (IsMirroring)
+                        g.DrawImage(itemgh[(int)ItemType], scrollCount - ItemWidth, CenterY - Height / 2, ItemWidth, ItemHeight);
 
                     g.DrawImage(itemgh[(int)ItemType], CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
                 }
@@ -240,12 +252,12 @@ namespace WPFBlockCrash
                 {
                     float opacity = (255f / 40) * (20 - count) / byte.MaxValue;
 
-                    if (scrollcount > 0)
+                    if (IsMirroring)
                     {
                         if (WasItem)
-                            g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollcount - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
+                            g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollCount - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
                         else
-                            g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollcount - Width, CenterY - Height / 2, Width, Height);
+                            g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollCount - Width, CenterY - Height / 2, Width, Height);
                     }
 
                     if (WasItem)
@@ -263,35 +275,39 @@ namespace WPFBlockCrash
         {
             if (!scrollStop) // スクロールストップフラグが立ってたらストップ
             {
-                if (scroll == 1)// 右スクロール
+                if (ScrollDirection == 1)// 右スクロール
                 {
                     CenterX += (int)Main.RunningSpeedFactor;
                     
-                    if (CenterX + Width / 2 >= 800)//画面外に出たら逆の画面へ
+                    if (CenterX + Width / 2 >= 800) //画面右外に出始める
                     {
-                        scrollcount = CenterX + Width / 2 - 800;
+                        IsMirroring = true;
+                        scrollCount = CenterX + Width / 2 - 800;
                     }
 
-                    if (CenterX - Width / 2 >= 800)
+                    if (CenterX - Width / 2 >= 800) //画面右外に完全に出る
                     {
+                        IsMirroring = false;
                         CenterX -= 800;
-                        scrollcount = 0;
+                        scrollCount = 0;
                     }
                 }
 
-                if (scroll == -1)// 左スクロール
+                if (ScrollDirection == -1)// 左スクロール
                 {
                     CenterX -= (int)Main.RunningSpeedFactor;
                     
-                    if (CenterX - Width / 2 < 0)//画面外に出たら逆の画面へ
+                    if (CenterX - Width / 2 < 0) //画面左外に出始める
                     {
-                        scrollcount = CenterX + Width / 2 + 800;
+                        IsMirroring = true;
+                        scrollCount = CenterX + Width / 2 + 800;
                     }
                     
-                    if (CenterX + Width / 2 < 0)
+                    if (CenterX + Width / 2 < 0) //画面左外に完全に出る
                     {
+                        IsMirroring = false;
                         CenterX += 800;
-                        scrollcount = 0;
+                        scrollCount = 0;
                     }
                 }
             }

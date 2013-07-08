@@ -59,7 +59,7 @@ namespace WPFBlockCrash
                     block[i] = new Block(550 + 50 * (i - 59), 50 + 28 * 13, extendOn, EBlockColor.PURPLE);
 
                 block[i].HalfFlag = true;
-                block[i].ScrollFlag = 1;
+                block[i].IsScrolling = 1;
             }
         }
 

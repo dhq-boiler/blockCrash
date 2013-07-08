@@ -28,10 +28,11 @@ namespace WPFBlockCrash
         public static readonly Random rand = new Random(Environment.TickCount);
         public static Main MainInstance = null;
 
+        public DisplayInfo dInfo { get; private set; }
+
         private IInputable CurrentState;
         private WPFBlockCrash.BlockCrashView.EOperatingType OperatingType;
         private int AutoModeControl;
-        private DisplayInfo dInfo;
         private UserChoice userChoice;
         private TakeOver takeOver;
         private WPFBlockCrash.BlockCrashView.EOperatingType OldOperatingType;
