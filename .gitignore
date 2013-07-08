@@ -16,3 +16,8 @@ Release/
 *.psess
 
 *.opensdf
+
+DebugLBC/*.wav
+DebugLBC/*.bmp
+DebugLBC/*.png
+
