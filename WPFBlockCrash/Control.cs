@@ -469,7 +469,7 @@ namespace WPFBlockCrash
 				}
 				else if (block[i].ItemFlag)
 				{
-					if (block[i].matchlesscount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+					if (block[i].matchlessCount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 						continue;
 					CheckGettingItem(ballX, ballY, i);
 				}
@@ -553,17 +553,27 @@ namespace WPFBlockCrash
 
 		private bool CheckCrashingBlock(Ball ball, Block block)
 		{
-			int blockendX = 0;
-			int ballCX = ball.CenterX;
-			int ballCY = ball.CenterY;
-			int blockCX = block.CenterX;
-			int blockCY = block.CenterY;
+			bool IsNotOverlapping = false;
 
-			if (blockCX - blockWidth / 2 < 0)
-				blockendX = blockCX - blockWidth / 2 + 800;
-			if (blockCX + blockWidth / 2 >= 800)
-				blockendX = blockCX + blockWidth / 2 - 800;
+			IsNotOverlapping |= DetectOneCollision(ball, block, ball.CenterX, ball.CenterX, block.CenterX, block.CenterY);
+			if (block.IsMirroring)
+				IsNotOverlapping |= DetectOneCollision(ball, block, ball.CenterX, ball.CenterY, block.MirrorCenterX, block.MirrorCenterY);
 
+			if (block.IsDead)
+			{
+				int NonMoveBonus = 0;
+				if (!bar.IsMove)
+					NonMoveBonus = 500;
+				++ComboCount;
+				Score += 100 + 50 * ball.Level + ComboCount * 100 + NonMoveBonus;
+				ball.Radius = 0;
+			}
+
+			return block.IsDead;
+		}
+
+		private bool DetectOneCollision(Ball ball, Block block, int ballCX, int ballCY, int blockCX, int blockCY)
+		{
 			bool IsOverlappedVertical = Math.Abs(blockCY - ballCY) < ballHeight / 2 + blockHeight / 2;
 			bool IsOverlappedHorizontal = Math.Abs(blockCX - ballCX) < ballWidth / 2 + blockWidth / 2;
 
@@ -582,7 +592,7 @@ namespace WPFBlockCrash
 				else //左辺反射
 					OverlapDistanceX = (block.Left - ball.Right) / (double)block.Width;
 
-				if (OverlapDistanceX > 0d || OverlapDistanceY > 0d)
+				if (OverlapDistanceX >= 0d || OverlapDistanceY >= 0d)
 					return false;
 
 				if (ball.Penetrability == Ball.EPenetrability.PENETRATING)
@@ -612,19 +622,11 @@ namespace WPFBlockCrash
 				{
 					Debug.WriteLine("N ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 				}
+
+				return true;
 			}
 
-			if (block.IsDead)
-			{
-				int NonMoveBonus = 0;
-				if (!bar.IsMove)
-					NonMoveBonus = 500;
-				++ComboCount;
-				Score += 100 + 50 * ball.Level + ComboCount * 100 + NonMoveBonus;
-				ball.Radius = 0;
-			}
-
-			return block.IsDead;
+			return false;
 		}
 
 		private void ItemEffect(EItemType eItemType, int ballX, int ballY)
