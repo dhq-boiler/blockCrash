@@ -107,6 +107,7 @@ namespace ScrollCrash
             EnterButton.ThresholdUnderAsShadow1ch = 20;
             EnterButton.MarginLeft = EnterButton.MarginTop = EnterButton.MarginRight = EnterButton.MarginBottom = 10;
             EnterButton.IsEnableLongTouch = false;
+            EnterButton.JudgingTimeOut = TimeSpan.FromSeconds(1);
 
             ScrollBar.Thumb.ProjectionColor = Colors.Lime;
             ScrollBar.Thumb.JudgementColor = Colors.Magenta;
@@ -121,6 +122,7 @@ namespace ScrollCrash
                 ScrollBar.Thumb.MarginTop =
                 ScrollBar.Thumb.MarginBottom = 10;
             ScrollBar.Thumb.IsEnableLongTouch = false;
+            ScrollBar.Thumb.JudgingTimeOut = TimeSpan.FromSeconds(1);
             ScrollBar.ScrollAreaColor = Colors.LightBlue;
             ScrollBar.PixelsPerStep = 1;
             ScrollBar.RadiusOfSearchAreaCircle = Math.Sqrt(Math.Pow(ScrollBar.Thumb.ActualWidth, 2) + Math.Pow(ScrollBar.Thumb.ActualHeight, 2)) * 5;
