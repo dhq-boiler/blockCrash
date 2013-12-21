@@ -11,6 +11,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 using WPFBlockCrash;
+using libts;
 
 namespace ScrollCrash
 {
@@ -77,64 +78,6 @@ namespace ScrollCrash
         public MainWindow()
         {
             InitializeComponent();
-
-            try
-            {
-                CameraNumber = Settings.Load("settings.xml").UseCameraNumber;
-            }
-            catch (IOException e)
-            {
-                Settings.Save("settings.xml", new Settings());
-                MessageBox.Show("settings.xmlを出力しました．<UseCameraNumber>に0から始まるカメラ番号を入力して再起動してください．");
-                Environment.Exit(1);
-            }
-
-            capture = new CvCapture(CameraNumber);
-            bitmap = new WriteableBitmap(VGACameraWidth, VGACameraHeight, 92, 92, PixelFormats.Bgr24, null);
-            calibrator = new Calibrator(new CvSize((int)ImageWidthStandard, (int)ImageHeightStandard), new CvSize(10, 7));
-
-            MaximizeWindowSize.Visibility = System.Windows.Visibility.Visible;
-            NomalizeWindowSize.Visibility = System.Windows.Visibility.Hidden;
-            StartCalibration.Visibility = System.Windows.Visibility.Visible;
-
-            EnterButton.ProjectionColor = Colors.Lime;
-            EnterButton.JudgementColor = Colors.Magenta;
-            EnterButton.PushedButtonBorderColor = Colors.Black;
-            EnterButton.PushedButtonBorderThickness = 2;
-            EnterButton.ThresholdCheckPercent = 25;
-            EnterButton.ShadowThresholdPercent = 1;
-            EnterButton.ThresholdDifferentPixel = 100;
-            EnterButton.ThresholdUnderAsShadow1ch = 20;
-            EnterButton.MarginLeft = EnterButton.MarginTop = EnterButton.MarginRight = EnterButton.MarginBottom = 10;
-            EnterButton.IsEnableLongTouch = false;
-            EnterButton.JudgingTimeOut = TimeSpan.FromSeconds(1);
-
-            ScrollBar.Thumb.ProjectionColor = Colors.Lime;
-            ScrollBar.Thumb.JudgementColor = Colors.Magenta;
-            ScrollBar.Thumb.PushedButtonBorderColor = Colors.Black;
-            ScrollBar.Thumb.PushedButtonBorderThickness = 2;
-            ScrollBar.Thumb.ThresholdCheckPercent = 25;
-            ScrollBar.Thumb.ShadowThresholdPercent = 1;
-            ScrollBar.Thumb.ThresholdDifferentPixel = 100;
-            ScrollBar.Thumb.ThresholdUnderAsShadow1ch = 20;
-            ScrollBar.Thumb.MarginLeft =
-                ScrollBar.Thumb.MarginRight =
-                ScrollBar.Thumb.MarginTop =
-                ScrollBar.Thumb.MarginBottom = 10;
-            ScrollBar.Thumb.IsEnableLongTouch = false;
-            ScrollBar.Thumb.JudgingTimeOut = TimeSpan.FromSeconds(1);
-            ScrollBar.ScrollAreaColor = Colors.LightBlue;
-            ScrollBar.PixelsPerStep = 1;
-            ScrollBar.RadiusOfSearchAreaCircle = Math.Sqrt(Math.Pow(ScrollBar.Thumb.ActualWidth, 2) + Math.Pow(ScrollBar.Thumb.ActualHeight, 2)) * 5;
-
-            input = new Input();
-            blockCrashView.input = input;
-            StatusInfoIndicator.Content = "Auto Mode";
-
-            timerToPreview = new DispatcherTimer();
-            timerToPreview.Interval = TimeSpan.FromMilliseconds(1);
-            timerToPreview.Tick += (s, e) => PreviewCameraInputLoop(s, e);
-            timerToPreview.Start();
         }
 
         private void PreviewCameraInputLoop(object s, EventArgs e)
@@ -179,9 +122,7 @@ namespace ScrollCrash
             timerToCalibrate.Interval = TimeSpan.FromMilliseconds(1);
             timerToCalibrate.Start();
         }
-
-        private int calibrateSuccessedCount = 0;
-
+        
         private void CalibrateCameraInputLoop(object s, EventArgs ea)
         {
             Debug.WriteLine("Trying Calibration Count:" + (calibratingCount + 1));
@@ -319,14 +260,18 @@ namespace ScrollCrash
                 EnterButton.Process(imgMat, SlideChangeTime, now);
                 ScrollBar.Thumb.Process(imgMat, SlideChangeTime, now);
 
-#if Debug
+                Cv.ShowImage("Camera Input", imgCap);
+                Cv.ShowImage("EnterButton Current Image", TSUtil.ExtractROI(imgMat, EnterButton.ButtonPosition));
+                Cv.ShowImage("ScrollBarhandle Current Image", TSUtil.ExtractROI(imgMat, ScrollBar.Thumb.ButtonPosition));
+                Cv.ShowImage("EnterButton Reference Image", EnterButton.ReferenceImage);
+                Cv.ShowImage("ScrollBarHandle Reference Image", ScrollBar.Thumb.ReferenceImage);
                 imgMat.DrawLine(new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Top),
                     new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Bottom),
                     new CvScalar(255, 0, 0), 3);
                 imgMat.DrawRect(ScrollBar.Thumb.ButtonPosition, new CvScalar(0, 0, 255));
                 imgMat.DrawRect(EnterButton.ButtonPosition, new CvScalar(0, 0, 255));
-                Cv.ShowImage("Screen", imgMat);
-#endif
+                Cv.ShowImage("Camera Input that is projective transformation", imgMat);
+
                 if (input.AT && (DateTime.Now - ChangedDisplayInfomationTime).TotalSeconds >= 1)
                 {
                     switch (StatusInfoIndicator.Visibility)
@@ -370,6 +315,7 @@ namespace ScrollCrash
             double c = b + 50; // 50.0 -> 750.0
             //Debug.WriteLine("a:" + a + " b:" + b + " c:" + c);
             blockCrashView.MoveBarTo((int)c);
+            Console.WriteLine(DateTime.Now.ToString() + " : " + ((int)c).ToString());
         }
 
         private void MaximizeWindowSize_Click(object sender, RoutedEventArgs e)
@@ -414,6 +360,76 @@ namespace ScrollCrash
                 this.PreviewImage.Height = ImageHeightStandard;
                 calibrator = new Calibrator(new CvSize((int)mainGrid.ActualWidth, (int)mainGrid.ActualHeight), new CvSize(10, 7));
             }
+        }
+
+        private void mainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CameraNumber = Settings.Load("settings.xml").UseCameraNumber;
+            }
+            catch (IOException)
+            {
+                Settings.Save("settings.xml", new Settings());
+                MessageBox.Show("settings.xmlを出力しました．<UseCameraNumber>に0から始まるカメラ番号を入力して再起動してください．");
+                Environment.Exit(1);
+            }
+
+            try
+            {
+                capture = new CvCapture(CameraNumber);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("カメラが応答しません．settings.xml の <UseCameraNumber> を確認してください．UseCameraNumber=" + CameraNumber, "エラー");
+                Environment.Exit(1);
+            }
+
+            bitmap = new WriteableBitmap(VGACameraWidth, VGACameraHeight, 92, 92, PixelFormats.Bgr24, null);
+            calibrator = new Calibrator(new CvSize((int)ImageWidthStandard, (int)ImageHeightStandard), new CvSize(10, 7));
+
+            MaximizeWindowSize.Visibility = System.Windows.Visibility.Visible;
+            NomalizeWindowSize.Visibility = System.Windows.Visibility.Hidden;
+            StartCalibration.Visibility = System.Windows.Visibility.Visible;
+
+            EnterButton.ProjectionColor = Colors.Lime;
+            EnterButton.JudgementColor = Colors.Magenta;
+            EnterButton.PushedButtonBorderColor = Colors.Black;
+            EnterButton.PushedButtonBorderThickness = 2;
+            EnterButton.ThresholdCheckPercent = 30;
+            EnterButton.ShadowThresholdPercent = 8;
+            EnterButton.ThresholdDifferentPixel = 100;
+            EnterButton.ThresholdUnderAsShadow1ch = 25;
+            EnterButton.MarginLeft = EnterButton.MarginTop = EnterButton.MarginRight = EnterButton.MarginBottom = 10;
+            EnterButton.IsEnableLongTouch = false;
+            EnterButton.JudgingTimeOut = TimeSpan.FromSeconds(1);
+
+            ScrollBar.Thumb.ProjectionColor = Colors.Lime;
+            ScrollBar.Thumb.JudgementColor = Colors.Magenta;
+            ScrollBar.Thumb.PushedButtonBorderColor = Colors.Black;
+            ScrollBar.Thumb.PushedButtonBorderThickness = 2;
+            ScrollBar.Thumb.ThresholdCheckPercent = 30;
+            ScrollBar.Thumb.ShadowThresholdPercent = 8;
+            ScrollBar.Thumb.ThresholdDifferentPixel = 100;
+            ScrollBar.Thumb.ThresholdUnderAsShadow1ch = 25;
+            ScrollBar.Thumb.MarginLeft =
+                ScrollBar.Thumb.MarginRight =
+                ScrollBar.Thumb.MarginTop =
+                ScrollBar.Thumb.MarginBottom = 10;
+            ScrollBar.Thumb.IsEnableLongTouch = false;
+            ScrollBar.Thumb.JudgingTimeOut = TimeSpan.FromSeconds(1);
+            ScrollBar.ScrollAreaColor = Colors.LightBlue;
+            ScrollBar.PixelsPerStep = 1;
+            //ScrollBar.RadiusOfSearchAreaCircle = Math.Sqrt(Math.Pow(ScrollBar.Thumb.ActualWidth, 2) + Math.Pow(ScrollBar.Thumb.ActualHeight, 2)) * 5;
+
+            input = new Input();
+            blockCrashView.input = input;
+            StatusInfoIndicator.Content = "Auto Mode";
+
+            timerToPreview = new DispatcherTimer();
+            timerToPreview.Interval = TimeSpan.FromMilliseconds(1);
+            timerToPreview.Tick += (s, ea) => PreviewCameraInputLoop(s, ea);
+            timerToPreview.Start();
         }
     }
 }
