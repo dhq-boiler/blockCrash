@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1BBE0E95-6EDE-4FA3-9366-1BB68D6CB5FB}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ScrollCrash</RootNamespace>
     <AssemblyName>ScrollCrash</AssemblyName>
@@ -33,8 +33,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="libts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="libts, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\touchscreen\libts\bin\Release_Parallel\libts.dll</HintPath>
     </Reference>

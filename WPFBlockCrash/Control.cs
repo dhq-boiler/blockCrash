@@ -556,10 +556,10 @@ namespace WPFBlockCrash
 			bool IsNotOverlapping = false;
 
 			IsNotOverlapping |= DetectOneCollision(ref block.isdead, ball.CenterX, ball.CenterY, ball.Top, ball.Bottom, ball.Left, ball.Right, ref ball.dx, ref ball.dy,
-                                   block.CenterX, block.CenterY, block.Top, block.Bottom, block.Left, block.Right, block.Width, block.Height, ref block.dx, ref block.dy, ball.Penetrability);
-            if (block.IsMirroring)
-                IsNotOverlapping |= DetectOneCollision(ref block.isdead, ball.CenterX, ball.CenterY, ball.Top, ball.Bottom, ball.Left, ball.Right, ref ball.dx, ref ball.dy,
-                                        block.MirrorCenterX, block.MirrorCenterY, block.MirrorTop, block.MirrorBottom, block.MirrorLeft, block.MirrorRight, block.Width, block.Height, ref block.dx, ref block.dy, ball.Penetrability);
+								   block.CenterX, block.CenterY, block.Top, block.Bottom, block.Left, block.Right, block.Width, block.Height, ref block.dx, ref block.dy, ball.Penetrability);
+			if (block.IsMirroring)
+				IsNotOverlapping |= DetectOneCollision(ref block.isdead, ball.CenterX, ball.CenterY, ball.Top, ball.Bottom, ball.Left, ball.Right, ref ball.dx, ref ball.dy,
+										block.MirrorCenterX, block.MirrorCenterY, block.MirrorTop, block.MirrorBottom, block.MirrorLeft, block.MirrorRight, block.Width, block.Height, ref block.dx, ref block.dy, ball.Penetrability);
 
 			if (block.IsDead)
 			{
@@ -575,9 +575,9 @@ namespace WPFBlockCrash
 		}
 
 		private bool DetectOneCollision(ref bool BlockIsDead,
-            int ballCX, int ballCY, int ballTop, int ballBottom, int ballLeft, int ballRight, ref int ballDX, ref int ballDY,
-            int blockCX, int blockCY, int blockTop, int blockBottom, int blockLeft, int blockRight, int blockWidth, int blockHeight, ref int blockDX, ref int blockDY,
-            Ball.EPenetrability Penetrability)
+			int ballCX, int ballCY, int ballTop, int ballBottom, int ballLeft, int ballRight, ref int ballDX, ref int ballDY,
+			int blockCX, int blockCY, int blockTop, int blockBottom, int blockLeft, int blockRight, int blockWidth, int blockHeight, ref int blockDX, ref int blockDY,
+			Ball.EPenetrability Penetrability)
 		{
 			bool IsOverlappedVertical = Math.Abs(blockCY - ballCY) < ballHeight / 2 + blockHeight / 2;
 			bool IsOverlappedHorizontal = Math.Abs(blockCX - ballCX) < ballWidth / 2 + blockWidth / 2;
@@ -607,23 +607,23 @@ namespace WPFBlockCrash
 				else if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-                    Collision.ReflectVerticalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY,
-                        blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref blockDY, ref isballcatch, ref combocount, ref boundFlag);
-                    Collision.ReflectHorizontalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, ref ballCX,
-                        blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref boundFlag);
+					Collision.ReflectVerticalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY,
+						blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref blockDY, ref isballcatch, ref combocount, ref boundFlag);
+					Collision.ReflectHorizontalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, ref ballCX,
+						blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref boundFlag);
 					BlockIsDead = true;
 				}
 				else if (OverlapDistanceY < OverlapDistanceX)
 				{
-                    Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-                    Collision.ReflectHorizontalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, ref ballCX,
-                        blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref boundFlag);
+					Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
+					Collision.ReflectHorizontalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, ref ballCX,
+						blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref boundFlag);
 					BlockIsDead = true;
 				}
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-                    Collision.ReflectVerticalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref blockDY, ref isballcatch, ref combocount, ref boundFlag);
+					Collision.ReflectVerticalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref blockDY, ref isballcatch, ref combocount, ref boundFlag);
 					BlockIsDead = true;
 				}
 				else
