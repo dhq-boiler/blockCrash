@@ -188,14 +188,16 @@ namespace ScrollCrash
                             if (EnterButton.SetReferenceImageIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
                             {
                                 StageRetrieveingScrollArea = 1;
+                                ScrollBar.Thumb.Visibility = System.Windows.Visibility.Hidden;
+                                ScrollBar.PaintScrollAreaBy(ScrollBar.Thumb.ProjectionColor);
+                                ScrollBar.Thumb.ReferenceImageAdjustedTime = DateTime.Now;
                             }
                             break;
                         case 1:
                             if (ScrollBar.SetThumbReferenceImageIfThatIsNull(imgMat, SecondToWaitForAppearingTouchButton))
                             {
                                 StageRetrieveingScrollArea = 2;
-                                ScrollBar.Thumb.Visibility = System.Windows.Visibility.Hidden;
-                                ScrollBar.PaintScrollAreaBy(ScrollBar.Thumb.ProjectionColor);
+                                ScrollBar.SetSinceChangingScrollAreaColorNow();
                             }
                             break;
                         case 2:
@@ -203,6 +205,7 @@ namespace ScrollCrash
                             {
                                 StageRetrieveingScrollArea = 3;
                                 ScrollBar.PaintScrollAreaBy(ScrollBar.ScrollAreaColor);
+                                ScrollBar.SetSinceChangingScrollAreaColorNow();
                             }
                             break;
                         case 3:
