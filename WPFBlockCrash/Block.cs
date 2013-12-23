@@ -198,6 +198,7 @@ namespace WPFBlockCrash
                 ItemType = EItemType.ITEMTYPE_NO;
             }
 #else
+            //全てのブロックにアイテムを仕込む
             ItemFlag = true;
             ItemType = EItemType.ITEMTYPE_INCRESE;
 #endif
@@ -250,6 +251,7 @@ namespace WPFBlockCrash
 #if !DEBUG
             else 
             {
+                //ブロックが徐々に消える描画処理
                 if (count < 20)
                 {
                     float opacity = (255f / 40) * (20 - count) / byte.MaxValue;

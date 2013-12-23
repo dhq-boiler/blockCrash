@@ -23,7 +23,7 @@ namespace WPFBlockCrash
         public static readonly double ElasticCoefficient = 1.0;
         public static readonly double RunningSpeedFactor = 1.5;
         public static readonly bool PenetrationEnables = true;
-        public static readonly bool CatchBallEnables = false;
+        public static readonly bool CatchBallEnables = true;
         public static readonly string ResourceDirectory = Directory.GetCurrentDirectory() + "\\res\\";
         public static readonly Random rand = new Random(Environment.TickCount);
         public static Main MainInstance = null;
