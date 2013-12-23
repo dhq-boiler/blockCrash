@@ -7,7 +7,8 @@
         Title="MainWindow"
         x:Name="mainWindow"
         ResizeMode="NoResize"
-        SizeChanged="mainWindow_SizeChanged">
+        SizeChanged="mainWindow_SizeChanged"
+        Loaded="mainWindow_Loaded">
     <Grid x:Name="mainGrid">
         <Grid.RowDefinitions>
             <RowDefinition />
