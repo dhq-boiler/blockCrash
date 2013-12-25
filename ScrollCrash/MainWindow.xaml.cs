@@ -310,15 +310,13 @@ namespace ScrollCrash
 
         private void Move()
         {
+            // 25 <= vx <= 775 のスケールに変換する
             int barXValue = (int)ScrollBar.Value;
             int barXMaxValue = ScrollBar.MaxValue;
-            // 50 <= vx <= 750;
             double a = (double)barXValue / (double)barXMaxValue; //0.0 -> 1.0
-            double b = a * 700; //0.0 -> 700.0
-            double c = b + 50; // 50.0 -> 750.0
-            //Debug.WriteLine("a:" + a + " b:" + b + " c:" + c);
+            double b = a * 750; //0.0 -> 750.0
+            double c = b + 25; // 25.0 -> 775.0
             blockCrashView.MoveBarTo((int)c);
-            Console.WriteLine(DateTime.Now.ToString() + " : " + ((int)c).ToString());
         }
 
         private void MaximizeWindowSize_Click(object sender, RoutedEventArgs e)
