@@ -30,6 +30,7 @@ namespace WPFBlockCrash
         public int CenterX { get; set; }
         public int CenterY { get; set; }
         public int Width { get; set; }
+        public int EnlargedWidth { get { return Width * EnlargementFactor; } }
         public int Height { get; set; }
         public int Top { get { return CenterY - Height / 2; } }
         public int Bottom { get { return CenterY + Height / 2; } }

@@ -22,7 +22,7 @@ namespace WPFBlockCrash
             return new Tuple<double, double>(newV1, newV2);
         }
 
-        private static void ReflectVertical(Ball ball, Bar bar, EBarType BarType, ref bool ballcatch, ref int combocount, ref bool boundFlag)
+        public static void ReflectVertical(Ball ball, Bar bar, EBarType BarType, ref bool ballcatch, ref int combocount, ref bool boundFlag)
         {
             ball.Radius = 20;
             int barWidth = bar.Width;
@@ -112,7 +112,7 @@ namespace WPFBlockCrash
         //    Debug.WriteLine("ReflectHorizontal " + (ballDX > 0 ? "→" : "←"));
         //}
 
-        private static void ReflectHorizontal(ref int ballDX, ref int ballDY, ref int ballCX, ref bool boundFlag)
+        public static void ReflectHorizontal(ref int ballDX, ref int ballDY, ref int ballCX, ref bool boundFlag)
         {
             ballDX = -ballDX;
             ballCX += ballDX;

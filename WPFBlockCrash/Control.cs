@@ -701,14 +701,14 @@ namespace WPFBlockCrash
 				double OverlapDistanceY = double.MaxValue;
 
 				if (barCY < ballCY) //下辺反射
-					OverlapDistanceY = (ball.Top - bar.Bottom) / (double)bar.Height;
+					OverlapDistanceY = Math.Abs(ball.Top - bar.Bottom) / (double)bar.Height;
 				else  //上辺反射
-					OverlapDistanceY = (bar.Top - ball.Bottom) / (double)bar.Height;
+					OverlapDistanceY = Math.Abs(bar.Top - ball.Bottom) / (double)bar.Height;
 
 				if (barCX < ballCX) //右辺反射
-					OverlapDistanceX = (ball.Left - bar.Right) / (double)bar.Width;
+					OverlapDistanceX = Math.Abs(ball.Left - bar.Right) / (double)bar.EnlargedWidth;
 				else //左辺反射
-					OverlapDistanceX = (bar.Left - ball.Right) / (double)bar.Width;
+					OverlapDistanceX = Math.Abs(bar.Left - ball.Right) / (double)bar.EnlargedWidth;
 
 #if DEBUG
 				g.DrawString(string.Format("ODX:{0}", OverlapDistanceX), font, DrawUtil.BrushRGB(255, 120, 0), 20, 480);
@@ -718,18 +718,22 @@ namespace WPFBlockCrash
 				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.25)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					Collision.ReflectVerticalIfOverlapped(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag, ref reflectEnableByBar);
-					Collision.ReflectHorizontalIfOverlapped(ball, bar, barAccel, ref boundFlag, ref reflectEnableByBar);
+					//Collision.ReflectVerticalIfOverlapped(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag, ref reflectEnableByBar);
+					//Collision.ReflectHorizontalIfOverlapped(ball, bar, barAccel, ref boundFlag, ref reflectEnableByBar);
+					Collision.ReflectHorizontal(ref ball.dx, ref ball.dy, ref ball.cx, ref boundFlag);
+					Collision.ReflectVertical(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag);
 				}
 				else if (OverlapDistanceY < OverlapDistanceX)
 				{
 					Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					Collision.ReflectHorizontalIfOverlapped(ball, bar, barAccel, ref boundFlag, ref reflectEnableByBar);
+					//Collision.ReflectHorizontalIfOverlapped(ball, bar, barAccel, ref boundFlag, ref reflectEnableByBar);
+					Collision.ReflectHorizontal(ref ball.dx, ref ball.dy, ref ball.cx, ref boundFlag);
 				}
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					Collision.ReflectVerticalIfOverlapped(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag, ref reflectEnableByBar);
+					//Collision.ReflectVerticalIfOverlapped(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag, ref reflectEnableByBar);
+					Collision.ReflectVertical(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag);
 				}
 				else
 				{
