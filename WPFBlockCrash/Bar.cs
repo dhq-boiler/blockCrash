@@ -60,7 +60,7 @@ namespace WPFBlockCrash
             Bitmap bi = gh[0] as Bitmap;
 
             if (mBar == EBarType.SHORT)
-            {// 2ならバーは小さくする
+            {
                 Width = (int)bi.Width / 2;
                 SPEED = 16;
             }
@@ -114,15 +114,22 @@ namespace WPFBlockCrash
             return IsPushedAnyKey;
         }
 
-        public void BallCatch( bool on )// ボールがバーにくっつく状態
-        { 
-            if (on && mBar != EBarType.MOLD)
+        private bool _IsBallCatch;
+        public bool IsBallCatch
+        {
+            get { return _IsBallCatch; }
+            set
             {
-                moldBar = mBar;
-                mBar = EBarType.MOLD;
+                if (value && mBar != EBarType.MOLD)
+                {
+                    moldBar = mBar;
+                    mBar = EBarType.MOLD;
+                }
+                else if (!value)
+                    mBar = moldBar;
+
+                _IsBallCatch = value;
             }
-            else if(!on)
-                mBar = moldBar;
         }
 
         internal void Reset()

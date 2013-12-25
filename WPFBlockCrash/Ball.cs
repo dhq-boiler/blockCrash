@@ -41,8 +41,10 @@ namespace WPFBlockCrash
         public int IsNewCount { get; set; }
         public bool IsStop { get; set; }
         public bool IsCatching { get; set; }
+        public bool IsThrowing { get; set; }
 
         private LinkedList<Ball> OverlappingBalls;
+        private Bar bar;
 
         public enum EPenetrability
         {
@@ -50,7 +52,7 @@ namespace WPFBlockCrash
             PENETRATING
         }
 
-        public Ball(DisplayInfo dInfo)
+        public Ball(DisplayInfo dInfo, Bar bar)
         {
             this.dInfo = dInfo;
             gh = new Image[4];
@@ -80,6 +82,7 @@ namespace WPFBlockCrash
             xoffset = 0;
             baccel = 0;
             acbectl = 0;
+            this.bar = bar;
 
             OverlappingBalls = new LinkedList<Ball>();
         }
@@ -206,6 +209,7 @@ namespace WPFBlockCrash
                     }
                     ActCount = 1;
                     IsCatching = false;
+                    IsThrowing = true;
                 }
             }
         }

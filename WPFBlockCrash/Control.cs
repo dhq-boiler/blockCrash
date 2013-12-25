@@ -50,8 +50,8 @@ namespace WPFBlockCrash
 		public int Score { get; set; }
 		public int Stock { get; set; }
 		public int sballcount { get; set; }
-		private bool isballcatch;
-		public bool IsBallCatch { get { return isballcatch; } set { isballcatch = value; } }
+        //private bool isballcatch;
+        //public bool IsBallCatch { get { return isballcatch; } set { isballcatch = value; } }
 		public bool clear;
 		private int alphacombo { get; set; }
 		private int combocount;
@@ -97,7 +97,7 @@ namespace WPFBlockCrash
 	
 			//バーとボールのインスタンスを生成
 			bar = new Bar(BarType, dInfo, Operator);
-			mainBall = new Ball(dInfo);
+			mainBall = new Ball(dInfo, bar);
 			ballspup = 0;
 
 			SmallBalls = new LinkedList<Ball>();
@@ -110,7 +110,7 @@ namespace WPFBlockCrash
 			Stock = takeOver.Stock;
 			Stage = userChoice.StageType;
 			vspeed = 0;
-			IsBallCatch = false;
+            //IsBallCatch = false;
 			ComboCount = 0;
 			comboon = false;
 			combooncount = 0;
@@ -609,7 +609,7 @@ namespace WPFBlockCrash
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					Collision.ReflectVerticalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY,
-						blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref blockDY, ref isballcatch, ref combocount, ref boundFlag);
+						blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref blockDY, bar, ref combocount, ref boundFlag);
 					Collision.ReflectHorizontalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, ref ballCX,
 						blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref boundFlag);
 					BlockIsDead = true;
@@ -624,7 +624,7 @@ namespace WPFBlockCrash
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					Collision.ReflectVerticalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref blockDY, ref isballcatch, ref combocount, ref boundFlag);
+					Collision.ReflectVerticalIfOverlapped(ballTop, ballBottom, ballLeft, ballRight, ref ballDX, ref ballDY, blockTop, blockBottom, blockLeft, blockRight, ref blockDX, ref blockDY, bar, ref combocount, ref boundFlag);
 					BlockIsDead = true;
 				}
 				else
@@ -659,7 +659,7 @@ namespace WPFBlockCrash
 						if (sballcount >= MAX_SBALLCOUNT)
 							break;
 
-						Ball newSmallBall = new Ball(dInfo);
+						Ball newSmallBall = new Ball(dInfo, bar);
 						newSmallBall.IsStop = false;
 						newSmallBall.Increse(mainBall, ballX, ballY);
 						willBeAddedSmallBalls.Add(newSmallBall);
@@ -675,8 +675,9 @@ namespace WPFBlockCrash
 					Score += 5000;
 					break;
 				case EItemType.ITEMTYPE_BALLCATCHER:
-					bar.BallCatch( true );
-					IsBallCatch = true;
+                    bar.IsBallCatch = true;
+                    //bar.BallCatch( true );
+                    //IsBallCatch = true;
 					break;
 			}
 		}
@@ -719,7 +720,7 @@ namespace WPFBlockCrash
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					Collision.ReflectHorizontal(ref ball.dx, ref ball.dy, ref ball.cx, ref boundFlag);
-					Collision.ReflectVertical(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag);
+					Collision.ReflectVertical(ball, bar, BarType, ref combocount, ref boundFlag);
 				}
 				else if (OverlapDistanceY < OverlapDistanceX)
 				{
@@ -729,7 +730,7 @@ namespace WPFBlockCrash
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					Collision.ReflectVertical(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag);
+					Collision.ReflectVertical(ball, bar, BarType, ref combocount, ref boundFlag);
 				}
 				else
 				{
@@ -811,8 +812,9 @@ namespace WPFBlockCrash
 		internal void Reset()
 		{
 			SmallBalls = new LinkedList<Ball>();
-			IsBallCatch = false;
-			bar.BallCatch(false);
+            bar.IsBallCatch = false;
+            //IsBallCatch = false;
+            //bar.BallCatch(false);
 			sballcount = 0;
 			vspeed = 0;
 			barWidth = bar.Width;

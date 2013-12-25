@@ -10,6 +10,14 @@ namespace WPFBlockCrash
 {
     static class Collision
     {
+        public static bool IsOverlapping(Bar bar, Ball ball)
+        {
+            bool IsOverlappedVertical = Math.Abs(bar.CenterY - ball.CenterY) < (bar.Height + ball.Height) / 2;
+            if (!IsOverlappedVertical) return IsOverlappedVertical;
+            bool IsOverlappedHorizontal = Math.Abs(bar.CenterX - ball.CenterX) < (bar.Width + ball.Width) / 2;
+            return IsOverlappedHorizontal;
+        }
+
         public static bool BallsIsOverlapping(Ball ball1, Ball ball2)
         {
             return Math.Pow(ball1.CenterX - ball2.CenterX, 2) + Math.Pow(ball1.CenterY - ball2.CenterY, 2) <= Math.Pow(20, 2);
@@ -22,12 +30,18 @@ namespace WPFBlockCrash
             return new Tuple<double, double>(newV1, newV2);
         }
 
-        public static void ReflectVertical(Ball ball, Bar bar, EBarType BarType, ref bool ballcatch, ref int combocount, ref bool boundFlag)
+        public static void ReflectVertical(Ball ball, Bar bar, EBarType BarType, ref int combocount, ref bool boundFlag)
         {
             ball.Radius = 20;
             int barWidth = bar.Width;
 
-            if (Main.CatchBallEnables && ballcatch)// ボールがバーにくっつく状態
+            if (ball.IsThrowing && IsOverlapping(bar, ball))
+            {
+                ball.IsThrowing = false;
+                return;
+            }
+
+            if (Main.CatchBallEnables && bar.IsBallCatch)// ボールがバーにくっつく状態
             {
                 ball.IsCatching = true;
                 ball.DX = ball.DY = 0;
@@ -85,7 +99,7 @@ namespace WPFBlockCrash
                 }
                 else
                 {
-                    Collision.ReflectVertical(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag);
+                    Collision.ReflectVertical(ball, bar, BarType, ref combocount, ref boundFlag);
                 }
                 ReflectEnableByBar = false;
             }
@@ -99,7 +113,7 @@ namespace WPFBlockCrash
                 }
                 else
                 {
-                    Collision.ReflectVertical(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag);
+                    Collision.ReflectVertical(ball, bar, BarType, ref combocount, ref boundFlag);
                 }
                 ReflectEnableByBar = false;
             }
@@ -167,7 +181,7 @@ namespace WPFBlockCrash
 
         public static void ReflectVerticalIfOverlapped(int ballTop, int ballBottom, int ballLeft, int ballRight, ref int ballDX, ref int ballDY,
             int blockTop, int blockBottom, int blockLeft, int blockRight, ref int blockDX, ref int blockDY,
-            ref bool ballcatch, ref int combocount, ref bool boundFlag)
+            Bar bar, ref int combocount, ref bool boundFlag)
         {
             if (ballBottom > blockTop && ballTop < blockTop) //ブロックの上辺で反射
             {
