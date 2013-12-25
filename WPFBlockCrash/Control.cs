@@ -23,6 +23,7 @@ namespace WPFBlockCrash
 		private List<Ball> willBeAddedSmallBalls;
 		private Block[] block;
 		
+		//将来廃止する変数
 		private int barWidth, barHeight, ballWidth, ballHeight, blockWidth, blockHeight;
 
 		private int exwidth;
