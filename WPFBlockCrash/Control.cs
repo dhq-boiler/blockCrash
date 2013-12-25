@@ -715,24 +715,20 @@ namespace WPFBlockCrash
 				g.DrawString(string.Format("ODY:{0}", OverlapDistanceY), font, DrawUtil.BrushRGB(255, 120, 0), 20, 520);
 #endif
 
-				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.25)
+				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					//Collision.ReflectVerticalIfOverlapped(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag, ref reflectEnableByBar);
-					//Collision.ReflectHorizontalIfOverlapped(ball, bar, barAccel, ref boundFlag, ref reflectEnableByBar);
 					Collision.ReflectHorizontal(ref ball.dx, ref ball.dy, ref ball.cx, ref boundFlag);
 					Collision.ReflectVertical(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag);
 				}
 				else if (OverlapDistanceY < OverlapDistanceX)
 				{
 					Debug.WriteLine("RH ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					//Collision.ReflectHorizontalIfOverlapped(ball, bar, barAccel, ref boundFlag, ref reflectEnableByBar);
 					Collision.ReflectHorizontal(ref ball.dx, ref ball.dy, ref ball.cx, ref boundFlag);
 				}
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
-					//Collision.ReflectVerticalIfOverlapped(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag, ref reflectEnableByBar);
 					Collision.ReflectVertical(ball, bar, BarType, ref isballcatch, ref combocount, ref boundFlag);
 				}
 				else
