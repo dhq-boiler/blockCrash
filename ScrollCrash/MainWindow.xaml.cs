@@ -1,29 +1,28 @@
-﻿using OpenCvItmdUtil;
-using OpenCvSharp;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Collections.Generic;
-using System.IO;
-using WPFBlockCrash;
 using libts;
+using OpenCvSharp;
+using OpenCvSharp.CPlusPlus;
+using WPFBlockCrash;
 
 namespace ScrollCrash
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : System.Windows.Window
     {
         #region カメラ入力系
 
-        private IplImage frame;
-        private CvCapture capture;
+        private VideoCapture vc;
         private WriteableBitmap bitmap;
         private const int VGACameraWidth = 640;
         private const int VGACameraHeight = 480;
@@ -46,7 +45,7 @@ namespace ScrollCrash
         /// <summary>
         /// 検出されたチェスボードの4頂点
         /// </summary>
-        private ValueType[] vtArray;
+        private Point2f[] vtArray;
 
         /// <summary>
         /// キャリブレーション試行回数
@@ -57,7 +56,6 @@ namespace ScrollCrash
         /// キャリブレーション最大試行回数
         /// </summary>
         private const int Max_calibratingCount = 5;
-        private DateTime SlideChangeTime;
 
         #endregion
 
@@ -82,9 +80,10 @@ namespace ScrollCrash
 
         private void PreviewCameraInputLoop(object s, EventArgs e)
         {
-            using (frame = Cv.QueryFrame(capture))
+            using (Mat mat = new Mat())
             {
-                Util.CopyImageToBitmap(bitmap, frame);
+                vc.Retrieve(mat, CameraChannels.Zero);
+                TSUtil.CopyImageToBitmap(bitmap, mat);
             }
             SetBitmapToImage(PreviewImage, bitmap);
         }
@@ -92,7 +91,7 @@ namespace ScrollCrash
         private void SetBitmapToImage(System.Windows.Controls.Image PreviewImage, WriteableBitmap bitmap)
         {
             if (!PreviewImage.CheckAccess())
-                Dispatcher.Invoke(new Action(() => SetBitmapToImage(PreviewImage, bitmap)));
+                Dispatcher.Invoke(() => SetBitmapToImage(PreviewImage, bitmap));
             else
                 PreviewImage.Source = bitmap;
         }
@@ -110,7 +109,7 @@ namespace ScrollCrash
                 bitmap = new WriteableBitmap((int)ImageWidthStandard, (int)ImageHeightStandard, 92, 92, PixelFormats.Gray8, null);
             else
                 bitmap = new WriteableBitmap((int)mainGrid.ActualWidth, (int)mainGrid.ActualHeight, 92, 92, PixelFormats.Gray8, null);
-            Util.CopyImageToBitmap(bitmap, calibrator.ChessBoardMat, 1);
+            TSUtil.CopyImageToBitmap(bitmap, calibrator.ChessBoardMat);
             SetBitmapToImage(PreviewImage, bitmap);
 
             //キャリブレーションテストの初期化
@@ -127,10 +126,9 @@ namespace ScrollCrash
         {
             Debug.WriteLine("Trying Calibration Count:" + (calibratingCount + 1));
 
-            using (frame = Cv.QueryFrame(capture))
-            using (CvMat mat = new CvMat(VGACameraHeight, VGACameraWidth, MatrixType.U8C3))
+            using (Mat mat = new Mat())
             {
-                frame.Copy(mat);
+                
                 vtArray = calibrator.Detect10x7(mat);
                 if (vtArray != null)
                 {
@@ -172,13 +170,11 @@ namespace ScrollCrash
 
         private void RetrieveButtonBackground(object ss, EventArgs e)
         {
-            using (frame = Cv.QueryFrame(capture))
-            using (CvMat imgCap = new CvMat(480, 640, MatrixType.U8C3))
-            using (CvMat imgMat = new CvMat(480, 640, MatrixType.U8C3))
+            using (Mat imgMat = new Mat())
+            using (Mat imgCap = new Mat())
             {
-                frame.Copy(imgCap);
-
-                ProjectionTransform.transform(imgMat, imgCap, vtArray);
+                vc.Retrieve(imgCap, CameraChannels.Zero);
+                ProjectionTransform.Transform(imgMat, imgCap, vtArray);
 
                 try
                 {
@@ -251,29 +247,27 @@ namespace ScrollCrash
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            using (frame = Cv.QueryFrame(capture))
-            using (CvMat imgCap = new CvMat(480, 640, MatrixType.U8C3))
-            using (CvMat imgMat = new CvMat(480, 640, MatrixType.U8C3))
+            using (Mat imgCap= new Mat())
+            using (Mat imgMat = new Mat())
             {
                 DateTime now = DateTime.Now;
-                frame.Copy(imgCap);
 
-                ProjectionTransform.transform(imgMat, imgCap, vtArray);
+                ProjectionTransform.Transform(imgMat, imgCap, vtArray);
 
-                EnterButton.Process(imgMat, SlideChangeTime, now);
-                ScrollBar.Thumb.Process(imgMat, SlideChangeTime, now);
+                EnterButton.Process(imgMat, now);
+                ScrollBar.Thumb.Process(imgMat, now);
 
-                Cv.ShowImage("Camera Input", imgCap);
-                Cv.ShowImage("EnterButton Current Image", TSUtil.ExtractROI(imgMat, EnterButton.ButtonPosition));
-                Cv.ShowImage("ScrollBarhandle Current Image", TSUtil.ExtractROI(imgMat, ScrollBar.Thumb.ButtonPosition));
-                Cv.ShowImage("EnterButton Reference Image", EnterButton.ReferenceImage);
-                Cv.ShowImage("ScrollBarHandle Reference Image", ScrollBar.Thumb.ReferenceImage);
-                imgMat.DrawLine(new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Top),
+                Cv2.ImShow("Camera Input", imgCap);
+                Cv2.ImShow("EnterButton Current Image", TSUtil.ExtractROI(imgMat, EnterButton.ButtonPosition));
+                Cv2.ImShow("ScrollBarhandle Current Image", TSUtil.ExtractROI(imgMat, ScrollBar.Thumb.ButtonPosition));
+                Cv2.ImShow("EnterButton Reference Image", EnterButton.ReferenceImage);
+                Cv2.ImShow("ScrollBarHandle Reference Image", ScrollBar.Thumb.ReferenceImage);
+                imgMat.Line(new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Top),
                     new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Bottom),
                     new CvScalar(255, 0, 0), 3);
-                imgMat.DrawRect(ScrollBar.Thumb.ButtonPosition, new CvScalar(0, 0, 255));
-                imgMat.DrawRect(EnterButton.ButtonPosition, new CvScalar(0, 0, 255));
-                Cv.ShowImage("Camera Input that is projective transformation", imgMat);
+                imgMat.Rectangle(ScrollBar.Thumb.ButtonPosition, new CvScalar(0, 0, 255));
+                imgMat.Rectangle(EnterButton.ButtonPosition, new CvScalar(0, 0, 255));
+                Cv2.ImShow("Camera Input that is projective transformation", imgMat);
 
                 if (input.AT && (DateTime.Now - ChangedDisplayInfomationTime).TotalSeconds >= 1)
                 {
@@ -378,7 +372,7 @@ namespace ScrollCrash
 
             try
             {
-                capture = new CvCapture(CameraNumber);
+                vc = new VideoCapture(CameraNumber);
             }
             catch (Exception)
             {
@@ -398,7 +392,6 @@ namespace ScrollCrash
             EnterButton.PushedButtonBorderColor = Colors.Black;
             EnterButton.PushedButtonBorderThickness = 2;
             EnterButton.ThresholdCheckPercent = 30;
-            EnterButton.ShadowThresholdPercent = 8;
             EnterButton.ThresholdDifferentPixel = 100;
             EnterButton.ThresholdUnderAsShadow1ch = 25;
             EnterButton.MarginLeft = EnterButton.MarginTop = EnterButton.MarginRight = EnterButton.MarginBottom = 10;
@@ -410,7 +403,6 @@ namespace ScrollCrash
             ScrollBar.Thumb.PushedButtonBorderColor = Colors.Black;
             ScrollBar.Thumb.PushedButtonBorderThickness = 2;
             ScrollBar.Thumb.ThresholdCheckPercent = 30;
-            ScrollBar.Thumb.ShadowThresholdPercent = 8;
             ScrollBar.Thumb.ThresholdDifferentPixel = 100;
             ScrollBar.Thumb.ThresholdUnderAsShadow1ch = 25;
             ScrollBar.Thumb.MarginLeft =
@@ -421,7 +413,6 @@ namespace ScrollCrash
             ScrollBar.Thumb.JudgingTimeOut = TimeSpan.FromSeconds(1);
             ScrollBar.ScrollAreaColor = Colors.LightBlue;
             ScrollBar.PixelsPerStep = 1;
-            //ScrollBar.RadiusOfSearchAreaCircle = Math.Sqrt(Math.Pow(ScrollBar.Thumb.ActualWidth, 2) + Math.Pow(ScrollBar.Thumb.ActualHeight, 2)) * 5;
 
             input = new Input();
             blockCrashView.input = input;
