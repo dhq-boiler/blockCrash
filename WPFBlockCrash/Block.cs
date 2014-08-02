@@ -104,7 +104,9 @@ namespace WPFBlockCrash
             }
         }
 
+#pragma warning disable 414
         private bool WasItem; //is used "Release" mode build.
+#pragma warning restore 414
         public bool HalfFlag
         {
             get { return half; }
@@ -180,7 +182,6 @@ namespace WPFBlockCrash
             
 #if true
             int r = Main.rand.Next() % 5;
-            //int r = 1; デバック用
             if (r == 1)
             {
                 itemflag = true;
@@ -189,8 +190,6 @@ namespace WPFBlockCrash
                 else {
                      ItemType = (EItemType)((Main.rand.Next() % 5) + 1 );
                 }
-                    
-                
             }
             else
             {
@@ -198,6 +197,7 @@ namespace WPFBlockCrash
                 ItemType = EItemType.ITEMTYPE_NO;
             }
 #else
+            //全てのブロックにアイテムを仕込む
             ItemFlag = true;
             ItemType = EItemType.ITEMTYPE_INCRESE;
 #endif
@@ -226,30 +226,43 @@ namespace WPFBlockCrash
             if (!IsDead)
             {
                 if (IsMirroring)
+                {
                     g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], scrollCount - Width, CenterY - Height / 2, Width, Height);
+                    DrawUtil.Debug_DrawBlockRectangle(g, scrollCount - Width, CenterY - Height / 2, Width, Height);
+                }
 
                 g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
+                DrawUtil.Debug_DrawBlockRectangle(g, CenterX - Width / 2, CenterY - Height / 2, Width, Height);
             }
             else if (ItemFlag)
             {
                 if (half)
                 {
                     if (IsMirroring)
+                    {
                         g.DrawImage(itemgh[(int)ItemType], scrollCount - Width, CenterY - Height / 2, Width, Height);
+                        DrawUtil.Debug_DrawBlockRectangle(g, scrollCount - Width, CenterY - Height / 2, Width, Height);
+                    }
 
                     g.DrawImage(itemgh[(int)ItemType], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
+                    DrawUtil.Debug_DrawBlockRectangle(g, CenterX - Width / 2, CenterY - Height / 2, Width, Height);
                 }
                 else
                 {
                     if (IsMirroring)
+                    {
                         g.DrawImage(itemgh[(int)ItemType], scrollCount - ItemWidth, CenterY - Height / 2, ItemWidth, ItemHeight);
+                        DrawUtil.Debug_DrawBlockRectangle(g, scrollCount - ItemWidth, CenterY - Height / 2, ItemWidth, ItemHeight);
+                    }
 
                     g.DrawImage(itemgh[(int)ItemType], CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
+                    DrawUtil.Debug_DrawBlockRectangle(g, CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
                 }
             }
 #if !DEBUG
             else 
             {
+                //ブロックが徐々に消える描画処理
                 if (count < 20)
                 {
                     float opacity = (255f / 40) * (20 - count) / byte.MaxValue;

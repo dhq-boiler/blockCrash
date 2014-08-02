@@ -43,7 +43,7 @@ namespace WPFBlockCrash
                 gh[2] = new Bitmap(Main.ResourceDirectory + "barthird.bmp");
                 newgh = new Bitmap(Main.ResourceDirectory + "new.bmp");
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -97,7 +97,7 @@ namespace WPFBlockCrash
                     }
                     fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create); // 再作成
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // 開けなかったらCreate
                     fs1 = new System.IO.FileStream("savedata.xml", System.IO.FileMode.Create); //作成

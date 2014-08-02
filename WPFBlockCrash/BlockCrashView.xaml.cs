@@ -38,9 +38,7 @@ namespace WPFBlockCrash
         private WriteableBitmap bitmap;
         private const int DisplayWidth = 800;
         private const int DisplayHeight = 600;
-
-        public bool IsInitialized { get; set; }
-
+        
         public BlockCrashView()
         {
             InitializeComponent();
@@ -53,7 +51,6 @@ namespace WPFBlockCrash
         public void Initialize(EOperatingType OperatingType)
         {
             main = new Main(new DisplayInfo() { Width = DisplayWidth, Height = DisplayHeight }, OperatingType);
-            IsInitialized = true;
         }
 
         private WriteableBitmap RenderBitmap(Action<Graphics> Run_Main_ProcessLoop)
@@ -87,7 +84,7 @@ namespace WPFBlockCrash
 
         public void RunGame()
         {
-            if (!IsInitialized)
+            if (main == null)
                 throw new InvalidOperationException("Not Initialize yet.");
 
             timerToRun = new DispatcherTimer();

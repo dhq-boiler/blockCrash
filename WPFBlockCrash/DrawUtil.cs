@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -57,6 +58,12 @@ namespace WPFBlockCrash
         public static Brush BrushRGB(byte r, byte g, byte b)
         {
             return new SolidBrush(Color.FromArgb(r, g, b));
+        }
+
+        [Conditional("DEBUG")]
+        public static void Debug_DrawBlockRectangle(Graphics g, int x, int y, int width, int height)
+        {
+            g.DrawRectangle(new Pen(Brushes.Red, 1), new Rectangle(x, y, width, height));
         }
     }
 }

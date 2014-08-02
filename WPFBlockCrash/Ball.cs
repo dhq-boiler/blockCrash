@@ -8,28 +8,23 @@ namespace WPFBlockCrash
 {
     class Ball : IInputable
     {
+        private Image[] gh;
+        private DisplayInfo dInfo;
         public int xoffset { get; set; }
         public int baccel { get; set; } 
         public int acbectl { get; set; } // 加速の向き
-        private Image[] gh;
-        private DisplayInfo dInfo;
         public int ActCount { get; set; }
-        public int cx;
-        public int CenterX { get { return cx; } set { cx = value; } }
-        public int cy;
-        public int CenterY { get { return cy; } set { cy = value; } }
+        public int CenterX { get; set; }
+        public int CenterY { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public int Top { get { return CenterY - Height / 2; } }
         public int Bottom { get { return CenterY + Height / 2; } }
         public int Left { get { return CenterX - Width / 2; } }
         public int Right { get { return CenterX + Width / 2; } }
-        public int dx;
-        public int DX { get { return dx; } set { dx = value; } }
-        public int dy;
-        public int DY { get { return dy; } set { dy = value; } }
+        public int DX { get; set; }
+        public int DY { get; set; }
         public int Level { get; set; }
-        public int Radius { get; set; }
         public int OldY { get; set; }
         public bool IsDead { get; set; }
         public bool PlaySound { get; set; }
@@ -41,8 +36,13 @@ namespace WPFBlockCrash
         public int IsNewCount { get; set; }
         public bool IsStop { get; set; }
         public bool IsCatching { get; set; }
+        public bool IsThrowing { get; set; }
+        public bool IsBounding { get; set; }
+
+        public bool NowCrashingBlockOrGettingItem { get; set; }
 
         private LinkedList<Ball> OverlappingBalls;
+        private Bar bar;
 
         public enum EPenetrability
         {
@@ -50,7 +50,7 @@ namespace WPFBlockCrash
             PENETRATING
         }
 
-        public Ball(DisplayInfo dInfo)
+        public Ball(DisplayInfo dInfo, Bar bar)
         {
             this.dInfo = dInfo;
             gh = new Image[4];
@@ -66,7 +66,6 @@ namespace WPFBlockCrash
             CenterY = 540 - Height + 2;
             DX = 0;
             DY = 0;
-            Radius = 60;
             ActCount = 0;
             OldY = CenterY;
             IsDead = false;
@@ -80,6 +79,7 @@ namespace WPFBlockCrash
             xoffset = 0;
             baccel = 0;
             acbectl = 0;
+            this.bar = bar;
 
             OverlappingBalls = new LinkedList<Ball>();
         }
@@ -101,6 +101,7 @@ namespace WPFBlockCrash
                 src = gh[0];
 
             g.DrawImage(src, CenterX - Width / 2, CenterY - Height / 2);
+            DrawUtil.Debug_DrawBlockRectangle(g, CenterX - Width / 2, CenterY - Height / 2, Width, Height);
         }
 
         internal void LvUp(int incLv)
@@ -132,6 +133,8 @@ namespace WPFBlockCrash
 
         public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
         {
+            NowCrashingBlockOrGettingItem = false;
+
             if (ActCount != 0 || IsSmall)
                 Move();
 
@@ -160,7 +163,7 @@ namespace WPFBlockCrash
         {
             if (input.eB)
             {
-                if (ActCount == 0 && !IsSmall || IsCatching)
+                if (ActCount == 0 || IsCatching)
                 {
                     if (input.AT)
                     {
@@ -206,6 +209,7 @@ namespace WPFBlockCrash
                     }
                     ActCount = 1;
                     IsCatching = false;
+                    IsThrowing = true;
                 }
             }
         }
@@ -226,6 +230,9 @@ namespace WPFBlockCrash
             }
         }
 
+        /// <summary>
+        /// ボールの位置を更新する．上左右壁面との衝突も管理する．
+        /// </summary>
         private void Move()
         {
             PlaySound = false;
@@ -269,7 +276,6 @@ namespace WPFBlockCrash
             DY = 0;
             ActCount = 0;
             IsDead = false;
-            Radius = 1;
             Level -= 5;
             if (Level < 1)
                 Level = 1;
