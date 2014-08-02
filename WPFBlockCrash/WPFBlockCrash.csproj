@@ -68,19 +68,24 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenCvSharp">
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.9.20140718\lib\net40\OpenCvSharp.dll</HintPath>
     </Reference>
-    <Reference Include="OpenCvSharp.Blob">
+    <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.9.20140718\lib\net40\OpenCvSharp.Blob.dll</HintPath>
     </Reference>
-    <Reference Include="OpenCvSharp.CPlusPlus">
+    <Reference Include="OpenCvSharp.CPlusPlus, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.9.20140718\lib\net40\OpenCvSharp.CPlusPlus.dll</HintPath>
     </Reference>
-    <Reference Include="OpenCvSharp.Extensions">
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.9.20140718\lib\net40\OpenCvSharp.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="OpenCvSharp.UserInterface">
+    <Reference Include="OpenCvSharp.UserInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.9.20140718\lib\net40\OpenCvSharp.UserInterface.dll</HintPath>
     </Reference>
     <Reference Include="PV2E, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

@@ -140,8 +140,8 @@ namespace WPFBlockCrash
 					client.SharedMode(false, false);
 					client.EventDriven();
 
-					ReadWavFile(client, "bound_mix.wav", ref bound_wav);
-					ReadWavFile(client, "demolish_44100_STREAM_SAMPLETYPE_FLOAT32.wav", ref demolish_wav);
+					ReadWavFile(client, "bound.wav", ref bound_wav);
+					ReadWavFile(client, "demolish.wav", ref demolish_wav);
 				}
 			}
 			catch (Exception e)
@@ -501,12 +501,12 @@ namespace WPFBlockCrash
 
 		private void PlayDemolishSoundAsync()
 		{
-			new Thread(() => PlaySync(demolish_wav, "demolish_44100_STREAM_SAMPLETYPE_FLOAT32.wav")).Start();
+			new Thread(() => PlaySync(demolish_wav, "demolish.wav")).Start();
 		}
 
 		private void PlayBoundSoundAsync()
 		{
-			new Thread(() => PlaySync(bound_wav, "bound_mix.wav")).Start();
+			new Thread(() => PlaySync(bound_wav, "bound.wav")).Start();
 		}
 
 		private void PlaySync(IStream stream, string soundName)
