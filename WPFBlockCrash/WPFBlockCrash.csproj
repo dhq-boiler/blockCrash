@@ -83,13 +83,16 @@
     <Reference Include="OpenCvSharp.UserInterface">
       <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.9.20140718\lib\net40\OpenCvSharp.UserInterface.dll</HintPath>
     </Reference>
-    <Reference Include="PV2E">
+    <Reference Include="PV2E, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>dll\PV2E.dll</HintPath>
     </Reference>
-    <Reference Include="PV2IO">
+    <Reference Include="PV2IO, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>dll\PV2IO.dll</HintPath>
     </Reference>
-    <Reference Include="PV2SS">
+    <Reference Include="PV2SS, Version=1.0.5327.25506, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>dll\PV2SS.dll</HintPath>
     </Reference>
     <Reference Include="System" />

@@ -20,7 +20,7 @@ namespace WPFBlockCrash
     {
         public readonly int SPEED = (int)(8 * Main.RunningSpeedFactor);
 
-        private int EnlargementFactor;
+        private double EnlargementFactor;
         private Image[] gh;
         private DisplayInfo dInfo;
         private IOperator Operator;
@@ -29,13 +29,13 @@ namespace WPFBlockCrash
         private int AcceleratingCount;
         public int CenterX { get; set; }
         public int CenterY { get; set; }
-        public int Width { get; set; }
-        public int EnlargedWidth { get { return Width * EnlargementFactor; } }
+        private int Width { get; set; }
+        public int EnlargedWidth { get { return (int)(Width * EnlargementFactor); } }
         public int Height { get; set; }
         public int Top { get { return CenterY - Height / 2; } }
         public int Bottom { get { return CenterY + Height / 2; } }
-        public int Left { get { return CenterX - Width / 2; } }
-        public int Right { get { return CenterX + Width / 2; } }
+        public int Left { get { return CenterX - EnlargedWidth / 2; } }
+        public int Right { get { return CenterX + EnlargedWidth / 2; } }
         public int MX { get; set; }
         public bool IsDead { get; set; }
         public bool IsMove { get; set; } // 動いたかどうか
@@ -70,7 +70,7 @@ namespace WPFBlockCrash
     
             CenterX = dInfo.Width / 2;
             CenterY = 540;
-            EnlargementFactor = 2;
+            Reset();
             IsDead = false;
             IsMove = false;
         }
@@ -95,19 +95,21 @@ namespace WPFBlockCrash
 
         private void Draw(Graphics g)
         {
-            g.DrawImage(gh[(int)mBar - 1], CenterX - Width * EnlargementFactor / 4, CenterY - Height / 2,
-                Width * EnlargementFactor / 2, Height);
+            g.DrawImage(gh[(int)mBar - 1], CenterX - EnlargedWidth / 2, CenterY - Height / 2,
+                EnlargedWidth, Height);
+            DrawUtil.Debug_DrawBlockRectangle(g, CenterX - EnlargedWidth / 2, CenterY - Height / 2,
+                EnlargedWidth, Height);
         }
 
         private bool KeyGet(Input input)
         {
             bool IsPushedAnyKey = Operator.MoveBar(this, ref AcceleratingCount, input);
 
-            if (CenterX < Width * EnlargementFactor / 4)
-                CenterX = Width * EnlargementFactor / 4;
+            if (CenterX < EnlargedWidth / 2)
+                CenterX = EnlargedWidth / 2;
 
-            if (CenterX > dInfo.Width - Width * EnlargementFactor / 4)
-                CenterX = dInfo.Width - Width * EnlargementFactor / 4;
+            if (CenterX > dInfo.Width - EnlargedWidth / 2)
+                CenterX = dInfo.Width - EnlargedWidth / 2;
 
             MX = CenterX;
 
@@ -134,12 +136,12 @@ namespace WPFBlockCrash
 
         internal void Reset()
         {
-            EnlargementFactor = 2;
+            EnlargementFactor = 1;
         }
 
         internal void ExtendWidth()
         {
-            ++EnlargementFactor;
+            EnlargementFactor += 0.5;
         }
     }
 }
