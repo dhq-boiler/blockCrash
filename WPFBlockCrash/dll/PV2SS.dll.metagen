@@ -1,0 +1,304 @@
+ImageRuntimeVersion: v4.0.30319
+Assembly PV2SS, Version=1.0.*, Culture=Invariant Language (Invariant Country): 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly PV2E, Version=1.0.*, Culture=Invariant Language (Invariant Country): 
+	hash=None, flags=None
+Assembly PV2IO, Version=1.0.*, Culture=Invariant Language (Invariant Country): 
+	hash=None, flags=None
+Assembly System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Class PV2SS.Session: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(IAudioSessionControl*, ISimpleAudioVolume*, IChannelAudioVolume*, _GUID*): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Properties:
+    System.String IconPath 'get set' : 
+    System.ValueType GroupingParam 'get set' Guid IsBoxed : 
+    System.String DisplayName 'get set' : 
+  Methods:
+    GetAllVolumes(UInt32): PrivateScope, Public, HideBySig
+    GetChannelCount(): PrivateScope, Public, HideBySig
+    GetChannelVolume(UInt32): PrivateScope, Public, HideBySig
+    SetAllVolumes(UInt32, Single*): PrivateScope, Public, HideBySig
+    SetChannelVolume(UInt32, Single IsConst): PrivateScope, Public, HideBySig
+    GetMasterVolume(): PrivateScope, Public, HideBySig
+    GetMute(): PrivateScope, Public, HideBySig
+    SetMasterVolume(Single): PrivateScope, Public, HideBySig
+    SetMute(Int32): PrivateScope, Public, HideBySig
+    GetDisplayName(): PrivateScope, Public, HideBySig
+    GetGroupingParam(): PrivateScope, Public, HideBySig
+    GetIconPath(): PrivateScope, Public, HideBySig
+    SetDisplayName(String): PrivateScope, Public, HideBySig
+    SetGroupingParam(ValueType Guid IsBoxed): PrivateScope, Public, HideBySig
+    SetIconPath(String): PrivateScope, Public, HideBySig
+    get_DisplayName(): PrivateScope, Public, HideBySig, SpecialName
+    set_DisplayName(String): PrivateScope, Public, HideBySig, SpecialName
+    get_GroupingParam(): PrivateScope, Public, HideBySig, SpecialName
+    set_GroupingParam(ValueType Guid IsBoxed): PrivateScope, Public, HideBySig, SpecialName
+    get_IconPath(): PrivateScope, Public, HideBySig, SpecialName
+    set_IconPath(String): PrivateScope, Public, HideBySig, SpecialName
+Class PV2SS.SessionManager: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(IMMDevice*, IAudioSessionManager*): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    GetSession(_GUID*, Int32): PrivateScope, Public, HideBySig
+Class PV2SS.SoundDevice: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(IMMDevice*): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Properties:
+    IMMDevice* DevicePtr 'get ' : 
+    Single MasterVolumeScalar 'get ' : 
+    UInt32 ChannelCount 'get ' : 
+    Boolean IsMute 'get ' : 
+    System.String Name 'get ' : 
+    System.String ID 'get ' : 
+  Methods:
+    GetId(): PrivateScope, Public, HideBySig
+    GetAudioClient(): PrivateScope, Public, HideBySig
+    GetState(): PrivateScope, Public, HideBySig
+    ToString(): PrivateScope, Public, Virtual, HideBySig
+    GetSessionManager(): PrivateScope, Public, HideBySig
+    VolumeStepUp(): PrivateScope, Public, HideBySig
+    VolumeStepDown(): PrivateScope, Public, HideBySig
+    GetMute(): PrivateScope, Public, HideBySig
+    ToggleMute(): PrivateScope, Public, HideBySig
+    GetChannelCount(): PrivateScope, Public, HideBySig
+    GetChannelVolumeLevelScalar(UInt32): PrivateScope, Public, HideBySig
+    GetMasterVolumeScalar(): PrivateScope, Public, HideBySig
+    SetChannelVolumeLevelScalar(UInt32, Single): PrivateScope, Public, HideBySig
+    SetMasterVolumeScalar(Single): PrivateScope, Public, HideBySig
+    SetMute(Int32): PrivateScope, Public, HideBySig
+    get_ID(): PrivateScope, Public, HideBySig, SpecialName
+    get_Name(): PrivateScope, Public, HideBySig, SpecialName
+    get_IsMute(): PrivateScope, Public, HideBySig, SpecialName
+    get_ChannelCount(): PrivateScope, Public, HideBySig, SpecialName
+    get_MasterVolumeScalar(): PrivateScope, Public, HideBySig, SpecialName
+    get_DevicePtr(): PrivateScope, Public, HideBySig, SpecialName
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Class PV2SS.Client: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(PV2SS.SoundDevice, IAudioClient*): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Fields:
+    UInt32 nFramesInBuffer : Public
+    WAVEFORMATEXTENSIBLE* pDeviceFormat : Public
+    WAVEFORMATEXTENSIBLE* pStreamFormat : Public
+    UInt32 flags IsLong : Public
+    IAudioClient* pAudioClient : Public
+  Properties:
+    PV2SS.Capture Capturer 'get ' : 
+    PV2SS.Renderer Renderer 'get ' : 
+    PV2SS.ShareMode ShareMode 'get ' : 
+    PV2SS.DriveSystem DriveSystem 'get ' : 
+    System.String DeviceName 'get ' : 
+  Methods:
+    ExclusiveMode(): PrivateScope, Public, HideBySig
+    SharedMode(Boolean(HasFieldMarshal), Boolean(HasFieldMarshal)): PrivateScope, Public, HideBySig
+    EventDriven(): PrivateScope, Public, HideBySig
+    TimerDriven(UInt64): PrivateScope, Public, HideBySig
+    IsFormatSupported(PCMParam): PrivateScope, Public, HideBySig
+    Initialize(PCMParam, ValueType Guid IsBoxed, Boolean(HasFieldMarshal)): PrivateScope, Public, HideBySig
+    StartUpRenderer(IStream): PrivateScope, Public, HideBySig
+    StartUpRendererAsync(DirectWave, AvailablePackets, AsyncData): PrivateScope, Public, HideBySig
+    StartUpCapturer(IStream(Out)): PrivateScope, Public, HideBySig
+    GetDeviceMixFormat(): PrivateScope, Public, HideBySig
+    GetFormat(): PrivateScope, Public, HideBySig
+    GetReady(): PrivateScope, Public, HideBySig
+    Start(): PrivateScope, Public, HideBySig
+    Drive(): PrivateScope, Public, HideBySig
+    DriveAsync(): PrivateScope, Public, HideBySig
+    Stop(): PrivateScope, Public, HideBySig
+    Reset(): PrivateScope, Public, HideBySig
+    ShutDown(): PrivateScope, Public, HideBySig
+    EnableAudioStreamVolume(): PrivateScope, Public, HideBySig
+    SelectFormat(): PrivateScope, Public, HideBySig
+    GetDeviceFormatAsWAVEFORMATEXTENSIBLE(WAVEFORMATEXTENSIBLE*): PrivateScope, Public, HideBySig
+    GetDeviceFormatAsPCMParam(): PrivateScope, Public, HideBySig
+    GetDeviceSupportFormats(): PrivateScope, Public, HideBySig
+    GetBufferSize(): PrivateScope, Public, HideBySig
+    GetAllVolumes(UInt32): PrivateScope, Public, HideBySig
+    GetChannelCount(): PrivateScope, Public, HideBySig
+    GetChannelVolume(UInt32): PrivateScope, Public, HideBySig
+    SetAllVolumes(UInt32, Single*): PrivateScope, Public, HideBySig
+    SetChannelVolume(UInt32, Single IsConst): PrivateScope, Public, HideBySig
+    get_DeviceName(): PrivateScope, Public, HideBySig, SpecialName
+    get_DriveSystem(): PrivateScope, Public, HideBySig, SpecialName
+    get_ShareMode(): PrivateScope, Public, HideBySig, SpecialName
+    get_Renderer(): PrivateScope, Public, HideBySig, SpecialName
+    get_Capturer(): PrivateScope, Public, HideBySig, SpecialName
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Class PV2SS.DriveSystem: AutoLayout, AnsiClass, Class, Public, Abstract, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Properties:
+    System.String DriveSystemName 'get ' : 
+    UInt64 hnsActualDuration 'get set' : 
+    UInt64 Duration 'get set' : 
+  Methods:
+    GetFlags(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    GetBufferDuration(ShareMode): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    GetPeriodicity(ShareMode): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    GetReady(Client, WAVEFORMATEXTENSIBLE*): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    Wait(ShareMode): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    ShutDown(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    ToString(): PrivateScope, Public, Virtual, HideBySig
+    get_Duration(): PrivateScope, Public, HideBySig, SpecialName
+    set_Duration(UInt64): PrivateScope, Public, HideBySig, SpecialName
+    get_hnsActualDuration(): PrivateScope, Public, HideBySig, SpecialName
+    set_hnsActualDuration(UInt64): PrivateScope, Public, HideBySig, SpecialName
+    get_DriveSystemName(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract, SpecialName
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Class PV2SS.ShareMode: AutoLayout, AnsiClass, Class, Public, Abstract, BeforeFieldInit
+    Void .ctor(PV2SS.Client): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Properties:
+    System.String ModeName 'get ' : 
+    UInt32 Option 'get set' IsLong : 
+  Methods:
+    get_Option(): PrivateScope, Public, HideBySig, SpecialName
+    set_Option(UInt32 IsLong): PrivateScope, Public, HideBySig, SpecialName
+    GetMode(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    GetReady(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    ShutDown(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    NewInstance(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    ToString(): PrivateScope, Public, Virtual, HideBySig
+    GetDevicePeriod(): PrivateScope, Public, HideBySig
+    GetAvailableFrames(ShareMode, IAudioClient*, UInt32, DriveSystem): PrivateScope, Public, Static, HideBySig
+    GetNextPacketSize(IAudioCaptureClient*, ShareMode, DriveSystem, UInt32): PrivateScope, Public, Static, HideBySig
+    get_ModeName(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract, SpecialName
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Class PV2SS.Driver: AutoLayout, AnsiClass, Class, Public, Abstract, BeforeFieldInit
+    Void .ctor(PV2SS.Client): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Properties:
+    System.String DriverType 'get ' : 
+  Methods:
+    ToString(): PrivateScope, Public, Virtual, HideBySig
+    GetReady(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    Drive(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    DriveAsync(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    Stop(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    Reset(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract
+    ShutDown(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask
+    GetFormat(): PrivateScope, Public, HideBySig
+    get_DriverType(): PrivateScope, Public, Virtual, HideBySig, VtableLayoutMask, Abstract, SpecialName
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Struct PV2SS.Driver+DriveType: AutoLayout, AnsiClass, Class, NestedPublic, Sealed, BeforeFieldInit
+  :System.Enum
+  Fields:
+    Int32 value__ : Public, SpecialName, RTSpecialName
+    DriveType Render = 0 : Public, Static, Literal, HasDefault
+    DriveType Capture = 1 : Public, Static, Literal, HasDefault
+Class PV2SS.Renderer: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :PV2SS.Driver
+    Void .ctor(PV2SS.Client, IAudioRenderClient*, PV2E.Stream.IStream): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(PV2SS.Client, IAudioRenderClient*): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Properties:
+    System.String DriverType 'get ' : 
+  Methods:
+    GetReady(): PrivateScope, Public, Virtual, HideBySig
+    Drive(): PrivateScope, Public, Virtual, HideBySig
+    DriveAsync(): PrivateScope, Public, Virtual, HideBySig
+    Stop(): PrivateScope, Public, Virtual, HideBySig
+    Reset(): PrivateScope, Public, Virtual, HideBySig
+    ShutDown(): PrivateScope, Public, Virtual, HideBySig
+    Send(): PrivateScope, Public, HideBySig
+    SetStream(IStream): PrivateScope, Public, HideBySig
+    IsSuitableStream(PCMParam): PrivateScope, Public, HideBySig
+    NeedTobeConverted(PCMParam): PrivateScope, Public, HideBySig
+    get_DriverType(): PrivateScope, Public, Virtual, HideBySig, SpecialName
+Class PV2SS.exception.RenderingException: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Exception
+    Void .ctor(System.String): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+Class PV2SS.Capture: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :PV2SS.Driver
+    Void .ctor(PV2SS.Client, IAudioCaptureClient*, PV2E.Stream.IStream): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Properties:
+    System.String DriverType 'get ' : 
+  Methods:
+    GetReady(): PrivateScope, Public, Virtual, HideBySig
+    Drive(): PrivateScope, Public, Virtual, HideBySig
+    DriveAsync(): PrivateScope, Public, Virtual, HideBySig
+    Stop(): PrivateScope, Public, Virtual, HideBySig
+    Reset(): PrivateScope, Public, Virtual, HideBySig
+    ShutDown(): PrivateScope, Public, Virtual, HideBySig
+    CopyFrames(Void*, UInt32, UInt32, Int32*): PrivateScope, Public, HideBySig
+    get_DriverType(): PrivateScope, Public, Virtual, HideBySig, SpecialName
+Class PV2SS.Util: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    CHECK_FILLED_ARGUMENT(Void*): PrivateScope, Public, Static, HideBySig
+    CHECK_ERROR(Int32 IsLong): PrivateScope, Public, Static, HideBySig
+    SAFE_RELEASE<IUnknown *>(IUnknown*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioClient *>(IAudioClient*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioStreamVolume *>(IAudioStreamVolume*): PrivateScope, Public, Static, HideBySig
+    SAFE_RELEASE<PV2SS::Renderer>(Renderer): PrivateScope, Public, Static, HideBySig
+    SAFE_RELEASE<PV2SS::ShareMode>(ShareMode): PrivateScope, Public, Static, HideBySig
+    SAFE_RELEASE<PV2SS::DriveSystem>(DriveSystem): PrivateScope, Public, Static, HideBySig
+    SAFE_RELEASE<PV2SS::Capture>(Capture): PrivateScope, Public, Static, HideBySig
+    SAFE_RELEASE<WAVEFORMATEXTENSIBLE>(WAVEFORMATEXTENSIBLE*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<PV2SS::MMDevice>(MMDevice): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IMMDeviceCollection *>(IMMDeviceCollection*): PrivateScope, Public, Static, HideBySig
+    SAFE_RELEASE<PV2SS::MMDevice>(MMDevice): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioEndpointVolume *>(IAudioEndpointVolume*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioEndpointVolumeCallback *>(IAudioEndpointVolumeCallback*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioMeterInformation *>(IAudioMeterInformation*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IMMEndpoint *>(IMMEndpoint*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IMMDevice *>(IMMDevice*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IMMNotificationClient *>(IMMNotificationClient*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioSessionControl *>(IAudioSessionControl*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<ISimpleAudioVolume *>(ISimpleAudioVolume*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IChannelAudioVolume *>(IChannelAudioVolume*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<_GUID const *>(_GUID*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioSessionManager *>(IAudioSessionManager*): PrivateScope, Public, Static, HideBySig
+    SAFE_RELEASE<IAudioClient>(IAudioClient*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioCaptureClient *>(IAudioCaptureClient*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<void *>(Void*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioClock *>(IAudioClock*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioRenderClient *>(IAudioRenderClient*): PrivateScope, Public, Static, HideBySig
+    CHECK_FILLED_ARGUMENT<IAudioSessionEvents *>(IAudioSessionEvents*): PrivateScope, Public, Static, HideBySig
+Class PV2SS.exception.CapturingException: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Exception
+    Void .ctor(System.String): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+Class PV2SS.exception.DriverException: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Exception
+    Void .ctor(System.String): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+Class PV2SS.exception.InitializingException: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Exception
+    Void .ctor(System.String): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Methods:
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Class PV2SS.DeviceManager: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Fields:
+    UInt32 Render IsLong IsConst : Public, Static, HasDefault
+    UInt32 Capture IsLong IsConst : Public, Static, HasDefault
+    UInt32 Console IsLong IsConst : Public, Static, HasDefault
+    UInt32 Multimedia IsLong IsConst : Public, Static, HasDefault
+    UInt32 Communications IsLong IsConst : Public, Static, HasDefault
+  Properties:
+    UInt32 Count 'get ' : 
+  Methods:
+    ReadyRenderDeviceCollection(): PrivateScope, Public, HideBySig
+    ReadyCaptureDeviceCollection(): PrivateScope, Public, HideBySig
+    GetCount(): PrivateScope, Public, HideBySig
+    GetDevice(UInt32): PrivateScope, Public, HideBySig
+    GetDevices(): PrivateScope, Public, HideBySig
+    GetDefaultDevice(UInt32 IsLong, UInt32 IsLong): PrivateScope, Public, HideBySig
+    get_Count(): PrivateScope, Public, HideBySig, SpecialName
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
