@@ -128,7 +128,7 @@ namespace ScrollCrash
 
             using (Mat mat = new Mat())
             {
-                
+                vc.Retrieve(mat, CameraChannels.Zero);
                 vtArray = calibrator.Detect10x7(mat);
                 if (vtArray != null)
                 {
@@ -251,7 +251,7 @@ namespace ScrollCrash
             using (Mat imgMat = new Mat())
             {
                 DateTime now = DateTime.Now;
-
+                vc.Retrieve(imgCap, CameraChannels.Zero);
                 ProjectionTransform.Transform(imgMat, imgCap, vtArray);
 
                 EnterButton.Process(imgMat, now);
