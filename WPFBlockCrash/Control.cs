@@ -37,10 +37,10 @@ namespace WPFBlockCrash
 		
 		private System.Drawing.Image gh;
 
-		private bool clear;
+		private bool cleared;
 		private int stageTotalBlockCount;
-		private int ballspup;
-		private int ramdomWalkCount;
+		private int ballSpeedUpCount; //速度上昇カウント
+		private int ramdomWalkCount; //ランダムウォークカウント
 		private DisplayInfo dInfo;
 		private IOperator Operator;
 		private StageBuilder builder;
@@ -51,10 +51,8 @@ namespace WPFBlockCrash
 		public EStageType Stage { get; set; }
 		public int Score { get; set; }
 		public int Stock { get; set; }
-		public int sballcount { get; set; }
 		private int alphacombo { get; set; }
-		private int combocount;
-		private int ComboCount { get { return combocount; } set { combocount = value; } }
+		private int ComboCount { get; set; }
 		private bool OnCombo { get; set; }
 		private int combooncount { get; set; }
 		private bool reflectEnableByBar;
@@ -97,12 +95,12 @@ namespace WPFBlockCrash
 			//バーとボールのインスタンスを生成
 			bar = new Bar(BarType, dInfo, Operator);
 			mainBall = new Ball(dInfo, bar);
-			ballspup = 0;
+			ballSpeedUpCount = 0;
 
 			SmallBalls = new LinkedList<Ball>();
 			willBeAddedSmallBalls = new List<Ball>();
 
-			clear = false;
+			cleared = false;
 			Score = takeOver.Score;
 			Stock = takeOver.Stock;
 			Stage = userChoice.StageType;
@@ -207,7 +205,7 @@ namespace WPFBlockCrash
 					}
 				}
 			}
-			else if (clear)
+			else if (cleared)
 			{
 				if (IsPlaying)
 				{
@@ -304,7 +302,7 @@ namespace WPFBlockCrash
 			//全てのブロックを破壊したか
 			if (brokenBlockCount == stageTotalBlockCount)
 			{
-				clear = true;
+				cleared = true;
 
 				//クリア処理
 				FreezeBall(mainBall);
@@ -420,28 +418,28 @@ namespace WPFBlockCrash
 			// ボールの動き
 			if (!mainBall.IsStop && !mainBall.IsCatching)
 			{
-				++ballspup; // 速度上昇カウント
+				++ballSpeedUpCount;
 
 				switch (BarType) // バーによりの速度上昇の早さが違う
 				{
 
 					case EBarType.LONG:
-						g.DrawString(string.Format("{0} ballspup", ballspup % 1500), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
-						if (ballspup % 1500 == 0)// やさしい
+						g.DrawString(string.Format("{0} ballspup", ballSpeedUpCount % 1500), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
+						if (ballSpeedUpCount % 1500 == 0)// やさしい
 						{
 							mainBall.LvUp(1);
 						}
 						break;
 					case EBarType.MEDIUM:
-						g.DrawString(string.Format("{0} ballspup", ballspup % 1000), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
-						if (ballspup % 1000 == 0)// ふつう
+						g.DrawString(string.Format("{0} ballspup", ballSpeedUpCount % 1000), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
+						if (ballSpeedUpCount % 1000 == 0)// ふつう
 						{
 							mainBall.LvUp(1);
 						}
 						break;
 					case EBarType.SHORT:
-						g.DrawString(string.Format("{0} ballspup", ballspup % 800), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
-						if (ballspup % 800 == 0)// 難しい
+						g.DrawString(string.Format("{0} ballspup", ballSpeedUpCount % 800), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
+						if (ballSpeedUpCount % 800 == 0)// 難しい
 						{
 							mainBall.LvUp(1);
 						}
@@ -476,7 +474,6 @@ namespace WPFBlockCrash
 				if (SmallBallDroped)
 				{
 					willBeRemovedSmallBalls.Add(smallBall);
-					--sballcount;
 				}
 				else
 				{
@@ -589,7 +586,7 @@ namespace WPFBlockCrash
 						break;
 					}
 				}
-				else if (blocks[i].ItemFlag)
+				else if (blocks[i].IsItem)
 				{
 					if (blocks[i].matchlessCount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 						continue;
@@ -645,14 +642,14 @@ namespace WPFBlockCrash
 					break;
 			}
 
-			if (!block.ItemFlag)
+			if (!block.IsItem)
 				Score += 300;
 		}
 
 		private void GetItem(Ball ball, Block block)
 		{
 			ramdomWalkCount = 0;
-			block.ItemFlag = false;
+			block.IsItem = false;
 			ItemEffect(block.ItemType, ball.CenterX, ball.CenterY);
 			ball.NowCrashingBlockOrGettingItem = true;
 		}
@@ -670,7 +667,8 @@ namespace WPFBlockCrash
 				int NonMoveBonus = 0;
 				if (!bar.IsMove)
 					NonMoveBonus = 500;
-				++ComboCount;
+				if (!block.IsItem)
+					++ComboCount;
 				Score += 100 + 50 * ball.Level + ComboCount * 100 + NonMoveBonus;
 			}
 
@@ -707,7 +705,7 @@ namespace WPFBlockCrash
 				else if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVerticalIfOverlapped(ball, block, ref combocount);
+					Collision.ReflectVerticalIfOverlapped(ball, block);
 					Collision.ReflectHorizontalIfOverlapped(ball, block);
 					block.IsDead = true;
 				}
@@ -720,7 +718,7 @@ namespace WPFBlockCrash
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVerticalIfOverlapped(ball, block, ref combocount);
+					Collision.ReflectVerticalIfOverlapped(ball, block);
 					block.IsDead = true;
 				}
 
@@ -760,7 +758,7 @@ namespace WPFBlockCrash
 				else if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVerticalIfOverlapped(ball, block, ref combocount);
+					Collision.ReflectVerticalIfOverlapped(ball, block);
 					block.IsDead = true;
 				}
 				else if (OverlapDistanceY < OverlapDistanceX)
@@ -772,7 +770,7 @@ namespace WPFBlockCrash
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVerticalIfOverlapped(ball, block, ref combocount);
+					Collision.ReflectVerticalIfOverlapped(ball, block);
 					block.IsDead = true;
 				}
 				else
@@ -803,14 +801,13 @@ namespace WPFBlockCrash
 				case EItemType.ITEMTYPE_INCRESE:
 					while (true)
 					{
-						if (sballcount >= MAX_SBALLCOUNT)
+						if (SmallBalls.Count() + willBeAddedSmallBalls.Count() >= MAX_SBALLCOUNT)
 							break;
 
 						Ball newSmallBall = new Ball(dInfo, bar);
 						newSmallBall.IsStop = false;
 						newSmallBall.Increse(mainBall, ballX, ballY);
 						willBeAddedSmallBalls.Add(newSmallBall);
-						++sballcount;
 						++ct;
 						if (ct == 3) break;
 					}
@@ -861,7 +858,7 @@ namespace WPFBlockCrash
 				{
 					Console.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					Collision.ReflectHorizontal(ball);
-					Collision.ReflectVertical(ball, bar, BarType, ref combocount);
+					Collision.ReflectVertical(ball, bar, BarType);
 					if (!ball.IsCatching) ball.PlaySound = true;
 				}
 				else if (OverlapDistanceY > OverlapDistanceX)
@@ -873,7 +870,7 @@ namespace WPFBlockCrash
 				else if (OverlapDistanceX > OverlapDistanceY)
 				{
 					Console.WriteLine("RV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVertical(ball, bar, BarType, ref combocount);
+					Collision.ReflectVertical(ball, bar, BarType);
 					if (!ball.IsCatching) ball.PlaySound = true;
 				}
 				else
@@ -964,7 +961,6 @@ namespace WPFBlockCrash
 		{
 			SmallBalls = new LinkedList<Ball>();
 			bar.IsBallCatch = false;
-			sballcount = 0;
 			ramdomWalkCount = 0;
 			ComboCount = 0;
 			bar.Reset();

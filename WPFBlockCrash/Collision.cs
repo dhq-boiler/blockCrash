@@ -30,7 +30,7 @@ namespace WPFBlockCrash
             return new Tuple<double, double>(newV1, newV2);
         }
 
-        public static void ReflectVertical(Ball ball, Bar bar, EBarType BarType, ref int combocount)
+        public static void ReflectVertical(Ball ball, Bar bar, EBarType BarType)
         {
             if (Main.CatchBallEnables && bar.IsBallCatch)// ボールがバーにくっつく状態
             {
@@ -39,13 +39,11 @@ namespace WPFBlockCrash
                 ball.IsStop = true;
                 if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
                     ball.xoffset = ball.CenterX - bar.CenterX;
-                combocount = 0;
                 bar.IsMove = false;
             }
             else if (ball.CenterX < bar.CenterX - bar.EnlargedWidth / 2 * 2 / 3
                 && ball.CenterX > bar.CenterX + bar.EnlargedWidth / 2 * 2 / 3)
             {
-                combocount = 0;
                 bar.IsMove = false;
                 if (BarType == EBarType.SHORT)
                     ball.LvUp(1);
@@ -63,7 +61,6 @@ namespace WPFBlockCrash
                     ball.LvUp(1); // 速度が上がって短時間貫通化
                 }
 
-                combocount = 0;
                 bar.IsMove = false;
                 if (BarType == EBarType.SHORT)
                     ball.LvUp(1);
@@ -160,7 +157,7 @@ namespace WPFBlockCrash
         }
 
 
-        public static void ReflectVerticalIfOverlapped(Ball ball, Block block, ref int combocount)
+        public static void ReflectVerticalIfOverlapped(Ball ball, Block block)
         {
             if (ball.Bottom > block.Top && ball.Top < block.Top) //ブロックの上辺で反射
             {
@@ -172,7 +169,7 @@ namespace WPFBlockCrash
                 }
                 else
                 {
-                    ReflectVertical(ball, ref combocount);
+                    ReflectVertical(ball);
                 }
             }
             else if (ball.Top < block.Bottom && block.Bottom < ball.Bottom) //ブロックの下辺で反射
@@ -185,20 +182,18 @@ namespace WPFBlockCrash
                 }
                 else
                 {
-                    ReflectVertical(ball, ref combocount);
+                    ReflectVertical(ball);
                 }
             }
         }
 
-        private static void ReflectVertical(Ball ball, ref int combocount)
+        private static void ReflectVertical(Ball ball)
         {
-            ++combocount;
             ball.DY = -ball.DY;
         }
 
-        private static void ReflectVertical(ref int ballDY, ref int combocount, ref bool boundFlag)
+        private static void ReflectVertical(ref int ballDY, ref bool boundFlag)
         {
-            ++combocount;
             ballDY = -ballDY;
             boundFlag = true;
         }

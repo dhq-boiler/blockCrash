@@ -74,7 +74,7 @@ namespace WPFBlockCrash
                 bool old = isdead;
                 isdead = value;
 
-                if (value == true && ItemFlag)
+                if (value == true && IsItem)
                 {
                     matchlessCount = 10; // 10フレーム無敵に                    
                 }
@@ -85,7 +85,7 @@ namespace WPFBlockCrash
         }
 
         private bool itemflag;
-        public bool ItemFlag
+        public bool IsItem
         {
             get { return itemflag; }
             set
@@ -100,7 +100,7 @@ namespace WPFBlockCrash
         {
             get
             {
-                return ItemFlag ? 4 : 0;
+                return IsItem ? 4 : 0;
             }
         }
 
@@ -234,7 +234,7 @@ namespace WPFBlockCrash
                 g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
                 DrawUtil.Debug_DrawBlockRectangle(g, CenterX - Width / 2, CenterY - Height / 2, Width, Height);
             }
-            else if (ItemFlag)
+            else if (IsItem)
             {
                 if (half)
                 {
