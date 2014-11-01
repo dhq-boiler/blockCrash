@@ -10,7 +10,7 @@ namespace WPFBlockCrash
     {
         private Image[] gh;
         private DisplayInfo dInfo;
-        public int xoffset { get; set; }
+        public int CatchXOffset { get; set; }
         public int baccel { get; set; } 
         public int AccelVector { get; set; } // 加速の向き
         public int ActCount { get; set; }
@@ -76,7 +76,7 @@ namespace WPFBlockCrash
             IsNewCount = 0;
             Level = 1;
             IsStop = true;
-            xoffset = 0;
+            CatchXOffset = 0;
             baccel = 0;
             AccelVector = 0;
             this.bar = bar;
@@ -275,7 +275,7 @@ namespace WPFBlockCrash
             Level -= 5;
             if (Level < 1)
                 Level = 1;
-            xoffset = 0;
+            CatchXOffset = 0;
             baccel = 0;
             AccelVector = 0;
         }

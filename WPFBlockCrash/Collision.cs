@@ -38,7 +38,7 @@ namespace WPFBlockCrash
                 ball.DX = ball.DY = 0;
                 ball.IsStop = true;
                 if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
-                    ball.xoffset = ball.CenterX - bar.CenterX;
+                    ball.CatchXOffset = ball.CenterX - bar.CenterX;
                 bar.IsMove = false;
             }
             else if (ball.CenterX < bar.CenterX - bar.EnlargedWidth / 2 * 2 / 3

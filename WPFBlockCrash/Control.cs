@@ -315,7 +315,7 @@ namespace WPFBlockCrash
 
 				foreach (var blk in blocks)
 				{
-					blk.scrollStop = true;
+					blk.IsScrolling = false;
 				}
 
 				ramdomWalkCount = 0;
@@ -333,7 +333,7 @@ namespace WPFBlockCrash
 			if (BallIsDead)
 			{
 				for (int i = 0; i < stageTotalBlockCount; ++i)
-					blocks[i].scrollStop = true;
+					blocks[i].IsScrolling = false;
 				bar.IsDead = true;
 				mainBall.DX = 0;
 			}
@@ -412,7 +412,7 @@ namespace WPFBlockCrash
 			//吸着時のメインボールのX座標
 			if (mainBall.IsCatching)
 			{
-				mainBall.CenterX = bar.CenterX + mainBall.xoffset;
+				mainBall.CenterX = bar.CenterX + mainBall.CatchXOffset;
 			}
 
 			// ボールの動き
@@ -480,7 +480,7 @@ namespace WPFBlockCrash
 					if (smallBall.IsCatching)// ボールが止まっていれば
 					{
 						//吸着時のスモールボールのX座標
-						smallBall.CenterX = bar.CenterX + smallBall.xoffset;
+						smallBall.CenterX = bar.CenterX + smallBall.CatchXOffset;
 					}
 
 					HitCheckBallAndBar(smallBall, g);
@@ -966,7 +966,7 @@ namespace WPFBlockCrash
 			bar.Reset();
 			mainBall.Reset();
 			for (int i = 0; i < stageTotalBlockCount; ++i)
-				blocks[i].scrollStop = false;
+				blocks[i].IsScrolling = true;
 			bar.IsDead = false;
 		}
 	}
