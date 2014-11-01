@@ -32,19 +32,13 @@ namespace WPFBlockCrash
 
         public static void ReflectVertical(Ball ball, Bar bar, EBarType BarType, ref int combocount)
         {
-            if (ball.IsThrowing && IsOverlapping(bar, ball))
-            {
-                ball.IsThrowing = false;
-                return;
-            }
-
             if (Main.CatchBallEnables && bar.IsBallCatch)// ボールがバーにくっつく状態
             {
                 ball.IsCatching = true;
                 ball.DX = ball.DY = 0;
                 ball.IsStop = true;
                 if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
-                    ball.xoffset = ball.CenterX - bar.MX;
+                    ball.xoffset = ball.CenterX - bar.CenterX;
                 combocount = 0;
                 bar.IsMove = false;
             }
@@ -79,134 +73,6 @@ namespace WPFBlockCrash
                 Console.WriteLine("Reflect Vertical " + (ball.DY > 0 ? "↓" : "↑"));
             }
         }
-
-        [Obsolete]
-        public static void ReflectVertical(Ball ball, Bar bar, EBarType BarType, ref int combocount, ref bool boundFlag)
-        {
-            if (ball.IsThrowing && IsOverlapping(bar, ball))
-            {
-                ball.IsThrowing = false;
-                return;
-            }
-
-            if (Main.CatchBallEnables && bar.IsBallCatch)// ボールがバーにくっつく状態
-            {
-                ball.IsCatching = true;
-                ball.DX = ball.DY = 0;
-                ball.IsStop = true;
-                if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
-                    ball.xoffset = ball.CenterX - bar.MX;
-                combocount = 0;
-                bar.IsMove = false;
-            }
-            else if (ball.CenterX < bar.CenterX - bar.EnlargedWidth / 2 * 2 / 3
-                && ball.CenterX > bar.CenterX + bar.EnlargedWidth / 2 * 2 / 3)
-            {
-                combocount = 0;
-                bar.IsMove = false;
-                if (BarType == EBarType.SHORT)
-                    ball.LvUp(1);
-
-                //ball.DX = -ball.DX;
-                ball.DY = -ball.DY;
-                ball.CenterY = ball.CenterY - 5;
-
-                boundFlag = true;
-
-                Debug.WriteLine("Reflect Vertical " + (ball.DY > 0 ? "↓" : "↑"));
-            }
-            else
-            {
-                if (ball.CenterX < bar.CenterX + 10 && ball.CenterX > bar.CenterX - 10)
-                {
-                    ball.Penetration();
-                    ball.LvUp(1); // 速度が上がって短時間貫通化
-                }
-
-                combocount = 0;
-                bar.IsMove = false;
-                if (BarType == EBarType.SHORT)
-                    ball.LvUp(1);
-                ball.DY = -ball.DY;
-                ball.CenterY = ball.CenterY - 5;
-                boundFlag = true;
-
-                Debug.WriteLine("Reflect Vertical " + (ball.DY > 0 ? "↓" : "↑"));
-            }
-        }
-
-        [Obsolete]
-        public static void ReflectVerticalIfOverlapped(Ball ball, Bar bar, EBarType BarType, ref bool isballcatch, ref int combocount, ref bool ReflectEnableByBar)
-        {
-            if (ball.Bottom > bar.Top && ball.Top < bar.Top) //バーの上辺で反射
-            {
-                if (ball.DY < 0)
-                {
-                    Debug.Write("Accelerate " + ball.DY);
-                    ball.DY = (int)(ball.DY * 1.2);
-                    Debug.WriteLine(" → " + ball.DY);
-                }
-                else
-                {
-                    Collision.ReflectVertical(ball, bar, BarType, ref combocount);
-                }
-                ReflectEnableByBar = false;
-            }
-            else if (ball.Top < bar.Bottom && bar.Bottom < ball.Bottom) //バーの下辺で反射
-            {
-                if (ball.DY > 0)
-                {
-                    Debug.Write("Accelerate " + ball.DY);
-                    ball.DY = (int)(ball.DY * 1.2);
-                    Debug.WriteLine(" → " + ball.DY);
-                }
-                else
-                {
-                    Collision.ReflectVertical(ball, bar, BarType, ref combocount);
-                }
-                ReflectEnableByBar = false;
-            }
-        }
-
-        [Obsolete]
-        public static void ReflectVerticalIfOverlapped(Ball ball, Bar bar, EBarType BarType, ref bool isballcatch, ref int combocount, ref bool boundFlag, ref bool ReflectEnableByBar)
-        {
-            if (ball.Bottom > bar.Top && ball.Top < bar.Top) //バーの上辺で反射
-            {
-                if (ball.DY < 0)
-                {
-                    Debug.Write("Accelerate " + ball.DY);
-                    ball.DY = (int)(ball.DY * 1.2);
-                    Debug.WriteLine(" → " + ball.DY);
-                }
-                else
-                {
-                    Collision.ReflectVertical(ball, bar, BarType, ref combocount, ref boundFlag);
-                }
-                ReflectEnableByBar = false;
-            }
-            else if (ball.Top < bar.Bottom && bar.Bottom < ball.Bottom) //バーの下辺で反射
-            {
-                if (ball.DY > 0)
-                {
-                    Debug.Write("Accelerate " + ball.DY);
-                    ball.DY = (int)(ball.DY * 1.2);
-                    Debug.WriteLine(" → " + ball.DY);
-                }
-                else
-                {
-                    Collision.ReflectVertical(ball, bar, BarType, ref combocount, ref boundFlag);
-                }
-                ReflectEnableByBar = false;
-            }
-        }
-
-        //private static void ReflectHorizontal(ref int ballDX, ref int ballDY, ref int ballCX, int BarAccel, ref bool boundFlag)
-        //{
-        //    ReflectHorizontal(ref ballDX, ref ballDY, ref ballCX, ref boundFlag);
-        //    //ball.CenterX += ball.DX * BarAccel;
-        //    Debug.WriteLine("ReflectHorizontal " + (ballDX > 0 ? "→" : "←"));
-        //}
 
         public static void ReflectHorizontal(ref int ballDX, ref int ballDY, ref int ballCX, ref bool boundFlag)
         {
@@ -230,12 +96,6 @@ namespace WPFBlockCrash
             ball.CenterX += ball.DX;
             Debug.WriteLine("ReflectHorizontal " + (ball.DX > 0 ? "→" : "←"));
         }
-
-        //private static void ReflectHorizontal(ref int ballDX, ref int ballDY, ref int ballCX, ref bool boundFlag)
-        //{
-        //    ReflectHorizontal(ref ballDX, ref ballDY, ref ballCX, ref boundFlag);
-        //    Debug.WriteLine("ReflectHorizontal " + (ballDX > 0 ? "→" : "←"));
-        //}
 
         public static void ReflectHorizontalIfOverlapped(Ball ball, Block block)
         {
@@ -326,39 +186,6 @@ namespace WPFBlockCrash
                 else
                 {
                     ReflectVertical(ball, ref combocount);
-                }
-            }
-        }
-
-        [Obsolete]
-        public static void ReflectVerticalIfOverlapped(int ballTop, int ballBottom, int ballLeft, int ballRight, ref int ballDX, ref int ballDY,
-            int blockTop, int blockBottom, int blockLeft, int blockRight, ref int blockDX, ref int blockDY,
-            ref int combocount, ref bool boundFlag)
-        {
-            if (ballBottom > blockTop && ballTop < blockTop) //ブロックの上辺で反射
-            {
-                if (ballDY < 0)
-                {
-                    Debug.WriteLine("Accelerate " + ballDY);
-                    ballDY = (int)(ballDY * 1.2);
-                    Debug.WriteLine(" → " + ballDY);
-                }
-                else
-                {
-                    ReflectVertical(ref ballDY, ref combocount, ref boundFlag);
-                }
-            }
-            else if (ballTop < blockBottom && blockBottom < ballBottom) //ブロックの下辺で反射
-            {
-                if (ballDY > 0)
-                {
-                    Debug.WriteLine("Accelerate " + ballDY);
-                    ballDY = (int)(ballDY * 1.2);
-                    Debug.WriteLine(" → " + ballDY);
-                }
-                else
-                {
-                    ReflectVertical(ref ballDY, ref combocount, ref boundFlag);
                 }
             }
         }

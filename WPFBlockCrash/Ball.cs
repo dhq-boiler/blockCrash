@@ -12,7 +12,7 @@ namespace WPFBlockCrash
         private DisplayInfo dInfo;
         public int xoffset { get; set; }
         public int baccel { get; set; } 
-        public int acbectl { get; set; } // 加速の向き
+        public int AccelVector { get; set; } // 加速の向き
         public int ActCount { get; set; }
         public int CenterX { get; set; }
         public int CenterY { get; set; }
@@ -78,7 +78,7 @@ namespace WPFBlockCrash
             IsStop = true;
             xoffset = 0;
             baccel = 0;
-            acbectl = 0;
+            AccelVector = 0;
             this.bar = bar;
 
             OverlappingBalls = new LinkedList<Ball>();
@@ -122,7 +122,7 @@ namespace WPFBlockCrash
             }
         }
 
-        internal void spchange()
+        internal void RamdomWalk()
         {
             if (IsSmall) return;
 
@@ -190,19 +190,19 @@ namespace WPFBlockCrash
                         switch (baccel)
                         {
                             case 0:
-                                DX = (int)((2 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DX = (int)((2 + Level) * AccelVector * Main.RunningSpeedFactor);
                                 DY = (int)(-(2 + Level) * Main.RunningSpeedFactor);
                                 break;
                             case 1:
-                                DX = (int)((3 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DX = (int)((3 + Level) * AccelVector * Main.RunningSpeedFactor);
                                 DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
                             case 2:
-                                DX = (int)((4 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DX = (int)((4 + Level) * AccelVector * Main.RunningSpeedFactor);
                                 DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
                             case 3:
-                                DX = (int)((5 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DX = (int)((5 + Level) * AccelVector * Main.RunningSpeedFactor);
                                 DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
                         }
@@ -214,19 +214,15 @@ namespace WPFBlockCrash
             }
         }
 
-        public void BarAccel(int bac)
+        public void SetBarAccel(Bar bar)
         {
-            baccel = bac;
-            if (baccel == 0)
+            if (bar.Accel >= 0)
             {
-                acbectl = 1; //初速？
+                AccelVector = 1; //デフォルトで右上に発射
             }
-            else if (baccel > 0)
-                acbectl = 1;
             else
             {
-                acbectl = -1;
-                baccel = -baccel;
+                AccelVector = -1;
             }
         }
 
@@ -281,7 +277,7 @@ namespace WPFBlockCrash
                 Level = 1;
             xoffset = 0;
             baccel = 0;
-            acbectl = 0;
+            AccelVector = 0;
         }
 
         internal void PowerUp() // アイテム取得による貫通化

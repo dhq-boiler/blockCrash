@@ -22,3 +22,6 @@ DebugLBC/*.bmp
 DebugLBC/*.png
 
 blockcrash.v12.suo
+packages/
+ScrollCrash/dll/
+WPFBlockCrash/dll/
