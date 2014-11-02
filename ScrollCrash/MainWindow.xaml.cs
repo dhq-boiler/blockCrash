@@ -9,6 +9,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using libts;
+using libts.ctrlctr;
+using libts.data;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
 using WPFBlockCrash;
@@ -55,27 +57,44 @@ namespace ScrollCrash
         /// <summary>
         /// キャリブレーション最大試行回数
         /// </summary>
-        private const int Max_calibratingCount = 5;
+        private readonly int Max_calibratingCount = 5;
 
         #endregion
 
         #region UI系
 
-        public const double ImageWidthStandard = 1280;
-        public const double ImageHeightStandard = 800;
+        public double ImageWidthStandard { get { return mainGrid.ActualWidth; } }
+        public double ImageHeightStandard { get { return mainGrid.ActualHeight; } }
         private int StageRetrieveingScrollArea;
-        private const int SecondToWaitForAppearingTouchButton = 1;
-
+        private readonly int SecondToWaitForAppearingTouchButton = 1;
         public bool IsMaximized { get; set; }
         private int CameraNumber;
 
         #endregion
 
+        #region XMLデータ
+
+        private readonly string data_enter_xml = "xml\\data_enter.xml";
+        private readonly string data_thumb_xml = "xml\\data_thumb.xml";
+        private readonly string settings_xml   = "xml\\settings.xml";
+
+        #endregion
+
         private Input input;
+
+        #region Auto Mode Display
+
+        private DateTime ChangedDisplayInfomationTime;
+        private readonly TimeSpan InformationDisplayInterval = TimeSpan.FromSeconds(1);
+        
+        #endregion
 
         public MainWindow()
         {
             InitializeComponent();
+
+            bitmap = new WriteableBitmap(VGACameraWidth, VGACameraHeight, 92, 92, PixelFormats.Bgr24, null);
+            calibrator = new Calibrator(new OpenCvSharp.CPlusPlus.Size((int)ImageWidthStandard, (int)ImageHeightStandard), new OpenCvSharp.CPlusPlus.Size(10, 7));
         }
 
         private void PreviewCameraInputLoop(object s, EventArgs e)
@@ -124,7 +143,7 @@ namespace ScrollCrash
         
         private void CalibrateCameraInputLoop(object s, EventArgs ea)
         {
-            Debug.WriteLine("Trying Calibration Count:" + (calibratingCount + 1));
+            Trace.WriteLine("Trying Calibration Count:" + (calibratingCount + 1));
 
             using (Mat mat = new Mat())
             {
@@ -132,7 +151,7 @@ namespace ScrollCrash
                 vtArray = calibrator.Detect10x7(mat);
                 if (vtArray != null)
                 {
-                    Debug.WriteLine("Calibration succeeded!");
+                    Trace.WriteLine("Calibration succeeded!");
 
                     //キャリブレーションの停止
                     timerToCalibrate.Stop();
@@ -153,7 +172,7 @@ namespace ScrollCrash
                 }
                 else if ((++calibratingCount + 1) > Max_calibratingCount)
                 {
-                    Debug.WriteLine("Failed Calibration...");
+                    Trace.WriteLine("Failed Calibration...");
 
                     //キャリブレーションの停止
                     timerToCalibrate.Stop();
@@ -210,11 +229,11 @@ namespace ScrollCrash
                                 timerToRetrieveBackground.Stop();
 
                                 ScrollBar.Thumb.Visibility = System.Windows.Visibility.Visible;
-                                ScrollBar.Thumb.ButtonTouching += new libts.WPFTouchButton.ButtonTouchingEventHandler((s, ea) => ScrollBar.ScrollProcess(s, ea));
-                                ScrollBar.ValueChanged += new EventHandler((s, ea) => Move());
+                                ScrollBar.Thumb.ButtonTouching += (s, ea) => ScrollBar.ScrollProcess(s, ea);
+                                ScrollBar.ValueChanged += (s, ea) => Move();
 
-                                EnterButton.ButtonHandDown += new EventHandler((s, ea) => blockCrashView.KeyDownEnterButton());
-                                EnterButton.ButtonHandUp += new EventHandler((s, ea) => blockCrashView.KeyUpEnterButton());
+                                EnterButton.ButtonHandDown += (s, ea) => blockCrashView.KeyDownEnterButton();
+                                EnterButton.ButtonHandUp += (s, ea) => blockCrashView.KeyUpEnterButton();
 
                                 int ThumbValidPixels = ScrollBar.Thumb.ValidateArea.Width * ScrollBar.Thumb.ValidateArea.Height;
 
@@ -239,9 +258,6 @@ namespace ScrollCrash
             }
         }
 
-        private DateTime ChangedDisplayInfomationTime;
-        private readonly TimeSpan InformationDisplayInterval = TimeSpan.FromSeconds(1);
-
         private void ProcessingLoop(object s, EventArgs ea)
         {
             Stopwatch sw = new Stopwatch();
@@ -257,19 +273,9 @@ namespace ScrollCrash
                 EnterButton.Process(imgMat, now);
                 ScrollBar.Thumb.Process(imgMat, now);
 
-                Cv2.ImShow("Camera Input", imgCap);
-                Cv2.ImShow("EnterButton Current Image", TSUtil.ExtractROI(imgMat, EnterButton.ButtonPosition));
-                Cv2.ImShow("ScrollBarhandle Current Image", TSUtil.ExtractROI(imgMat, ScrollBar.Thumb.ButtonPosition));
-                Cv2.ImShow("EnterButton Reference Image", EnterButton.ReferenceImage);
-                Cv2.ImShow("ScrollBarHandle Reference Image", ScrollBar.Thumb.ReferenceImage);
-                imgMat.Line(new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Top),
-                    new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Bottom),
-                    new CvScalar(255, 0, 0), 3);
-                imgMat.Rectangle(ScrollBar.Thumb.ButtonPosition, new CvScalar(0, 0, 255));
-                imgMat.Rectangle(EnterButton.ButtonPosition, new CvScalar(0, 0, 255));
-                Cv2.ImShow("Camera Input that is projective transformation", imgMat);
+                DebugImShow(imgCap, imgMat);
 
-                if (input.AT && (DateTime.Now - ChangedDisplayInfomationTime).TotalSeconds >= 1)
+                if (input.AT && (DateTime.Now - ChangedDisplayInfomationTime) >= InformationDisplayInterval)
                 {
                     switch (StatusInfoIndicator.Visibility)
                     {
@@ -284,9 +290,7 @@ namespace ScrollCrash
                     ChangedDisplayInfomationTime = DateTime.Now;
                 }
                 else if (input.AT)
-                {
-
-                }
+                { }
                 else
                 {
                     StatusInfoIndicator.Visibility = System.Windows.Visibility.Hidden;
@@ -300,6 +304,22 @@ namespace ScrollCrash
             {
                 Close();
             }
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugImShow(Mat imgCap, Mat imgMat)
+        {
+            Cv2.ImShow("Camera Input", imgCap);
+            Cv2.ImShow("EnterButton Current Image", TSUtil.ExtractROI(imgMat, EnterButton.ButtonPosition));
+            Cv2.ImShow("ScrollBarhandle Current Image", TSUtil.ExtractROI(imgMat, ScrollBar.Thumb.ButtonPosition));
+            Cv2.ImShow("EnterButton Reference Image", EnterButton.ReferenceImage);
+            Cv2.ImShow("ScrollBarHandle Reference Image", ScrollBar.Thumb.ReferenceImage);
+            imgMat.Line(new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Top),
+                new CvPoint((int)(ScrollBar.ScrollAreaRectangle.Left + ScrollBar.center_of_gravity), (int)ScrollBar.ScrollAreaRectangle.Bottom),
+                new CvScalar(255, 0, 0), 3);
+            imgMat.Rectangle(ScrollBar.Thumb.ButtonPosition, new CvScalar(0, 0, 255));
+            imgMat.Rectangle(EnterButton.ButtonPosition, new CvScalar(0, 0, 255));
+            Cv2.ImShow("Camera Input that is projective transformation", imgMat);
         }
 
         private void Move()
@@ -347,46 +367,27 @@ namespace ScrollCrash
             {
                 this.PreviewImage.Width = mainGrid.ActualWidth;
                 this.PreviewImage.Height = mainGrid.ActualHeight;
-                calibrator = new Calibrator(new CvSize((int)mainGrid.ActualWidth, (int)mainGrid.ActualHeight), new CvSize(10, 7));
+                calibrator = new Calibrator(new OpenCvSharp.CPlusPlus.Size((int)mainGrid.ActualWidth, (int)mainGrid.ActualHeight), new OpenCvSharp.CPlusPlus.Size(10, 7));
             }
             else
             {
                 this.PreviewImage.Width = ImageWidthStandard;
                 this.PreviewImage.Height = ImageHeightStandard;
-                calibrator = new Calibrator(new CvSize((int)mainGrid.ActualWidth, (int)mainGrid.ActualHeight), new CvSize(10, 7));
+                calibrator = new Calibrator(new OpenCvSharp.CPlusPlus.Size((int)mainGrid.ActualWidth, (int)mainGrid.ActualHeight), new OpenCvSharp.CPlusPlus.Size(10, 7));
             }
         }
 
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                CameraNumber = Settings.Load("settings.xml").UseCameraNumber;
-            }
-            catch (IOException)
-            {
-                Settings.Save("settings.xml", new Settings());
-                MessageBox.Show("settings.xmlを出力しました．<UseCameraNumber>に0から始まるカメラ番号を入力して再起動してください．");
-                Environment.Exit(1);
-            }
+            LoadCameraNumber();
 
-            try
-            {
-                vc = new VideoCapture(CameraNumber);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("カメラが応答しません．settings.xml の <UseCameraNumber> を確認してください．UseCameraNumber=" + CameraNumber, "エラー");
-                Environment.Exit(1);
-            }
-
-            bitmap = new WriteableBitmap(VGACameraWidth, VGACameraHeight, 92, 92, PixelFormats.Bgr24, null);
-            calibrator = new Calibrator(new CvSize((int)ImageWidthStandard, (int)ImageHeightStandard), new CvSize(10, 7));
+            OpenVideoCapture();
 
             MaximizeWindowSize.Visibility = System.Windows.Visibility.Visible;
             NomalizeWindowSize.Visibility = System.Windows.Visibility.Hidden;
             StartCalibration.Visibility = System.Windows.Visibility.Visible;
 
+            this.EnterButton.ControlName = "EnterButton";
             EnterButton.ProjectionColor = Colors.Lime;
             EnterButton.JudgementColor = Colors.Magenta;
             EnterButton.PushedButtonBorderColor = Colors.Black;
@@ -398,6 +399,8 @@ namespace ScrollCrash
             EnterButton.IsEnableLongTouch = false;
             EnterButton.JudgingTimeOut = TimeSpan.FromSeconds(1);
 
+            this.ScrollBar.ControlName = "Slider";
+            this.ScrollBar.Thumb.ControlName = "Thumb";
             ScrollBar.Thumb.ProjectionColor = Colors.Lime;
             ScrollBar.Thumb.JudgementColor = Colors.Magenta;
             ScrollBar.Thumb.PushedButtonBorderColor = Colors.Black;
@@ -414,6 +417,15 @@ namespace ScrollCrash
             ScrollBar.ScrollAreaColor = Colors.LightBlue;
             ScrollBar.PixelsPerStep = 1;
 
+            ControlCenter dialog = new ControlCenter();
+            dialog.ControlCenterVM.Add(this.EnterButton);
+            dialog.ControlCenterVM.Add(this.ScrollBar.Thumb);
+            dialog.ControlCenterVM.Add(this.ScrollBar);
+            dialog.Show();
+
+            LoadParameters(data_enter_xml, EnterButton);
+            LoadParameters(data_thumb_xml, ScrollBar.Thumb);
+
             input = new Input();
             blockCrashView.input = input;
             StatusInfoIndicator.Content = "Auto Mode";
@@ -422,6 +434,79 @@ namespace ScrollCrash
             timerToPreview.Interval = TimeSpan.FromMilliseconds(1);
             timerToPreview.Tick += (s, ea) => PreviewCameraInputLoop(s, ea);
             timerToPreview.Start();
+        }
+
+        private static void LoadParameters(string filename, WPFTouchButton touchButton)
+        {
+            try
+            {
+                WPFTouchButtonData data = WPFTouchButtonData.Deserialize(filename);
+                touchButton.ThresholdCheck = data.ThresholdCheck;
+                touchButton.ThresholdTouch = data.ThresholdTouch;
+                touchButton.ThresholdDifferentPixel = data.ThresholdDifferentPixel;
+                touchButton.ThresholdUnderAsShadow1ch = data.ThresholdUnderAsShadow1ch;
+            }
+            catch (IOException e)
+            {
+                MessageBox.Show(e.Message, "タッチボタン設定読み込み失敗", MessageBoxButton.OK);
+            }
+        }
+
+        private void OpenVideoCapture()
+        {
+            try
+            {
+                vc = new VideoCapture(CameraNumber);
+            }
+            catch (OpenCvSharpException)
+            {
+                MessageBox.Show(string.Format("カメラが応答しません．{0} の <UseCameraNumber> を確認してください．UseCameraNumber={1}", settings_xml, CameraNumber), "エラー");
+                Environment.Exit(1);
+            }
+        }
+
+        private void LoadCameraNumber()
+        {
+            try
+            {
+                CameraNumber = Settings.Load(settings_xml).UseCameraNumber;
+            }
+            catch (IOException)
+            {
+                try
+                {
+                    Settings.Save(settings_xml, new Settings());
+                    MessageBox.Show(string.Format("{0} を出力しました．<UseCameraNumber>に0から始まるカメラ番号を入力して再実行してください．", settings_xml));
+                }
+                catch (IOException ex)
+                {
+                    MessageBox.Show(ex.Message, "IOエラー", MessageBoxButton.OK);
+                }
+                Environment.Exit(1);
+            }
+        }
+
+        private static void SaveParameters(string filename, WPFTouchButton touchButton)
+        {
+            try
+            {
+                WPFTouchButtonData data = new WPFTouchButtonData();
+                data.ThresholdCheck = touchButton.ThresholdCheck;
+                data.ThresholdTouch = touchButton.ThresholdTouch;
+                data.ThresholdDifferentPixel = touchButton.ThresholdDifferentPixel;
+                data.ThresholdUnderAsShadow1ch = touchButton.ThresholdUnderAsShadow1ch;
+                data.Serialize(filename);
+            }
+            catch (IOException e)
+            {
+                MessageBox.Show(e.Message, "タッチボタン設定書き込み失敗", MessageBoxButton.OK);
+            }
+        }
+
+        private void mainWindow_Closed(object sender, EventArgs e)
+        {
+            SaveParameters(data_enter_xml, EnterButton);
+            SaveParameters(data_thumb_xml, ScrollBar.Thumb);
         }
     }
 }

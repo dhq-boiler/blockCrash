@@ -10,10 +10,9 @@ namespace WPFBlockCrash
     {
         private Image[] gh;
         private DisplayInfo dInfo;
-        public int xoffset { get; set; }
+        public int CatchXOffset { get; set; }
         public int baccel { get; set; } 
-        public int acbectl { get; set; } // 加速の向き
-        public int ActCount { get; set; }
+        public int AccelVector { get; set; } // 加速の向き
         public int CenterX { get; set; }
         public int CenterY { get; set; }
         public int Width { get; set; }
@@ -35,8 +34,7 @@ namespace WPFBlockCrash
         public bool IsSmall { get; set; }
         public int IsNewCount { get; set; }
         public bool IsStop { get; set; }
-        public bool IsCatching { get; set; }
-        public bool IsThrowing { get; set; }
+        public bool IsCaught { get; set; }
         public bool IsBounding { get; set; }
 
         public bool NowCrashingBlockOrGettingItem { get; set; }
@@ -66,9 +64,9 @@ namespace WPFBlockCrash
             CenterY = 540 - Height + 2;
             DX = 0;
             DY = 0;
-            ActCount = 0;
             OldY = CenterY;
             IsDead = false;
+            IsCaught = true;
             PlaySound = false;
             Penetrability = EPenetrability.NON_PENETRATING;
             PenetratingCount = 0;
@@ -76,9 +74,9 @@ namespace WPFBlockCrash
             IsNewCount = 0;
             Level = 1;
             IsStop = true;
-            xoffset = 0;
+            CatchXOffset = 0;
             baccel = 0;
-            acbectl = 0;
+            AccelVector = 0;
             this.bar = bar;
 
             OverlappingBalls = new LinkedList<Ball>();
@@ -122,7 +120,7 @@ namespace WPFBlockCrash
             }
         }
 
-        internal void spchange()
+        internal void RamdomWalk()
         {
             if (IsSmall) return;
 
@@ -135,7 +133,7 @@ namespace WPFBlockCrash
         {
             NowCrashingBlockOrGettingItem = false;
 
-            if (ActCount != 0 || IsSmall)
+            if (!IsCaught || IsSmall)
                 Move();
 
             UpdateOverlapping();
@@ -163,7 +161,7 @@ namespace WPFBlockCrash
         {
             if (input.eB)
             {
-                if (ActCount == 0 || IsCatching)
+                if (IsCaught)
                 {
                     if (input.AT)
                     {
@@ -190,43 +188,38 @@ namespace WPFBlockCrash
                         switch (baccel)
                         {
                             case 0:
-                                DX = (int)((2 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DX = (int)((2 + Level) * AccelVector * Main.RunningSpeedFactor);
                                 DY = (int)(-(2 + Level) * Main.RunningSpeedFactor);
                                 break;
                             case 1:
-                                DX = (int)((3 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DX = (int)((3 + Level) * AccelVector * Main.RunningSpeedFactor);
                                 DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
                             case 2:
-                                DX = (int)((4 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DX = (int)((4 + Level) * AccelVector * Main.RunningSpeedFactor);
                                 DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
                             case 3:
-                                DX = (int)((5 + Level) * acbectl * Main.RunningSpeedFactor);
+                                DX = (int)((5 + Level) * AccelVector * Main.RunningSpeedFactor);
                                 DY = (int)(-(3 + Level) * Main.RunningSpeedFactor);
                                 break;
                         }
                     }
-                    ActCount = 1;
-                    IsCatching = false;
-                    IsThrowing = true;
+                    IsCaught = false;
+                    bar.IsBallCatch = false;
                 }
             }
         }
 
-        public void BarAccel(int bac)
+        public void SetBarAccel(Bar bar)
         {
-            baccel = bac;
-            if (baccel == 0)
+            if (bar.Accel >= 0)
             {
-                acbectl = 1; //初速？
+                AccelVector = 1; //デフォルトで右上に発射
             }
-            else if (baccel > 0)
-                acbectl = 1;
             else
             {
-                acbectl = -1;
-                baccel = -baccel;
+                AccelVector = -1;
             }
         }
 
@@ -274,14 +267,14 @@ namespace WPFBlockCrash
             OldY = CenterY;
             DX = 0;
             DY = 0;
-            ActCount = 0;
+            IsCaught = true;
             IsDead = false;
             Level -= 5;
             if (Level < 1)
                 Level = 1;
-            xoffset = 0;
+            CatchXOffset = 0;
             baccel = 0;
-            acbectl = 0;
+            AccelVector = 0;
         }
 
         internal void PowerUp() // アイテム取得による貫通化
@@ -304,6 +297,7 @@ namespace WPFBlockCrash
         {
             IsSmall = true;
             IsNewCount = 30;
+            IsCaught = false;
 
             double mainBallSpeed = Math.Sqrt(Math.Pow(mainball.DX, 2) + Math.Pow(mainball.DY, 2));
 

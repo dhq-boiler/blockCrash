@@ -29,7 +29,7 @@ namespace WPFBlockCrash
 		private Ball mainBall;
 		private LinkedList<Ball> SmallBalls;
 		private List<Ball> willBeAddedSmallBalls;
-		private Block[] block;
+		private Block[] blocks;
 
 		SoundDevice device;
 		IStream bound_wav;
@@ -37,10 +37,10 @@ namespace WPFBlockCrash
 		
 		private System.Drawing.Image gh;
 
-		private int sumblock;
-		private int accel;
-		private int ballspup;
-		private int vspeed;
+		private bool cleared;
+		private int stageTotalBlockCount;
+		private int ballSpeedUpCount; //速度上昇カウント
+		private int ramdomWalkCount; //ランダムウォークカウント
 		private DisplayInfo dInfo;
 		private IOperator Operator;
 		private StageBuilder builder;
@@ -51,12 +51,9 @@ namespace WPFBlockCrash
 		public EStageType Stage { get; set; }
 		public int Score { get; set; }
 		public int Stock { get; set; }
-		public int sballcount { get; set; }
-		public bool clear;
 		private int alphacombo { get; set; }
-		private int combocount;
-		private int ComboCount { get { return combocount; } set { combocount = value; } }
-		private bool comboon { get; set; }
+		private int ComboCount { get; set; }
+		private bool OnCombo { get; set; }
 		private int combooncount { get; set; }
 		private bool reflectEnableByBar;
 		private bool ReflectEnableByBar
@@ -98,18 +95,18 @@ namespace WPFBlockCrash
 			//バーとボールのインスタンスを生成
 			bar = new Bar(BarType, dInfo, Operator);
 			mainBall = new Ball(dInfo, bar);
-			ballspup = 0;
+			ballSpeedUpCount = 0;
 
 			SmallBalls = new LinkedList<Ball>();
 			willBeAddedSmallBalls = new List<Ball>();
 
-			clear = false;
+			cleared = false;
 			Score = takeOver.Score;
 			Stock = takeOver.Stock;
 			Stage = userChoice.StageType;
-			vspeed = 0;
+			ramdomWalkCount = 0;
 			ComboCount = 0;
-			comboon = false;
+			OnCombo = false;
 			combooncount = 0;
 			alphacombo = 0;
 			
@@ -120,7 +117,7 @@ namespace WPFBlockCrash
 
 			builder = StageBuilder.CreateStageBuilder(Stage);
 
-			builder.CreateStage(out block, ref sumblock, extendon);
+			builder.CreateStage(out blocks, ref stageTotalBlockCount, extendon);
 		}
 
 		private void PrepareSound()
@@ -169,7 +166,7 @@ namespace WPFBlockCrash
 
 		public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
 		{
-			if (CalculateAndDraw(input, g, uc, takeOver))
+			if (GameFrameProcess(input, g, uc, takeOver))
 			{
 				if (Stock > 1)
 				{
@@ -208,7 +205,7 @@ namespace WPFBlockCrash
 					}
 				}
 			}
-			else if (clear)
+			else if (cleared)
 			{
 				if (IsPlaying)
 				{
@@ -245,114 +242,123 @@ namespace WPFBlockCrash
 			};
 		}
 
-		private bool CalculateAndDraw(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
+		/// <summary>
+		/// ゲーム中の1フレームの処理を行います．これはステージ選択をした後からゲームクリア画面表示またはゲームオーバー画面表示が終わるまで実行されます．
+		/// </summary>
+		/// <param name="input">ユーザの現在の入力</param>
+		/// <param name="g">グラフィックスオブジェクト</param>
+		/// <param name="uc">ユーザが選択したバーの種類とステージの種類</param>
+		/// <param name="takeOver">ユーザのスコアとストックおよびディスプレイ環境</param>
+		/// <returns></returns>
+		private bool GameFrameProcess(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
 		{
-			bool BallIsDead;
-			int count = 0;
+			int brokenBlockCount = 0;
 
 			//ブロックの描画処理
-			builder.BlockProcess(input, g, uc, takeOver, block, ref count, sumblock);
-
-			//クリア判定
-			if (count == sumblock)
-			{
-				clear = true;
-			}
+			builder.BlockProcess(input, g, uc, takeOver, blocks, ref brokenBlockCount, stageTotalBlockCount);
 
 			if (input.AT)
 			{
-				//ボールの座標取得
-				bar.CenterX = mainBall.CenterX;
+				SyncMainBallCXToBarCX();
 			}
 
 			//バーの処理
 			bar.Process(input, g, uc, takeOver);
 
-			//発射前のメインボールのX座標
-			if (mainBall.ActCount == 0)
-			{
-				mainBall.CenterX = bar.MX;
-				if (!ReflectEnableByBar)
-					ReflectEnableByBar = true;
-			}
+			ApplyBarAccelToBalls();
 
-			//吸着時のメインボールのX座標
-			if (mainBall.IsCatching)
-			{
-				mainBall.CenterX = bar.MX + mainBall.xoffset;
-			}
+			UpdateMainBall(input, g);
+			UpdateSmallBalls(input, g, uc, takeOver);
 
-			//吸着時のスモールボールのX座標
-			foreach (Ball smallBall in SmallBalls)
-			{
-				if (smallBall.IsCatching)// ボールが止まっていれば
-				{ 
-					smallBall.CenterX = bar.MX + smallBall.xoffset;
-				}
-			}
+			//情報の表示
+			DisplayInfo(g, mainBall.IsDead);
 
-			// ボールの動き
-			if (!mainBall.IsStop && !mainBall.IsCatching)
-			{
-				++ballspup; // 速度上昇カウント
+			///音再生
+			SoundPlay();
 
-				switch (BarType) // バーによりの速度上昇の早さが違う
+			CheckEnd(brokenBlockCount, mainBall.IsDead);
+
+			return mainBall.IsDead;
+		}
+
+		private void SyncMainBallCXToBarCX()
+		{
+			//ボールの座標をバーの座標に同期
+			bar.CenterX = mainBall.CenterX;
+		}
+
+		private void CheckEnd(int brokenBlockCount, bool BallIsDead)
+		{
+			CheckFailed(BallIsDead);
+			CheckCleared(brokenBlockCount);
+		}
+
+		/// <summary>
+		/// クリアしているかチェックします．
+		/// </summary>
+		/// <param name="brokenBlockCount">破壊されたブロックの数</param>
+		private void CheckCleared(int brokenBlockCount)
+		{
+			//全てのブロックを破壊したか
+			if (brokenBlockCount == stageTotalBlockCount)
+			{
+				cleared = true;
+
+				//クリア処理
+				FreezeBall(mainBall);
+
+				// 小玉があれば
+				foreach (Ball smallBall in SmallBalls)
 				{
-
-					case EBarType.LONG:
-						g.DrawString(string.Format("{0} ballspup", ballspup % 1500), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
-						if (ballspup % 1500 == 0)// やさしい
-						{ 
-							mainBall.LvUp(1);
-						}
-						break;
-					case EBarType.MEDIUM:
-						g.DrawString(string.Format("{0} ballspup", ballspup % 1000), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
-						if (ballspup % 1000 == 0)// ふつう
-						{ 
-							mainBall.LvUp(1);
-						}
-						break;
-					case EBarType.SHORT:
-						g.DrawString(string.Format("{0} ballspup", ballspup % 800), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
-						if (ballspup % 800 == 0)// 難しい
-						{ 
-							mainBall.LvUp(1);
-						}
-						break;
+					FreezeBall(smallBall);
 				}
-			}
 
-			if (++vspeed == 1000)// 進まなくなったとき用カウントの増加
+				foreach (var blk in blocks)
+				{
+					blk.IsScrolling = false;
+				}
+
+				ramdomWalkCount = 0;
+				Score += mainBall.Level * Stock;
+				bar.IsDead = true;
+			}
+		}
+
+		/// <summary>
+		/// 失敗したかチェックします．
+		/// </summary>
+		/// <param name="BallIsDead">メインボールが死んだか</param>
+		private void CheckFailed(bool BallIsDead)
+		{
+			if (BallIsDead)
 			{
-				vspeed = 0;
-				mainBall.spchange();
+				for (int i = 0; i < stageTotalBlockCount; ++i)
+					blocks[i].IsScrolling = false;
+				bar.IsDead = true;
+				mainBall.DX = 0;
 			}
+		}
 
-			accel = bar.Accel; 
-
-			BallIsDead = UpdateBall(input, accel, g);
-
-			// 小玉があれば表示
-			UpdateSmallBalls(input, accel, g, uc, takeOver);
-			
+		private void DisplayInfo(Graphics g, bool BallIsDead)
+		{
 			// 得点、レベル、残機枠の表示
 			g.DrawRectangle(new System.Drawing.Pen(DrawUtil.BrushRGB(230, 230, 230), 3), 0, 0, 800, 30);
 			g.DrawString(string.Format("SCORE: {0}", Score), font, DrawUtil.BrushRGB(255, 120, 0), 20, 5);
 			g.DrawString(string.Format("LEVEL: {0}", mainBall.Level), font, DrawUtil.BrushRGB(255, 120, 0), 220, 5);
-
-			//デバック用
-
-			// コンボ表示　邪魔にならないよう透明化処理する  
-			if (ComboCount > 1)
+			
+			//ストック数の表示
+			for (int i = 0; i < (BallIsDead ? Stock - 2 : Stock - 1); ++i)
 			{
-				g.DrawString(string.Format("{0} COMBO!", ComboCount), font, DrawUtil.BrushRGB(255, 120, 0), 20, 400);
-				combooncount = 0;
-				comboon = true;
-				alphacombo = ComboCount;
+				g.DrawImage(gh, 540 + 18 * i, 7, (float)gh.Width, (float)gh.Height);
 			}
 
-			if(ComboCount == 0 && comboon)
+			//コンボ表示
+			CalculateAndDrawCombo(g);
+		}
+
+		private void CalculateAndDrawCombo(Graphics g)
+		{
+			if (ComboCount == 0 && OnCombo)
 			{
 				if (combooncount < 20)
 				{
@@ -361,76 +367,103 @@ namespace WPFBlockCrash
 				}
 				else
 				{
-					comboon = false;
+					OnCombo = false;
 					alphacombo = 0;
 				}
 			}
 
-			//ストック数の表示
-			for (int i = 0; i < (BallIsDead ? Stock - 2 : Stock - 1); ++i)
+			if (ComboCount > 1)
 			{
-				g.DrawImage(gh, 540 + 18 * i, 7, (float)gh.Width, (float)gh.Height);
+				g.DrawString(string.Format("{0} COMBO!", ComboCount), font, DrawUtil.BrushRGB(255, 120, 0), 20, 400);
+				combooncount = 0;
+				OnCombo = true;
+				alphacombo = ComboCount;
 			}
-
-			mainBall.BarAccel(accel);
-
-			// 小玉があれば加速させる？
-			foreach (Ball smallBall in SmallBalls)
-			{
-				smallBall.BarAccel(accel);
-			}
-
-			///音再生
-			SoundPlay();
-
-			if (BallIsDead)
-			{
-				for(int i = 0; i < sumblock; ++i)
-					block[i].scrollStop = true;
-				bar.IsDead = true;
-				mainBall.DX = 0;
-			}
-
-			if (clear)
-			{
-				mainBall.DX = 0;
-				mainBall.DY = 0;
-
-				for (int i = 0; i < sumblock; ++i)
-					block[i].scrollStop = true;
-
-				// 小玉があれば表示
-				foreach (Ball smallBall in SmallBalls)
-				{
-					smallBall.DX = 0;
-					smallBall.DY = 0;
-				}
-
-				vspeed = 0;
-				Score += mainBall.Level * Stock; 
-				bar.IsDead = true;
-			}
-
-			return BallIsDead;
 		}
 
-		private bool UpdateBall(Input input, int barAccel, Graphics g)
+		private void ApplyBarAccelToBalls()
 		{
-			bool BallIsDead = mainBall.Process(input, g, null, null).IsDead;
+			mainBall.SetBarAccel(bar);
+
+			foreach (Ball smallBall in SmallBalls)
+			{
+				smallBall.SetBarAccel(bar);
+			}
+		}
+
+		private void FreezeBall(Ball ball)
+		{
+			ball.DX = 0;
+			ball.DY = 0;
+		}
+
+		private void UpdateMainBall(Input input, Graphics g)
+		{
+			//発射前のメインボールのX座標
+			if (mainBall.IsCaught)
+			{
+				mainBall.CenterX = bar.CenterX;
+				if (!ReflectEnableByBar)
+					ReflectEnableByBar = true;
+			}
+
+			mainBall.Process(input, g, null, null);
+
+			//吸着時のメインボールのX座標
+			if (mainBall.IsCaught)
+			{
+				mainBall.CenterX = bar.CenterX + mainBall.CatchXOffset;
+			}
+
+			// ボールの動き
+			if (!mainBall.IsStop && !mainBall.IsCaught)
+			{
+				++ballSpeedUpCount;
+
+				switch (BarType) // バーによりの速度上昇の早さが違う
+				{
+
+					case EBarType.LONG:
+						g.DrawString(string.Format("{0} ballspup", ballSpeedUpCount % 1500), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
+						if (ballSpeedUpCount % 1500 == 0)// やさしい
+						{
+							mainBall.LvUp(1);
+						}
+						break;
+					case EBarType.MEDIUM:
+						g.DrawString(string.Format("{0} ballspup", ballSpeedUpCount % 1000), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
+						if (ballSpeedUpCount % 1000 == 0)// ふつう
+						{
+							mainBall.LvUp(1);
+						}
+						break;
+					case EBarType.SHORT:
+						g.DrawString(string.Format("{0} ballspup", ballSpeedUpCount % 800), font, DrawUtil.BrushRGB(255, 120, 0), 20, 440);
+						if (ballSpeedUpCount % 800 == 0)// 難しい
+						{
+							mainBall.LvUp(1);
+						}
+						break;
+				}
+			}
+
+			if (++ramdomWalkCount == 1000)// 進まなくなったとき用カウントの増加
+			{
+				ramdomWalkCount = 0;
+				mainBall.RamdomWalk();
+			}
 
 			// ボールとバーの当たり判定
-			HitCheckBallAndBar(mainBall, barAccel, g);
+			HitCheckBallAndBar(mainBall, g);
 
 			// ボールとブロックの当たり判定
 			HitCheckBallAndBlock(mainBall);
 
 			// ボールとボールの衝突判定
 			HitCheckBallAndBall(mainBall);
-
-			return BallIsDead;
 		}
 
-		private void UpdateSmallBalls(Input input, int barAccel, Graphics g, UserChoice uc, TakeOver takeOver)
+		private void UpdateSmallBalls(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
 		{
 			List<Ball> willBeRemovedSmallBalls = new List<Ball>();
 
@@ -438,17 +471,21 @@ namespace WPFBlockCrash
 			{
 				bool SmallBallDroped = smallBall.Process(input, g, uc, takeOver).IsDead;
 
-				HitCheckBallAndBar(smallBall, barAccel, g);
-
-				HitCheckBallAndBlock(smallBall);
-
-				// ボールとボールの衝突判定
-				HitCheckBallAndBall(smallBall);
-
 				if (SmallBallDroped)
 				{
 					willBeRemovedSmallBalls.Add(smallBall);
-					--sballcount;
+				}
+				else
+				{
+					if (smallBall.IsCaught)// ボールが止まっていれば
+					{
+						//吸着時のスモールボールのX座標
+						smallBall.CenterX = bar.CenterX + smallBall.CatchXOffset;
+					}
+
+					HitCheckBallAndBar(smallBall, g);
+					HitCheckBallAndBlock(smallBall);
+					HitCheckBallAndBall(smallBall);
 				}
 			}
 
@@ -539,21 +576,21 @@ namespace WPFBlockCrash
 			int ballX = ball.CenterX;
 			int ballY = ball.CenterY;
 
-			for (int i = 0; i < sumblock; ++i)
+			for (int i = 0; i < stageTotalBlockCount; ++i)
 			{
-				if (!block[i].IsDead)
+				if (!blocks[i].IsDead)
 				{
-					if (CheckCrashingBlock(ball, block[i]))
+					if (CheckCrashingBlock(ball, blocks[i]))
 					{
 						ball.NowCrashingBlockOrGettingItem = true;
 						break;
 					}
 				}
-				else if (block[i].ItemFlag)
+				else if (blocks[i].IsItem)
 				{
-					if (block[i].matchlessCount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
+					if (blocks[i].matchlessCount > 0 && ball.Penetrability == Ball.EPenetrability.NON_PENETRATING)
 						continue;
-					CheckGettingItem(ball, block[i]);
+					CheckGettingItem(ball, blocks[i]);
 				}
 			}
 		}
@@ -605,14 +642,14 @@ namespace WPFBlockCrash
 					break;
 			}
 
-			if (!block.ItemFlag)
+			if (!block.IsItem)
 				Score += 300;
 		}
 
 		private void GetItem(Ball ball, Block block)
 		{
-			vspeed = 0;
-			block.ItemFlag = false;
+			ramdomWalkCount = 0;
+			block.IsItem = false;
 			ItemEffect(block.ItemType, ball.CenterX, ball.CenterY);
 			ball.NowCrashingBlockOrGettingItem = true;
 		}
@@ -630,7 +667,8 @@ namespace WPFBlockCrash
 				int NonMoveBonus = 0;
 				if (!bar.IsMove)
 					NonMoveBonus = 500;
-				++ComboCount;
+				if (!block.IsItem)
+					++ComboCount;
 				Score += 100 + 50 * ball.Level + ComboCount * 100 + NonMoveBonus;
 			}
 
@@ -667,7 +705,7 @@ namespace WPFBlockCrash
 				else if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVerticalIfOverlapped(ball, block, ref combocount);
+					Collision.ReflectVerticalIfOverlapped(ball, block);
 					Collision.ReflectHorizontalIfOverlapped(ball, block);
 					block.IsDead = true;
 				}
@@ -680,7 +718,7 @@ namespace WPFBlockCrash
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVerticalIfOverlapped(ball, block, ref combocount);
+					Collision.ReflectVerticalIfOverlapped(ball, block);
 					block.IsDead = true;
 				}
 
@@ -720,7 +758,7 @@ namespace WPFBlockCrash
 				else if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
 				{
 					Debug.WriteLine("RHV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVerticalIfOverlapped(ball, block, ref combocount);
+					Collision.ReflectVerticalIfOverlapped(ball, block);
 					block.IsDead = true;
 				}
 				else if (OverlapDistanceY < OverlapDistanceX)
@@ -732,7 +770,7 @@ namespace WPFBlockCrash
 				else if (OverlapDistanceX < OverlapDistanceY)
 				{
 					Debug.WriteLine("RV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVerticalIfOverlapped(ball, block, ref combocount);
+					Collision.ReflectVerticalIfOverlapped(ball, block);
 					block.IsDead = true;
 				}
 				else
@@ -763,14 +801,13 @@ namespace WPFBlockCrash
 				case EItemType.ITEMTYPE_INCRESE:
 					while (true)
 					{
-						if (sballcount >= MAX_SBALLCOUNT)
+						if (SmallBalls.Count() + willBeAddedSmallBalls.Count() >= MAX_SBALLCOUNT)
 							break;
 
 						Ball newSmallBall = new Ball(dInfo, bar);
 						newSmallBall.IsStop = false;
 						newSmallBall.Increse(mainBall, ballX, ballY);
 						willBeAddedSmallBalls.Add(newSmallBall);
-						++sballcount;
 						++ct;
 						if (ct == 3) break;
 					}
@@ -787,7 +824,7 @@ namespace WPFBlockCrash
 			}
 		}
 
-		private void HitCheckBallAndBar(Ball ball, int barAccel, Graphics g)
+		private void HitCheckBallAndBar(Ball ball, Graphics g)
 		{
 			bool IsOverlappedVertical = Math.Abs(bar.CenterY - ball.CenterY) < ball.Height / 2 + bar.Height / 2;
 			bool IsOverlappedHorizontal = Math.Abs(bar.CenterX - ball.CenterX) < ball.Width / 2 + bar.EnlargedWidth / 2;
@@ -817,24 +854,27 @@ namespace WPFBlockCrash
 
 				DrawDebugString_ODX_ODY(g, OverlapDistanceX, OverlapDistanceY);
 
-				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
+				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.05)
 				{
 					Console.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					Collision.ReflectHorizontal(ball);
-					Collision.ReflectVertical(ball, bar, BarType, ref combocount);
-					if (!ball.IsCatching) ball.PlaySound = true;
+					Collision.ReflectVertical(ball, bar, BarType);
+					if (!ball.IsCaught)
+						ball.PlaySound = true;
 				}
 				else if (OverlapDistanceY > OverlapDistanceX)
 				{
 					Console.WriteLine("RH ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
 					Collision.ReflectHorizontal(ball);
-					if (!ball.IsCatching) ball.PlaySound = true;
+					if (!ball.IsCaught)
+						ball.PlaySound = true;
 				}
 				else if (OverlapDistanceX > OverlapDistanceY)
 				{
 					Console.WriteLine("RV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
-					Collision.ReflectVertical(ball, bar, BarType, ref combocount);
-					if (!ball.IsCatching) ball.PlaySound = true;
+					Collision.ReflectVertical(ball, bar, BarType);
+					if (!ball.IsCaught)
+						ball.PlaySound = true;
 				}
 				else
 				{
@@ -924,13 +964,12 @@ namespace WPFBlockCrash
 		{
 			SmallBalls = new LinkedList<Ball>();
 			bar.IsBallCatch = false;
-			sballcount = 0;
-			vspeed = 0;
+			ramdomWalkCount = 0;
 			ComboCount = 0;
 			bar.Reset();
 			mainBall.Reset();
-			for (int i = 0; i < sumblock; ++i)
-				block[i].scrollStop = false;
+			for (int i = 0; i < stageTotalBlockCount; ++i)
+				blocks[i].IsScrolling = true;
 			bar.IsDead = false;
 		}
 	}

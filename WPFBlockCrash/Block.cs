@@ -32,17 +32,18 @@ namespace WPFBlockCrash
         private static Image[] gh = new Image[8];
         private static Image[] itemgh = new Image[6];
 
-        private bool half;
-        private int count;
+        private int vanishingCount;
 
         public int ImageHandle { get; set; }
 
-        // スクロールブロック用変数,0=スクロールなし,1=右スクロール,-1=左スクロール
-        private int ScrollDirection = 0;
-        // スクロールカウント
+        /// <summary>
+        /// スクロールカウント
+        /// </summary>
         private int scrollCount = 0;
 
-        // スクロール時にブロック破壊と同時にアイテムを取得しないように変数を実装
+        /// <summary>
+        /// スクロール時にブロック破壊と同時にアイテムを取得することを防ぐ
+        /// </summary>
         public int matchlessCount = 0;
 
         public EItemType ItemType { get; private set; }
@@ -50,7 +51,23 @@ namespace WPFBlockCrash
 
         public int CenterX { get; private set; }
         public int CenterY { get; private set; }
-        public int Width { get; private set; }
+
+        private int _Width;
+        public int Width
+        {
+            get
+            {
+                if (IsHalf)
+                    return _Width / 2;
+                else
+                    return _Width;
+            }
+            set
+            {
+                _Width = value;
+            }
+        }
+
         public int Height { get; private set; }
         public int Top { get { return CenterY - Height / 2; } }
         public int Bottom { get { return CenterY + Height / 2; } }
@@ -58,34 +75,35 @@ namespace WPFBlockCrash
         public int Right { get { return CenterX + Width / 2; } }
         public int ItemWidth { get; private set; }
         public int ItemHeight { get; private set; }
-        public int dx;
-        public int DX { get { return dx; } set { dx = value; } }
-        public int dy;
-        public int DY { get { return dy; } set { dy = value; } }
+        public int DX { get; set; }
+        public int DY { get; set; }
 
-        public bool isdead;
-        public bool scrollStop;
-        public bool barextend;
+        public bool _IsDead;
+        public bool BarExtendable { get; private set; }
         public bool IsDead
         {
-            get { return isdead; }
+            get { return _IsDead; }
             set
             {
-                bool old = isdead;
-                isdead = value;
+                bool old = _IsDead;
+                _IsDead = value;
 
-                if (value == true && ItemFlag)
+                if (value == true && IncludesItem)
                 {
-                    matchlessCount = 10; // 10フレーム無敵に                    
+                    matchlessCount = 10; // 10フレーム無敵に    
+                    IsItem = true;
                 }
 
-                if (!old && isdead)
+                if (!old && _IsDead)
                     Debug.WriteLine("A Block is dead now. (" + CenterX + ", " + CenterY + ")");
             }
         }
 
+        private readonly bool _IncludesItem;
+        public bool IncludesItem { get { return _IncludesItem; } }
+
         private bool itemflag;
-        public bool ItemFlag
+        public bool IsItem
         {
             get { return itemflag; }
             set
@@ -100,34 +118,31 @@ namespace WPFBlockCrash
         {
             get
             {
-                return ItemFlag ? 4 : 0;
+                return IncludesItem ? 4 : 0;
             }
         }
 
-#pragma warning disable 414
-        private bool WasItem; //is used "Release" mode build.
-#pragma warning restore 414
-        public bool HalfFlag
+        private bool WasItem;
+
+        public bool IsHalf { get; set; }
+
+        private bool _IsScrolling;
+        private int _ScrollVector;
+
+        /// <summary>
+        /// 0=スクロールなし,1=右スクロール,-1=左スクロール
+        /// </summary>
+        public int ScrollVector
         {
-            get { return half; }
-            set
-            {
-                half = value;
-                if (half)
-                {
-                    Width /= 2;
-                }
-            }
+            get { return _ScrollVector; }
+            set { _ScrollVector = value; }
         }
 
         // ブロックのスクロールを制御する関数
-        public int IsScrolling
+        public bool IsScrolling
         {
-            set
-            {
-                ScrollDirection = value;
-                scrollStop = false;
-            }
+            get { return _IsScrolling; }
+            set { _IsScrolling = value; }
         }
 
         /// <summary>
@@ -142,7 +157,7 @@ namespace WPFBlockCrash
         public int MirrorLeft { get { return CenterX - Width / 2 - Main.MainInstance.dInfo.Width; } }
         public int MirrorRight { get { return CenterX + Width / 2 - Main.MainInstance.dInfo.Width; } }
 
-        public Block(int x, int y, bool extendon, EBlockColor blockColor)
+        public Block(int x, int y, bool extendOn, EBlockColor blockColor)
         {
             if (IsFirstInstance)
             {
@@ -177,36 +192,29 @@ namespace WPFBlockCrash
             ItemHeight = (int)bsitem.Height;
 
             BlockColor = blockColor;
-            barextend = extendon;
+            BarExtendable = extendOn;
             IsDead = false;
-            
-#if true
+           
             int r = Main.rand.Next() % 5;
             if (r == 1)
             {
-                itemflag = true;
-                if (barextend) // バーが伸びる状態
+                _IncludesItem = true;
+                if (BarExtendable) // バーが伸びる状態
                     ItemType = (EItemType)(Main.rand.Next() % 6);
-                else {
-                     ItemType = (EItemType)((Main.rand.Next() % 5) + 1 );
-                }
+                else
+                    ItemType = (EItemType)((Main.rand.Next() % 5) + 1 );
             }
             else
             {
-                itemflag = false;
+                _IncludesItem = false;
                 ItemType = EItemType.ITEMTYPE_NO;
             }
-#else
-            //全てのブロックにアイテムを仕込む
-            ItemFlag = true;
-            ItemType = EItemType.ITEMTYPE_INCRESE;
-#endif
 
             this.CenterX = x;
             this.CenterY = y;
 
-            count = 0;
-            half = false;
+            vanishingCount = 0;
+            IsHalf = false;
         }
 
         public ProcessResult Process(Input input, Graphics g, UserChoice uc, TakeOver takeOver)
@@ -234,9 +242,9 @@ namespace WPFBlockCrash
                 g.DrawImage(gh[(int)BlockColor + ItemHandleOffset], CenterX - Width / 2, CenterY - Height / 2, Width, Height);
                 DrawUtil.Debug_DrawBlockRectangle(g, CenterX - Width / 2, CenterY - Height / 2, Width, Height);
             }
-            else if (ItemFlag)
+            else if (IsItem)
             {
-                if (half)
+                if (IsHalf)
                 {
                     if (IsMirroring)
                     {
@@ -259,38 +267,41 @@ namespace WPFBlockCrash
                     DrawUtil.Debug_DrawBlockRectangle(g, CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
                 }
             }
-#if !DEBUG
             else 
             {
-                //ブロックが徐々に消える描画処理
-                if (count < 20)
-                {
-                    float opacity = (255f / 40) * (20 - count) / byte.MaxValue;
-
-                    if (IsMirroring)
-                    {
-                        if (WasItem)
-                            g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollCount - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
-                        else
-                            g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollCount - Width, CenterY - Height / 2, Width, Height);
-                    }
-
-                    if (WasItem)
-                        g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
-                    else
-                        g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), CenterX - Width / 2, CenterY - Height / 2, Width, Height);
-
-                    ++count;
-                }
+                DrawVanishingGradually(g);
             }
-#endif
+        }
+
+        private void DrawVanishingGradually(Graphics g)
+        {
+            //ブロックが徐々に消える描画処理
+            if (vanishingCount < 20)
+            {
+                float opacity = (255f / 40) * (20 - vanishingCount) / byte.MaxValue;
+
+                if (IsMirroring)
+                {
+                    if (WasItem)
+                        g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), scrollCount - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
+                    else
+                        g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), scrollCount - Width, CenterY - Height / 2, Width, Height);
+                }
+
+                if (WasItem)
+                    g.DrawImage(DrawUtil.SetOpacity(itemgh[(int)ItemType], opacity), CenterX - ItemWidth / 2, CenterY - ItemHeight / 2, ItemWidth, ItemHeight);
+                else
+                    g.DrawImage(DrawUtil.SetOpacity(gh[(int)BlockColor], opacity), CenterX - Width / 2, CenterY - Height / 2, Width, Height);
+
+                ++vanishingCount;
+            }
         }
 
         private void CalculatePosition()
         {
-            if (!scrollStop) // スクロールストップフラグが立ってたらストップ
+            if (IsScrolling) // スクロールストップフラグが立ってたらストップ
             {
-                if (ScrollDirection == 1)// 右スクロール
+                if (ScrollVector == 1)// 右スクロール
                 {
                     CenterX += (int)Main.RunningSpeedFactor;
                     
@@ -308,7 +319,7 @@ namespace WPFBlockCrash
                     }
                 }
 
-                if (ScrollDirection == -1)// 左スクロール
+                if (ScrollVector == -1)// 左スクロール
                 {
                     CenterX -= (int)Main.RunningSpeedFactor;
                     

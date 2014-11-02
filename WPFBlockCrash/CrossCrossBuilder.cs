@@ -43,9 +43,11 @@ namespace WPFBlockCrash
                     block[i] = new Block(145 + (8 + 180) * (i - 44), 30 * 12 + 15, extendOn, EBlockColor.CYAN);
 
                 if (i % 2 == 0)
-                    block[i].IsScrolling = 1;
+                    block[i].ScrollVector = 1;
                 else
-                    block[i].IsScrolling = -1;
+                    block[i].ScrollVector = -1;
+
+                block[i].IsScrolling = true;
             }
         }
 

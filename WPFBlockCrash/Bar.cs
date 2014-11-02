@@ -36,7 +36,6 @@ namespace WPFBlockCrash
         public int Bottom { get { return CenterY + Height / 2; } }
         public int Left { get { return CenterX - EnlargedWidth / 2; } }
         public int Right { get { return CenterX + EnlargedWidth / 2; } }
-        public int MX { get; set; }
         public bool IsDead { get; set; }
         public bool IsMove { get; set; } // 動いたかどうか
 
@@ -110,8 +109,6 @@ namespace WPFBlockCrash
 
             if (CenterX > dInfo.Width - EnlargedWidth / 2)
                 CenterX = dInfo.Width - EnlargedWidth / 2;
-
-            MX = CenterX;
 
             return IsPushedAnyKey;
         }

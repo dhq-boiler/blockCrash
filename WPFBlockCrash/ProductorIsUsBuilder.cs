@@ -58,8 +58,9 @@ namespace WPFBlockCrash
                 else if (i > 58 && i < 64)
                     block[i] = new Block(550 + 50 * (i - 59), 50 + 28 * 13, extendOn, EBlockColor.PURPLE);
 
-                block[i].HalfFlag = true;
-                block[i].IsScrolling = 1;
+                block[i].IsHalf = true;
+                block[i].ScrollVector = 1;
+                block[i].IsScrolling = true;
             }
         }
 
