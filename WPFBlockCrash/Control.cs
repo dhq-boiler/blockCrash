@@ -854,24 +854,27 @@ namespace WPFBlockCrash
 
 				DrawDebugString_ODX_ODY(g, OverlapDistanceX, OverlapDistanceY);
 
-				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.10)
+				if (Math.Abs(OverlapDistanceX - OverlapDistanceY) < 0.05)
 				{
 					Console.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					Collision.ReflectHorizontal(ball);
 					Collision.ReflectVertical(ball, bar, BarType);
-					if (!ball.IsCaught) ball.PlaySound = true;
+					if (!ball.IsCaught)
+                        ball.PlaySound = true;
 				}
 				else if (OverlapDistanceY > OverlapDistanceX)
 				{
 					Console.WriteLine("RH ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
 					Collision.ReflectHorizontal(ball);
-					if (!ball.IsCaught) ball.PlaySound = true;
+					if (!ball.IsCaught)
+                        ball.PlaySound = true;
 				}
 				else if (OverlapDistanceX > OverlapDistanceY)
 				{
 					Console.WriteLine("RV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
 					Collision.ReflectVertical(ball, bar, BarType);
-					if (!ball.IsCaught) ball.PlaySound = true;
+					if (!ball.IsCaught)
+                        ball.PlaySound = true;
 				}
 				else
 				{
