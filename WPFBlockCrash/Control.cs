@@ -400,7 +400,7 @@ namespace WPFBlockCrash
 		private void UpdateMainBall(Input input, Graphics g)
 		{
 			//発射前のメインボールのX座標
-			if (mainBall.ActCount == 0)
+			if (mainBall.IsCaught)
 			{
 				mainBall.CenterX = bar.CenterX;
 				if (!ReflectEnableByBar)
@@ -410,13 +410,13 @@ namespace WPFBlockCrash
 			mainBall.Process(input, g, null, null);
 
 			//吸着時のメインボールのX座標
-			if (mainBall.IsCatching)
+			if (mainBall.IsCaught)
 			{
 				mainBall.CenterX = bar.CenterX + mainBall.CatchXOffset;
 			}
 
 			// ボールの動き
-			if (!mainBall.IsStop && !mainBall.IsCatching)
+			if (!mainBall.IsStop && !mainBall.IsCaught)
 			{
 				++ballSpeedUpCount;
 
@@ -477,7 +477,7 @@ namespace WPFBlockCrash
 				}
 				else
 				{
-					if (smallBall.IsCatching)// ボールが止まっていれば
+					if (smallBall.IsCaught)// ボールが止まっていれば
 					{
 						//吸着時のスモールボールのX座標
 						smallBall.CenterX = bar.CenterX + smallBall.CatchXOffset;
@@ -859,19 +859,19 @@ namespace WPFBlockCrash
 					Console.WriteLine("RHV ODX: " + OverlapDistanceX + " ODY: " + OverlapDistanceY);
 					Collision.ReflectHorizontal(ball);
 					Collision.ReflectVertical(ball, bar, BarType);
-					if (!ball.IsCatching) ball.PlaySound = true;
+					if (!ball.IsCaught) ball.PlaySound = true;
 				}
 				else if (OverlapDistanceY > OverlapDistanceX)
 				{
 					Console.WriteLine("RH ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
 					Collision.ReflectHorizontal(ball);
-					if (!ball.IsCatching) ball.PlaySound = true;
+					if (!ball.IsCaught) ball.PlaySound = true;
 				}
 				else if (OverlapDistanceX > OverlapDistanceY)
 				{
 					Console.WriteLine("RV ODX: " + OverlapDistanceX.ToString("0.00") + " ODY: " + OverlapDistanceY.ToString("0.00"));
 					Collision.ReflectVertical(ball, bar, BarType);
-					if (!ball.IsCatching) ball.PlaySound = true;
+					if (!ball.IsCaught) ball.PlaySound = true;
 				}
 				else
 				{

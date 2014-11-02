@@ -13,7 +13,6 @@ namespace WPFBlockCrash
         public int CatchXOffset { get; set; }
         public int baccel { get; set; } 
         public int AccelVector { get; set; } // 加速の向き
-        public int ActCount { get; set; }
         public int CenterX { get; set; }
         public int CenterY { get; set; }
         public int Width { get; set; }
@@ -35,7 +34,7 @@ namespace WPFBlockCrash
         public bool IsSmall { get; set; }
         public int IsNewCount { get; set; }
         public bool IsStop { get; set; }
-        public bool IsCatching { get; set; }
+        public bool IsCaught { get; set; }
         public bool IsBounding { get; set; }
 
         public bool NowCrashingBlockOrGettingItem { get; set; }
@@ -65,9 +64,9 @@ namespace WPFBlockCrash
             CenterY = 540 - Height + 2;
             DX = 0;
             DY = 0;
-            ActCount = 0;
             OldY = CenterY;
             IsDead = false;
+            IsCaught = true;
             PlaySound = false;
             Penetrability = EPenetrability.NON_PENETRATING;
             PenetratingCount = 0;
@@ -134,7 +133,7 @@ namespace WPFBlockCrash
         {
             NowCrashingBlockOrGettingItem = false;
 
-            if (ActCount != 0 || IsSmall)
+            if (!IsCaught || IsSmall)
                 Move();
 
             UpdateOverlapping();
@@ -162,7 +161,7 @@ namespace WPFBlockCrash
         {
             if (input.eB)
             {
-                if (ActCount == 0 || IsCatching)
+                if (IsCaught)
                 {
                     if (input.AT)
                     {
@@ -206,8 +205,7 @@ namespace WPFBlockCrash
                                 break;
                         }
                     }
-                    ActCount = 1;
-                    IsCatching = false;
+                    IsCaught = false;
                     bar.IsBallCatch = false;
                 }
             }
@@ -269,7 +267,7 @@ namespace WPFBlockCrash
             OldY = CenterY;
             DX = 0;
             DY = 0;
-            ActCount = 0;
+            IsCaught = true;
             IsDead = false;
             Level -= 5;
             if (Level < 1)
@@ -299,6 +297,7 @@ namespace WPFBlockCrash
         {
             IsSmall = true;
             IsNewCount = 30;
+            IsCaught = false;
 
             double mainBallSpeed = Math.Sqrt(Math.Pow(mainball.DX, 2) + Math.Pow(mainball.DY, 2));
 

@@ -34,7 +34,7 @@ namespace WPFBlockCrash
         {
             if (Main.CatchBallEnables && bar.IsBallCatch)// ボールがバーにくっつく状態
             {
-                ball.IsCatching = true;
+                ball.IsCaught = true;
                 ball.DX = ball.DY = 0;
                 ball.IsStop = true;
                 if (ball.IsStop) // ＋なら右に，ーなら左にずれてる
