@@ -36,7 +36,6 @@ namespace WPFBlockCrash
         public int IsNewCount { get; set; }
         public bool IsStop { get; set; }
         public bool IsCatching { get; set; }
-        public bool IsThrowing { get; set; }
         public bool IsBounding { get; set; }
 
         public bool NowCrashingBlockOrGettingItem { get; set; }
@@ -209,7 +208,7 @@ namespace WPFBlockCrash
                     }
                     ActCount = 1;
                     IsCatching = false;
-                    IsThrowing = true;
+                    bar.IsBallCatch = false;
                 }
             }
         }
