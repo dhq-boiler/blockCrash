@@ -74,9 +74,9 @@ namespace ScrollCrash
 
         #region XMLデータ
 
-        private readonly string data_enter_xml = "xml\\data_enter.xml";
-        private readonly string data_thumb_xml = "xml\\data_thumb.xml";
-        private readonly string settings_xml   = "xml\\settings.xml";
+        private readonly string data_enter_xml = ".\\..\\..\\xml\\data_enter.xml";
+        private readonly string data_thumb_xml = ".\\..\\..\\xml\\data_thumb.xml";
+        private readonly string settings_xml = ".\\..\\..\\xml\\settings.xml";
 
         #endregion
 
