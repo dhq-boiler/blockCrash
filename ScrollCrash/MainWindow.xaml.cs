@@ -398,6 +398,8 @@ namespace ScrollCrash
             EnterButton.MarginLeft = EnterButton.MarginTop = EnterButton.MarginRight = EnterButton.MarginBottom = 10;
             EnterButton.IsEnableLongTouch = false;
             EnterButton.JudgingTimeOut = TimeSpan.FromSeconds(1);
+            // 五十嵐 1行追加
+            EnterButton.ThresholdSD = 10;
 
             this.ScrollBar.ControlName = "Slider";
             this.ScrollBar.Thumb.ControlName = "Thumb";
@@ -416,6 +418,8 @@ namespace ScrollCrash
             ScrollBar.Thumb.JudgingTimeOut = TimeSpan.FromSeconds(1);
             ScrollBar.ScrollAreaColor = Colors.LightBlue;
             ScrollBar.PixelsPerStep = 1;
+            // 五十嵐 1行追加
+            ScrollBar.Thumb.ThresholdSD = 10;
 
             ControlCenter dialog = new ControlCenter();
             dialog.ControlCenterVM.Add(this.EnterButton);
@@ -436,7 +440,7 @@ namespace ScrollCrash
             timerToPreview.Start();
         }
 
-        private static void LoadParameters(string filename, WPFTouchButton touchButton)
+        private static void LoadParameters(string filename, WPFTouchButton2 touchButton)
         {
             try
             {
@@ -486,7 +490,7 @@ namespace ScrollCrash
             }
         }
 
-        private static void SaveParameters(string filename, WPFTouchButton touchButton)
+        private static void SaveParameters(string filename, WPFTouchButton2 touchButton)
         {
             try
             {

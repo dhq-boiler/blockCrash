@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <WPFTouchButtonData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <ThresholdCheck>0.10</ThresholdCheck>
-  <ThresholdDifferentPixel>15</ThresholdDifferentPixel>
-  <ThresholdTouch>0.10</ThresholdTouch>
-  <ThresholdUnderAsShadow1ch>50</ThresholdUnderAsShadow1ch>
+  <ThresholdDifferentPixel>45</ThresholdDifferentPixel>
+  <ThresholdTouch>0.13</ThresholdTouch>
+  <ThresholdUnderAsShadow1ch>20</ThresholdUnderAsShadow1ch>
 </WPFTouchButtonData>

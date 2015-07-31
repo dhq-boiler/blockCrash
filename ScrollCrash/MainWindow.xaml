@@ -70,7 +70,7 @@
                 <RowDefinition Height="600" />
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            <libts:WPFTouchButton x:Name="EnterButton"
+            <libts:WPFTouchButton2 x:Name="EnterButton"
                                   Grid.Column="0"
                                   Grid.Row="1"
                                   Width="150"
