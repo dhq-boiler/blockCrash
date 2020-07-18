@@ -1,5 +1,12 @@
 # BlockCrash ブロック崩しゲーム
 
+## 遊び方
+
+BlockCrashGUI.exeを実行する．
+
+Enterボタンで決定．
+←、→ボタンで選択．
+
 ## ソリューション構成
 
 ### BlockCrashGUI
