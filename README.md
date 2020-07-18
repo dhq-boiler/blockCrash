@@ -4,8 +4,11 @@
 
 BlockCrashGUI.exeを実行する．
 
-Enterボタンで決定．
-←、→ボタンで選択．
+キーボード、VIRTOS共通：Enterボタンで決定．
+
+キーボード：←、→ボタンで選択．
+
+VIRTOS： Sliderにより←、→の操作．
 
 ## ソリューション構成
 
