@@ -1,19 +1,28 @@
 # BlockCrash ブロック崩しゲーム
 
-##ソリューション構成
+## ソリューション構成
 
 ### BlockCrashGUI
+
 BlockCrash のGUI版．キーボードによる操作．
-###DebugLBC
+
+### DebugLBC
+
 使用していない．
-###libBlockCrash
+
+### libBlockCrash
+
 使用していない．
-###ScrollCrash
+
+### ScrollCrash
+
 VIRTOS 版．VIRTOS TouchButton および Slider による操作．
-###WPFBlockCrash
+
+### WPFBlockCrash
+
 BlockCrash ゲームエンジンおよびゲーム画面を描画するユーザコントロールを含む，C#ライブラリ．
 
-##使用上の注意
+## 使用上の注意
 
 * Windows 8.1 では使用するマシンのディスプレイ設定によってBlockCrashゲーム画面の描画が乱れる恐れがあります．次に従って，拡大率を100%にしてください．
 
